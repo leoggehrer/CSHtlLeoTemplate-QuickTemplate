@@ -1,0 +1,79 @@
+﻿@*@BaseCode*@
+@model IEnumerable<QuickTemplate.AspMvc.Models.ModelObject>
+
+@{
+    var title = "Index";
+    var image = (string)(ViewBag.Image ?? "banner.jpg");
+    var pageSize = (int)(ViewBag.PageSize ?? 0);
+    var modelCount = (int)(ViewBag.ModelCount ?? 0);
+    var canCreate = (bool)(ViewBag.CanCreate ?? true);
+    var infoClass = "btn btn-outline-primary ";
+    var infoTitle = $"{modelCount} records";
+    var type = Model.GetType();
+    var filter = ViewBag.Filter as QuickTemplate.AspMvc.Models.View.IFilterModel;
+
+    if (type != null)
+    {
+        if (type.IsArray)
+        {
+            title = type.GetElementType()!.Name;
+        }
+        else
+        {
+            title = type.GetGenericArguments()[0].Name;
+        }
+    }
+    ViewData["Title"] = title;
+    if (modelCount > pageSize)
+    {
+        infoClass = "btn btn-outline-danger ";
+        infoTitle = $"Only {modelCount} records are displayed!";
+    }
+}
+
+<img class="card-img-top" src="@($"/img/{image}")" style="margin-top: -20px; margin-bottom: -50px" alt="Banner">
+<h1>@title</h1>
+
+@if (filter != null && filter.Show)
+{
+    <div class="row" style="margin: 1em 0em 1em 0em;">
+        <div class="btn-group" role="group" aria-label="Basic outlined filter">
+            <button type="button" class="@infoClass" data-bs-toggle="collapse" data-bs-target="#collapseInfo" aria-expanded="false" aria-controls="collapseInfo" title="@infoTitle"><i class="fa fa-info"></i></button>
+            @if (canCreate)
+            {
+                <a asp-action="Create" class="btn btn-outline-success" title="Add item"><i class="fa fa-plus"></i></a>
+            }
+            <button type="button" class="btn btn-outline-secondary col-md-10" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter" title="Clear filter">@filter.ToString()</button>
+            <a asp-action="Clear" class="btn btn-outline-primary" title="Clear filter"><i class="fa fa-trash"></i></a>
+            <button type="button" class="btn btn-outline-primary " data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter" title="Open filter"><i class="fa fa-filter"></i></button>
+        </div>
+    </div>
+
+    <div class="collapse" id="collapseInfo" style="margin: 5px;">
+        <div class="card card-body">
+            @await Html.PartialAsync("_Info", filter)
+        </div>
+    </div>
+
+    <div class="collapse" id="collapseFilter" style="margin: 5px;">
+        <div class="card card-body">
+            @await Html.PartialAsync("_Filter", filter)
+        </div>
+    </div>
+}
+else if (canCreate)
+{
+    <p>
+        <a asp-action="Create" class="btn btn-outline-success" title="Add item"><i class="fa fa-plus"></i></a>
+    </p>
+}
+
+<table class="table table-hover">
+    @await Html.PartialAsync("_TableHeader", Model)
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @await Html.PartialAsync("_TableRow", item)
+        }
+    </tbody>
+</table>

@@ -1,0 +1,68 @@
+@*@BaseCode*@
+@*#if ACCOUNT_ON*@@*
+@{
+    @using Microsoft.AspNetCore.Mvc.Rendering
+    @using QuickTemplate.AspMvc.Models.View
+    @using QuickTemplate.AspMvc.Modules.Session
+    @model QuickTemplate.AspMvc.Models.Account.IdentityCreate
+
+    var sessionWrapper = new SessionWrapper(Context.Session);
+    var controller = ViewContext.RouteData?.Values["controller"]?.ToString() ?? string.Empty;
+    var action = ViewContext.RouteData?.Values["action"]?.ToString() ?? string.Empty;
+    ViewData["Title"] = "Create";
+
+    <img class="card-img-top" src="/img/banner.jpg" style="margin-top: -20px; margin-bottom: -50px" alt="Banner">
+    <h1>Create</h1>
+
+    <div class="d-flex bg-transparent">
+        <div class="p-sm-2 mr-auto">
+            <h4>@(controller)</h4>
+        </div>
+    </div>
+    <hr />
+
+    @if (string.IsNullOrEmpty(ViewBag.Error) == false)
+    {
+        <div class="alert alert-danger" role="alert">
+            @ViewBag.Error
+        </div>
+    }
+
+    <form asp-action="CreateIdentity" method="post">
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="TimeOutInMinutes" class="control-label"></label>
+                    <input asp-for="TimeOutInMinutes" class="form-control" />
+                    <span asp-validation-for="TimeOutInMinutes" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">@(nameof(Model.Password))</label>
+                    <input asp-for="Password" class="form-control" type="password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">@(nameof(Model.ConfirmPassword))</label>
+                    <input asp-for="ConfirmPassword" class="form-control" type="password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <p></p>
+        @await Html.PartialAsync("_SubmitBack", new SubmitBackCmd() { SubmitText = "Create" })
+    </form>
+}
+*@@*#endif*@

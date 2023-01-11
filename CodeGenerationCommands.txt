@@ -1,0 +1,30 @@
+UnitType:		Logic|WebApi|AspMvc
+ItemType:		DbContext|Model|AccessContract|Controller|ServiceContract|Service|Facade|Factory
+ItemName:		All|App.Record|...
+SettingName:	ControllerGenericType|Visibility|Generate|Attributes|CopyProperty
+SettingValue:	public|False|True|System.Text.Json.Serialization.JsonIgnore|...
+
+For example:
+------------
+UnitType;ItemType;ItemName;SettingName;SettingValue
+Logic;DbContext;All;Generate;True
+Logic;Model;All;Generate;False
+Logic;AccessContract;All;Generate;True
+Logic;Controller;All;Generate;True
+Logic;ServiceContract;All;Generate;False
+Logic;Service;All;Generate;True
+Logic;Facade;All;Generate;False
+Logic;Factory;All;Generate;True
+
+WebApi;Model;All;Generate;True
+WebApi;Controller;All;Generate;True
+WebApi;AddServices;All;Generate;True
+
+AspMvc;Model;All;Generate;True
+AspMvc;Controller;All;Generate;True
+AspMvc;Service;All;Generate;True
+AspMvc;View;All;Generate;True
+AspMvc;AddServices;All;Generate;True
+
+WebApi;Property;App.EntityType.EntityTypeId;Attributes;System.Text.Json.Serialization.JsonIgnore
+AspMvc;Property;App.ColumnInfoFilter.EntityTypeId;Generate;False

@@ -1,0 +1,25 @@
+@*@BaseCode*@
+@*#if ACCOUNT_ON*@@*
+@model QuickTemplate.AspMvc.Models.Account.IdentityUser
+
+<dl class="row">
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.IdentityEmail)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.IdentityEmail)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.FirstName)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.FirstName)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.LastName)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.LastName)
+    </dd>
+</dl>
+*@@*#endif*@

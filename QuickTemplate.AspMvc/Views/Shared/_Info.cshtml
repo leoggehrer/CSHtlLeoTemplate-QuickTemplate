@@ -1,0 +1,19 @@
+@*@BaseCode*@
+@{
+    var info = string.Empty;
+    var pageSize = (int)(ViewBag.PageSize ?? 0);
+    var modelCount = (int)(ViewBag.ModelCount ?? 0);
+}
+
+@if (modelCount > pageSize)
+{
+    <div class="alert alert-danger" role="alert">
+        There are more records [@modelCount] than are displayed [@pageSize]. Please limit the number of data records with the filter.
+    </div>
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        @modelCount data records are displayed. A maximum of @pageSize data sets can be displayed.
+    </div>
+}

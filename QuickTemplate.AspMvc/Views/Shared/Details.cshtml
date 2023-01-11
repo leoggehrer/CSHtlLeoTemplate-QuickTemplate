@@ -1,0 +1,29 @@
+﻿@*@BaseCode*@
+@model QuickTemplate.AspMvc.Models.ModelObject
+
+@{
+    var image = (string)(ViewBag.Image ?? "banner.jpg");
+    var canEdit = (bool)(ViewBag.CanEdit ?? true);
+
+    ViewData["Title"] = "Details";
+}
+
+<img class="card-img-top" src="@($"/img/{image}")" style="margin-top: -20px; margin-bottom: -50px" alt="Banner">
+<h1>Details</h1>
+<h3>@Model.GetType().Name</h3>
+<hr />
+<div>
+    @await Html.PartialAsync("_DisplayModel", Model)
+</div>
+
+<div class="d-flex bg-transparent">
+    @if (canEdit)
+    {
+        <div class="p-sm-2">
+            @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class="btn btn-outline-primary" ,@style="min-width: 8em;"})
+        </div>
+    }
+    <div class="p-sm-2" style="margin-left: 0.2em">
+        <a class="btn btn-outline-secondary" style="min-width: 8em;" asp-action="Index">Back to List</a>
+    </div>
+</div>

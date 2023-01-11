@@ -1,0 +1,65 @@
+@*@BaseCode*@
+@*#if ACCOUNT_ON*@@*
+@model QuickTemplate.AspMvc.Models.Account.Identity
+
+<style>
+    .row {
+        margin-top: 2px;
+        margin-bottom: 2px;
+    }
+
+    h3 {
+        margin-top: 20px;
+    }
+</style>
+
+<dl class="row">
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Guid)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.Guid)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Name)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.Name)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Email)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.Email)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.TimeOutInMinutes)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.TimeOutInMinutes)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.AccessFailedCount)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.AccessFailedCount)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.State)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.State)
+    </dd>
+</dl>
+
+<h3>Access roles</h3>
+<hr />
+@foreach (var item in Model.IdentityRoles.OrderBy(e => e.Designation))
+{
+    <div class="btn-group" style="margin-bottom: 10px; margin-right: 10px;">
+        <a href="#" class="btn btn-outline-primary"><i class="fa-solid fa-hand-point-right"></i></a>
+        <a href="#" class="btn btn-outline-primary">@item.Designation</a>
+    </div>
+}
+
+*@@*#endif*@

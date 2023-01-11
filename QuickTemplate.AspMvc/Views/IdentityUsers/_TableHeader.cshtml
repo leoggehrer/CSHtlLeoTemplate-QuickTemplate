@@ -1,0 +1,43 @@
+@*@BaseCode*@
+@*#if ACCOUNT_ON*@@*
+@model IEnumerable<QuickTemplate.AspMvc.Models.Account.IdentityUser>
+@{
+    var orderBy = (string)ViewBag.OrderBy ?? string.Empty;
+}
+<thead>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.IdentityEmail)
+        </th>
+        <th>
+            @if (orderBy.StartsWith("Firstname") && orderBy.EndsWith("ASC"))
+            {
+                <a asp-action="OrderBy" asp-route-orderBy="Firstname DESC" class="btn btn-outline"><strong>Firstname</strong> <i class="fa fa-sort-desc"></i></a>
+            }
+            else if (orderBy.StartsWith("Firstname") && orderBy.EndsWith("DESC"))
+            {
+                <a asp-action="OrderBy" asp-route-orderBy="" class="btn btn-outline"><strong>Firstname</strong> <i class="fa fa-sort-asc"></i></a>
+            }
+            else
+            {
+                <a asp-action="OrderBy" asp-route-orderBy="Firstname ASC" class="btn btn-outline"><strong>Firstname</strong></a>
+            }
+        </th>
+        <th>
+            @if (orderBy.StartsWith("Lastname") && orderBy.EndsWith("ASC"))
+            {
+                <a asp-action="OrderBy" asp-route-orderBy="Lastname DESC" class="btn btn-outline"><strong>Lastname</strong> <i class="fa fa-sort-desc"></i></a>
+            }
+            else if (orderBy.StartsWith("Lastname") && orderBy.EndsWith("DESC"))
+            {
+                <a asp-action="OrderBy" asp-route-orderBy="" class="btn btn-outline"><strong>Lastname</strong> <i class="fa fa-sort-asc"></i></a>
+            }
+            else
+            {
+                <a asp-action="OrderBy" asp-route-orderBy="Lastname ASC" class="btn btn-outline"><strong>Lastname</strong></a>
+            }
+        </th>
+        <th></th>
+    </tr>
+</thead>
+*@@*#endif*@

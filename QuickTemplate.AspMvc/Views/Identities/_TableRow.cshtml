@@ -1,0 +1,27 @@
+@*@BaseCode*@
+@*#if ACCOUNT_ON*@@*
+@model QuickTemplate.AspMvc.Models.Account.Identity
+
+<tr>
+    <td>
+        @Html.DisplayFor(model => model.Name)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.Email)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.TimeOutInMinutes)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.AccessFailedCount)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.State)
+    </td>
+    <td>
+        @Html.ActionLink("Edit", "Edit", new { id=Model.Id }) |
+        @Html.ActionLink("Details", "Details", new { id=Model.Id }) |
+        @Html.ActionLink("Delete", "Delete", new { id=Model.Id })
+    </td>
+</tr>
+*@@*#endif*@

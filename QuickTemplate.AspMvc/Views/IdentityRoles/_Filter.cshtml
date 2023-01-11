@@ -1,0 +1,28 @@
+@*@BaseCode*@
+@*#if ACCOUNT_ON*@@*
+@model QuickTemplate.AspMvc.Models.Account.IdentityRoleFilter
+@{
+    var boolSelect = new SelectList(new[] { new { Id = "", Value = "---" }, new { Id = "True", Value = "True" }, new { Id = "False", Value = "False" } }, "Id", "Value");
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Filter">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Designation" class="control-label"></label>
+                <input asp-for="Designation" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+            </div>
+            <p></p>
+            <div class="form-group">
+                <input type="submit" value="Apply" class="btn btn-primary" style="min-width: 100px;" />
+                @Html.ActionLink("Clear", "Clear", null, null, new { @class="btn btn-outline-success", @style="min-width: 100px;" })
+            </div>
+        </form>
+    </div>
+</div>
+*@@*#endif*@

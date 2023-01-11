@@ -1,0 +1,75 @@
+@*@BaseCode*@
+@*#if ACCESSRULES_ON*@@*
+@model QuickTemplate.AspMvc.Models.Access.AccessRuleFilter
+
+@{
+  var boolSelect = new SelectList(new[] { new { Id = "", Value = "---" }, new { Id = "True", Value = "True" }, new { Id = "False", Value = "False" } }, "Id", "Value");
+}
+
+<div class="row">
+ <div class="col-md-4">
+  <form asp-action="Filter">
+   <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+   <div class="form-group">
+    <label asp-for="Type" class="control-label"></label>
+   @{
+    var valuesType = new SelectListItem[]{ new SelectListItem() }.Union(Enum.GetValues(typeof(QuickTemplate.Logic.Modules.Access.RuleType)).Cast<QuickTemplate.Logic.Modules.Access.RuleType>().Select(e => new SelectListItem(e.ToString(), e.ToString())));
+   }
+   @Html.DropDownListFor(m => m.Type, valuesType, null, new { @class = "form-select" })
+   </div>
+   <div class="form-group">
+    <label asp-for="EntityType" class="control-label"></label>
+    <input asp-for="EntityType" class="form-control" />
+   </div>
+   <div class="form-group">
+    <label asp-for="RelationshipEntityType" class="control-label"></label>
+    <input asp-for="RelationshipEntityType" class="form-control" />
+   </div>
+   <div class="form-group">
+    <label asp-for="PropertyName" class="control-label"></label>
+    <input asp-for="PropertyName" class="form-control" />
+   </div>
+   <div class="form-group">
+    <label asp-for="EntityValue" class="control-label"></label>
+    <input asp-for="EntityValue" class="form-control" />
+   </div>
+   <div class="form-group">
+    <label asp-for="AccessType" class="control-label"></label>
+   @{
+    var valuesAccessType = new SelectListItem[]{ new SelectListItem() }.Union(Enum.GetValues(typeof(QuickTemplate.Logic.Modules.Access.AccessType)).Cast<QuickTemplate.Logic.Modules.Access.AccessType>().Select(e => new SelectListItem(e.ToString(), e.ToString())));
+   }
+   @Html.DropDownListFor(m => m.AccessType, valuesAccessType, null, new { @class = "form-select" })
+   </div>
+   <div class="form-group">
+    <label asp-for="AccessValue" class="control-label"></label>
+    <input asp-for="AccessValue" class="form-control" />
+   </div>
+   <div class="form-group">
+    <label asp-for="Creatable" class="control-label"></label>
+    @Html.DropDownListFor(model => model.Creatable, boolSelect, new { @class = "form-select" })
+   </div>
+   <div class="form-group">
+    <label asp-for="Readable" class="control-label"></label>
+    @Html.DropDownListFor(model => model.Readable, boolSelect, new { @class = "form-select" })
+   </div>
+   <div class="form-group">
+    <label asp-for="Updatable" class="control-label"></label>
+    @Html.DropDownListFor(model => model.Updatable, boolSelect, new { @class = "form-select" })
+   </div>
+   <div class="form-group">
+    <label asp-for="Deletable" class="control-label"></label>
+    @Html.DropDownListFor(model => model.Deletable, boolSelect, new { @class = "form-select" })
+   </div>
+   <div class="form-group">
+    <label asp-for="Viewable" class="control-label"></label>
+    @Html.DropDownListFor(model => model.Viewable, boolSelect, new { @class = "form-select" })
+   </div>
+   <p></p>
+   <div class="form-group">
+    <input type="submit" value="Apply" class="btn btn-primary" style="min-width: 100px;" />
+    @Html.ActionLink("Clear", "Clear", null, null, new { @class="btn btn-outline-success", @style="min-width: 100px;" })
+   </div>
+  </form>
+ </div>
+</div>
+*@@*#endif*@

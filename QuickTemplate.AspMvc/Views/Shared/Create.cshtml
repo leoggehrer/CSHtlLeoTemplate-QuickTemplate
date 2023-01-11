@@ -1,0 +1,34 @@
+﻿@*@BaseCode*@
+@model QuickTemplate.AspMvc.Models.ModelObject
+
+@{
+    var image = (string)(ViewBag.Image ?? "banner.jpg");
+
+    ViewData["Title"] = "Create";
+}
+
+<img class="card-img-top" src="@($"/img/{image}")" style="margin-top: -20px; margin-bottom: -50px" alt="Banner">
+<h1>Create</h1>
+<h3>@Model!.GetType().Name</h3>
+<hr />
+
+@if (string.IsNullOrEmpty(ViewBag.Error) == false)
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewBag.Error
+    </div>
+}
+
+<form asp-action="Create">
+    @await Html.PartialAsync("_EditModel", Model)
+    <p></p>
+    <div class="form-group">
+        @await Html.PartialAsync("_SubmitBack", new QuickTemplate.AspMvc.Models.View.SubmitBackCmd() { SubmitAction="Create" })
+    </div>
+</form>
+
+@section Scripts {
+    @{
+    //await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
