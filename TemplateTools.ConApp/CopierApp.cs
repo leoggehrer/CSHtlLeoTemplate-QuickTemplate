@@ -1,6 +1,5 @@
 ﻿//@BaseCode
 //MdStart
-using System;
 using TemplateTooles.ConApp;
 
 namespace TemplateTools.ConApp

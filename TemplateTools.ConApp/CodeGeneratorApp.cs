@@ -15,6 +15,7 @@ namespace TemplateTools.ConApp
         static CodeGeneratorApp()
         {
             ClassConstructing();
+            ToGroupFile = false;
             SolutionPath = Program.GetCurrentSolutionPath();
             ClassConstructed();
         }
@@ -23,13 +24,14 @@ namespace TemplateTools.ConApp
         #endregion Class-Constructors
 
         #region Properties
+        private static bool ToGroupFile { get; set; }
         private static string SolutionPath { get; set; }
         #endregion Properties
 
         #region Console methods
         public static void RunApp()
         {
-            var toGroupFile = false;
+            var toGroupFile = ToGroupFile;
             var input = string.Empty;
             var saveForeColor = Console.ForegroundColor;
             

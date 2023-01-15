@@ -1,4 +1,4 @@
-//@BaseCode
+﻿//@BaseCode
 //MdStart
 #if ACCOUNT_ON && ACCESSRULES_ON
 namespace QuickTemplate.WebApi.Controllers.Access

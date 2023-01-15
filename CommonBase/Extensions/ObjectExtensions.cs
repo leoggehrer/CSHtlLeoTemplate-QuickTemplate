@@ -200,7 +200,7 @@ namespace CommonBase.Extensions
                 if (sourcePropertyInfos.TryGetValue(mapping(propertyItemTarget.Value.PropertyInfo.Name), out var propertyItemSource))
                 {
                     if (propertyItemSource.PropertyInfo.PropertyType == propertyItemTarget.Value.PropertyInfo.PropertyType
-                        && ((propertyItemSource.CanReadAndIsPublic && propertyItemTarget.Value.CanWriteAndIsPublic)
+                        && ((propertyItemSource.CanReadAndIsPublic && propertyItemTarget.Value.CanWrite)
                             || (propertyItemSource.DeclaringType == propertyItemTarget.Value.DeclaringType && propertyItemSource.CanRead && propertyItemTarget.Value.CanWrite))
                         && (filter(propertyItemTarget.Value.PropertyInfo.Name)))
                     {

@@ -1,4 +1,4 @@
-//@BaseCode
+﻿//@BaseCode
 //MdStart
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuickTemplate.Logic.Contracts;

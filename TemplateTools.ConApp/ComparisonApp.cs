@@ -13,8 +13,8 @@ namespace TemplateTools.ConApp
             SourcePath = Program.SourcePath;
             TargetPaths = Array.Empty<string>();
             AddTargetPaths = Array.Empty<string>();
-            SourceLabels = new string[] { StaticLiterals.BaseCodeLabel };
-            TargetLabels = new string[] { StaticLiterals.CodeCopyLabel };
+            SourceLabels = new string[] { StaticLiterals.BaseCodeLabel, StaticLiterals.BaseCodeLabel };
+            TargetLabels = new string[] { StaticLiterals.CodeCopyLabel, StaticLiterals.BaseCodeLabel };
             ClassConstructed();
         }
         static partial void ClassConstructing();
@@ -148,7 +148,7 @@ namespace TemplateTools.ConApp
         {
             var sourcePathExists = Directory.Exists(sourcePath);
 
-            if (sourcePathExists)
+            if (sourcePathExists && sourceLabels.Length == targetLabels.Length)
             {
                 var targetPathsExists = new List<string>();
 
@@ -159,35 +159,41 @@ namespace TemplateTools.ConApp
                         targetPathsExists.Add(item);
                     }
                 }
-                // Delete all target labeled files
-                foreach (var targetPath in targetPathsExists)
+                for (int i = 0; i < sourceLabels.Length; i++)
                 {
-                    foreach (var searchPattern in SearchPatterns)
-                    {
-                        var targetCodeFiles = GetSourceCodeFiles(targetPath, searchPattern, targetLabels);
+                    var targetLabel = targetLabels[i];
+                    var sourceLabel = sourceLabels[i];
 
-                        foreach (var targetCodeFile in targetCodeFiles)
-                        {
-                            File.Delete(targetCodeFile);
-                        }
-                    }
-                }
-                // Copy all source labeled files
-                foreach (var searchPattern in SearchPatterns)
-                {
-                    var sourceCodeFiles = GetSourceCodeFiles(sourcePath, searchPattern, sourceLabels);
-
+                    // Delete all target labeled files
                     foreach (var targetPath in targetPathsExists)
                     {
-                        foreach (var sourceCodeFile in sourceCodeFiles)
+                        foreach (var searchPattern in SearchPatterns)
                         {
-                            SynchronizeSourceCodeFile(sourcePath, sourceCodeFile, targetPath, sourceLabels, targetLabels);
+                            var targetCodeFiles = GetSourceCodeFiles(targetPath, searchPattern, targetLabel);
+
+                            foreach (var targetCodeFile in targetCodeFiles)
+                            {
+                                File.Delete(targetCodeFile);
+                            }
+                        }
+                    }
+                    // Copy all source labeled files
+                    foreach (var searchPattern in SearchPatterns)
+                    {
+                        var sourceCodeFiles = GetSourceCodeFiles(sourcePath, searchPattern, sourceLabel);
+
+                        foreach (var targetPath in targetPathsExists)
+                        {
+                            foreach (var sourceCodeFile in sourceCodeFiles)
+                            {
+                                SynchronizeSourceCodeFile(sourcePath, sourceCodeFile, targetPath, sourceLabel, targetLabel);
+                            }
                         }
                     }
                 }
             }
         }
-        private static bool SynchronizeSourceCodeFile(string sourcePath, string sourceFilePath, string targetPath, string[] sourceLabels, string[] targetLabels)
+        private static bool SynchronizeSourceCodeFile(string sourcePath, string sourceFilePath, string targetPath, string sourceLabel, string targetLabel)
         {
             var result = false;
             var canCopy = true;
@@ -216,7 +222,7 @@ namespace TemplateTools.ConApp
                     var lines = File.ReadAllLines(targetFilePath, Encoding.Default);
 
                     canCopy = false;
-                    if (lines.Any() && targetLabels.Any(l => lines.First().Contains(l)))
+                    if (lines.Any() && lines.First().Contains(targetLabel))
                     {
                         canCopy = true;
                     }
@@ -230,9 +236,7 @@ namespace TemplateTools.ConApp
 
                     if (srcFirst != null)
                     {
-                        var label = sourceLabels.FirstOrDefault(l => srcFirst.Contains(l));
-
-                        cpyLines.Add(srcFirst.Replace(label ?? string.Empty, StaticLiterals.CodeCopyLabel));
+                        cpyLines.Add(srcFirst.Replace(sourceLabel, targetLabel));
                     }
                     cpyLines.AddRange(File.ReadAllLines(sourceFilePath, Encoding.Default)
                                        .Skip(1)
@@ -242,7 +246,7 @@ namespace TemplateTools.ConApp
             }
             return result;
         }
-        private static IEnumerable<string> GetSourceCodeFiles(string path, string searchPattern, string[] labels)
+        private static IEnumerable<string> GetSourceCodeFiles(string path, string searchPattern, string label)
         {
             var result = new List<string>();
             var files = Directory.GetFiles(path, searchPattern, SearchOption.AllDirectories)
@@ -253,7 +257,7 @@ namespace TemplateTools.ConApp
             {
                 var lines = File.ReadAllLines(file, Encoding.Default);
 
-                if (lines.Any() && labels.Any(l => lines.First().Contains(l)))
+                if (lines.Any() && lines.First().Contains(label))
                 {
                     result.Add(file);
                 }

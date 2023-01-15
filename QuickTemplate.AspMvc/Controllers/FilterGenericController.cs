@@ -1,4 +1,4 @@
-//@BaseCode
+﻿//@BaseCode
 //MdStart
 namespace QuickTemplate.AspMvc.Controllers
 {

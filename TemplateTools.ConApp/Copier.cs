@@ -275,7 +275,7 @@ namespace TemplateTooles.ConApp
             var targetText = new StringBuilder();
             var targetLines = new List<string>();
             var sourceText = File.ReadAllText(solutionSourceFilePath, Encoding.Default);
-            var projectTags = sourceText.GetAllTags(new string[] { "Project(", $"EndProject" });
+            var projectTags = sourceText.GetAllTags(new string[] { "Project(", $"EndProject{Environment.NewLine}" });
 
             if (projectTags.Any())
             {

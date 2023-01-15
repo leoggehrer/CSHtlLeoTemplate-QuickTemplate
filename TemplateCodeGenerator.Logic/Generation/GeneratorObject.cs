@@ -1,4 +1,4 @@
-//@BaseCode
+﻿//@BaseCode
 //MdStart
 namespace TemplateCodeGenerator.Logic.Generation
 {
@@ -138,7 +138,7 @@ namespace TemplateCodeGenerator.Logic.Generation
         /// <returns>Teil-Path</returns>
         public static string CreateSubPathFromType(Type type)
         {
-            return CreateSubNamespaceFromType(type).Replace(".", "/");
+            return CreateSubNamespaceFromType(type).Replace(".", Path.DirectorySeparatorChar.ToString());
         }
 
         /// <summary>

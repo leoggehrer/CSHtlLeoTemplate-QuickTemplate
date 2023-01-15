@@ -1,4 +1,4 @@
-//@BaseCode
+﻿//@BaseCode
 //MdStart
 #if ACCOUNT_ON && REVISION_ON
 namespace QuickTemplate.Logic.Models.Revision

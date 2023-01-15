@@ -16,13 +16,27 @@ namespace CommonBase.Modules.Collection
         public DelegateList(List<TInnerModel> list)
         {
             _innerlist = list;
+            _toOutModel = ToOutModel;
+            _toInnerModel = ToInnerModel;
+        }
+
+        public DelegateList(List<TInnerModel> innerlist, Func<TInnerModel, TOutModel> toOutModel)
+            : this(innerlist)
+        {
+            _toOutModel = toOutModel;
+        }
+        public DelegateList(List<TInnerModel> innerlist, Func<TInnerModel, TOutModel> toOutModel, Func<TOutModel, TInnerModel> toInnerModel) 
+            : this(innerlist)
+        {
+            _toOutModel = toOutModel;
+            _toInnerModel = toInnerModel;
         }
 
         #region Implement IList<>
         public TOutModel this[int index] 
         {
-            get => ToOutModel(_innerlist[index]);
-            set => _innerlist[index].CopyFrom(value);
+            get => _toOutModel(_innerlist[index]);
+            set => _innerlist[index] = _toInnerModel(value);
         }
 
         public int Count => _innerlist.Count;
@@ -30,7 +44,7 @@ namespace CommonBase.Modules.Collection
 
         public void Add(TOutModel item)
         {
-            _innerlist.Add(ToInnerModel(item));
+            _innerlist.Add(_toInnerModel(item));
         }
 
         public void Clear()
@@ -40,7 +54,7 @@ namespace CommonBase.Modules.Collection
 
         public bool Contains(TOutModel item)
         {
-            return _innerlist.Contains(ToInnerModel(item));
+            return _innerlist.Contains(_toInnerModel(item));
         }
 
         public void CopyTo(TOutModel[] array, int arrayIndex)
@@ -51,34 +65,30 @@ namespace CommonBase.Modules.Collection
 
             for (int i = 0; i < array.Length; i++)
             {
-                array[i] = ToOutModel(innerArray[i]);
+                array[i] = _toOutModel(innerArray[i]);
             }
         }
 
         public IEnumerator<TOutModel> GetEnumerator()
         {
-            return new DelegateEnumerator<TOutModel, TInnerModel>(_innerlist.GetEnumerator());
+            return new DelegateEnumerator<TOutModel, TInnerModel>(_innerlist.GetEnumerator(), _toOutModel);
         }
 
         public int IndexOf(TOutModel item)
         {
-            var innerModel = ToInnerModel(item);
+            var innerModel = _toInnerModel(item);
 
             return _innerlist.IndexOf(innerModel);
         }
 
         public void Insert(int index, TOutModel item)
         {
-            var innerModel = ToInnerModel(item);
-
-            _innerlist.Insert(index, innerModel);
+            _innerlist.Insert(index, _toInnerModel(item));
         }
 
         public bool Remove(TOutModel item)
         {
-            var innerModel = ToInnerModel(item);
-
-            return _innerlist.Remove(innerModel);
+            return _innerlist.Remove(_toInnerModel(item));
         }
 
         public void RemoveAt(int index)
@@ -88,33 +98,34 @@ namespace CommonBase.Modules.Collection
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return GetEnumerator();
         }
         #endregion Implement IList<>
 
         #region Implement enumerator
-        private class DelegateEnumerator<TModel, TOtherModel> : IEnumerator<TModel>
-            where TModel : class, new()
+        private class DelegateEnumerator<TOut, TInner> : IEnumerator<TOut>
+            where TOut : class, new()
         {
-            private IEnumerator<TOtherModel> _enumerator;
-            public TModel Current
+            private IEnumerator<TInner> _enumerator;
+            public TOut Current
             {
                 get
                 {
-                    var result = new TModel();
+                    var result = default(TOut);
 
                     if (_enumerator.Current != null)
                     {
-                        result.CopyFrom(_enumerator.Current);
+                        result = _toOut(_enumerator.Current);
                     }
-                    return result;
+                    return result ?? new TOut();
                 }
             }
             object IEnumerator.Current => Current;
 
-            public DelegateEnumerator(IEnumerator<TOtherModel> enumerator)
+            public DelegateEnumerator(IEnumerator<TInner> enumerator, Func<TInner, TOut> toOut)
             {
                 _enumerator = enumerator;
+                _toOut = toOut;
             }
             public void Dispose()
             {
@@ -130,10 +141,15 @@ namespace CommonBase.Modules.Collection
             {
                 _enumerator.Reset();
             }
+
+            private Func<TInner, TOut> _toOut;
         }
         #endregion Implement enumerator
 
         #region Helper
+        private Func<TInnerModel, TOutModel> _toOutModel;
+        private Func<TOutModel, TInnerModel> _toInnerModel;
+
         protected virtual TOutModel ToOutModel(TInnerModel model)
         {
             var result = new TOutModel();

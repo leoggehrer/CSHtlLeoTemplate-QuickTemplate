@@ -14,6 +14,9 @@ namespace TemplateCodeGenerator.Logic.Preprocessor
             Defines = new string[]
             {
                 "ACCOUNT_OFF",
+                "ACCESSRULES_ON",
+                "LOGGING_OFF",
+                "REVISION_OFF",
                 "DBOPERATION_OFF",
                 "ROWVERSION_ON",
                 "GUID_OFF",

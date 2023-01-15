@@ -1,4 +1,4 @@
-//@BaseCode
+﻿//@BaseCode
 //MdStart
 #if ACCOUNT_ON && LOGGING_ON
 namespace QuickTemplate.Logic.Contracts.Logging

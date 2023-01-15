@@ -73,6 +73,7 @@ namespace TemplateCodeGenerator.Logic.Generation
         public IGeneratedItem CreateEnumFromType(Type type)
         {
             var subPath = ConvertFileItem(CreateSubPathFromType(type));
+            var projectPath = Path.Combine(SolutionProperties.SolutionPath, SolutionProperties.AngularAppProjectName);
             var fileName = $"{ConvertFileItem(type.Name)}.{CodeExtension}";
             var result = new Models.GeneratedItem(Common.UnitType.Angular, Common.ItemType.TypeScriptEnum)
             {
@@ -92,6 +93,11 @@ namespace TemplateCodeGenerator.Logic.Generation
             }
 
             result.Add("}");
+
+            result.Source.Insert(result.Source.Count - 1, StaticLiterals.AngularCustomCodeBeginLabel);
+            result.Source.InsertRange(result.Source.Count - 1, ReadCustomCode(projectPath, result));
+            result.Source.Insert(result.Source.Count - 1, StaticLiterals.AngularCustomCodeEndLabel);
+
             result.AddRange(result.Source.Eject().Distinct());
             result.FormatCSharpCode();
             FinishCreateEnum(type, result.Source);
@@ -266,7 +272,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             {
                 result.AddRange(FileHandler.ReadAngularCustomImports(customFilePath));
             }
-            return result;
+            return result.Where(l => string.IsNullOrEmpty(l.Trim()) == false);
         }
         public static IEnumerable<string> ReadCustomCode(string sourcePath, Models.GeneratedItem generatedItem)
         {
@@ -282,7 +288,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             {
                 result.AddRange(FileHandler.ReadAngularCustomCode(customFilePath));
             }
-            return result;
+            return result.Where(l => string.IsNullOrEmpty(l.Trim()) == false);
         }
         public static string ConvertFileItem(string fileItem)
         {
@@ -293,6 +299,10 @@ namespace TemplateCodeGenerator.Logic.Generation
                 if (result.Length == 0)
                 {
                     result.Append(Char.ToLower(item));
+                }
+                else if (item == '\\')
+                {
+                    result.Append('/');
                 }
                 else if (Char.IsUpper(item))
                 {

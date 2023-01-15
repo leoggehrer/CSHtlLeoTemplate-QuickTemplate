@@ -44,7 +44,7 @@ namespace TemplateCodeGenerator.Logic.Generation
                 CreatePropertyAttributes(propertyInfo, result);
                 result.Add($"public System.Collections.Generic.IList<{modelType}> {propertyInfo.Name}");
                 result.Add("{");
-                result.Add($"get => new CommonBase.Modules.Collection.DelegateList<{entityType}, {modelType}>({delegateObjectName}.{delegatePropertyInfo.Name});");
+                result.Add($"get => new CommonBase.Modules.Collection.DelegateList<{entityType}, {modelType}>({delegateObjectName}.{delegatePropertyInfo.Name}, e => {modelType}.Create(e));");
                 result.Add("}");
             }
             else

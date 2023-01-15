@@ -1,4 +1,4 @@
-//@BaseCode
+﻿//@BaseCode
 //MdStart
 namespace TemplateCodeGenerator.Logic.Generation
 {

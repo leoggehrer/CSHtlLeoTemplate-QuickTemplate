@@ -1,4 +1,4 @@
-//@BaseCode
+﻿//@BaseCode
 //MdStart
 using QuickTemplate.AspMvc.Extensions;
 

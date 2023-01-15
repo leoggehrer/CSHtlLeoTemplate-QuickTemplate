@@ -20,14 +20,22 @@ namespace TemplateCodeGenerator.Logic.Generation
         public static IEnumerable<string> ReadAngularCustomParts(string filePath)
         {
             var result = new List<string>();
+            var imports = ReadAngularCustomImports(filePath).Where(l => string.IsNullOrEmpty(l.Trim()) == false);
+            var code = ReadAngularCustomCode(filePath).Where(l => string.IsNullOrEmpty(l.Trim()) == false);
 
-            result.Add(StaticLiterals.AngularCustomImportBeginLabel);
-            result.AddRange(ReadAngularCustomImports(filePath));
-            result.Add(StaticLiterals.AngularCustomImportEndLabel);
+            if (imports.Any())
+            {
+                result.Add(StaticLiterals.AngularCustomImportBeginLabel);
+                result.AddRange(imports);
+                result.Add(StaticLiterals.AngularCustomImportEndLabel);
+            }
 
-            result.Add(StaticLiterals.AngularCustomCodeBeginLabel);
-            result.AddRange(ReadAngularCustomCode(filePath));
-            result.Add(StaticLiterals.AngularCustomCodeEndLabel);
+            if (code.Any())
+            {
+                result.Add(StaticLiterals.AngularCustomCodeBeginLabel);
+                result.AddRange(code);
+                result.Add(StaticLiterals.AngularCustomCodeEndLabel);
+            }
 
             return result;
         }
