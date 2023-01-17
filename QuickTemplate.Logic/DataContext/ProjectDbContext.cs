@@ -28,7 +28,7 @@ namespace QuickTemplate.Logic.DataContext
                 connectionString = configuration["ConnectionStrings:SqlServerDefaultConnection"];
 #endif
 #if SQLITE_ON
-                connectionString = configuration["ConnectionStrings:SqlitelDefaultConnection"];
+                connectionString = configuration["ConnectionStrings:SqliteDefaultConnection"];
 #endif
 
                 if (string.IsNullOrEmpty(connectionString) == false)

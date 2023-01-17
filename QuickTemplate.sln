@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickTemplate.WebApi", "Qui
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonBase", "CommonBase\CommonBase.csproj", "{5D5C4E63-A490-4AD3-8B36-7CF49A5F5937}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documenst", "Documenst", "{7D1E32D0-6289-41AB-B44D-31F87C0C21A2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{7D1E32D0-6289-41AB-B44D-31F87C0C21A2}"
 	ProjectSection(SolutionItems) = preProject
 		cmd.md = cmd.md
 		CodeGeneration.csv = CodeGeneration.csv

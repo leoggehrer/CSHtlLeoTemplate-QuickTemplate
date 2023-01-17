@@ -17,6 +17,9 @@ namespace QuickTemplate.WebApi
             builder.Services.AddTransient<Logic.Contracts.Account.IRolesAccess<Logic.Models.Account.Role>, Logic.Facades.Account.RolesFacade>();
             builder.Services.AddTransient<Logic.Contracts.Account.IUsersAccess<Logic.Models.Account.User>, Logic.Facades.Account.UsersFacade>();
             builder.Services.AddTransient<Logic.Contracts.Account.IIdentitiesAccess<Logic.Models.Account.Identity>, Logic.Facades.Account.IdentitiesFacade>();
+#if ACCESSRULES_ON
+            builder.Services.AddTransient<Logic.Contracts.Access.IAccessRulesAccess<Logic.Models.Access.AccessRule>, Logic.Facades.Access.AccessRulesFacade>();
+#endif
 #endif
             AddServices(builder);
         }
