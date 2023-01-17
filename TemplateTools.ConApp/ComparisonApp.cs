@@ -48,7 +48,7 @@ namespace TemplateTools.ConApp
                 BeforeGetTargetPaths(Program.UserPath, targetPaths, ref handled);
                 if (handled == false)
                 {
-                    TargetPaths = Program.GetQuickTemplateProjects(Program.UserPath);
+                    TargetPaths = Program.GetQuickTemplateSolutions(Program.UserPath);
                     TargetPaths = TargetPaths.Union(AddTargetPaths).ToArray();
                 }
                 else

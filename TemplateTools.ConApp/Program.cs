@@ -183,10 +183,12 @@ namespace TemplateTools.ConApp
             {
                 try
                 {
-                    if ((filter == null || filter(directoryInfo.Name)
-                        && directoryInfo.Attributes.HasFlag(FileAttributes.Hidden) == false))
+                    if (directoryInfo.Attributes.HasFlag(FileAttributes.Hidden) == false)
                     {
-                        list.Add(directoryInfo.FullName);
+                        if ((filter == null || filter(directoryInfo.Name)))
+                        {
+                            list.Add(directoryInfo.FullName);
+                        }
                         if (deep < maxDeep)
                         {
                             foreach (var di in directoryInfo.GetDirectories())
@@ -198,7 +200,7 @@ namespace TemplateTools.ConApp
                             }
                         }
                     }
-               }
+                }
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
@@ -206,16 +208,55 @@ namespace TemplateTools.ConApp
             }
             var result = new List<string>();
             var directoryInfo = new DirectoryInfo(path);
-            
+
             GetDirectoriesWithoutHidden(filter, directoryInfo, result, 8, 0, excludeFolders);
             return result.ToArray();
         }
-        internal static string[] GetQuickTemplateProjects(string sourcePath)
+        internal static string[] GetQuickTemplateSolutions(string startPath)
         {
-            var directoryInfo = new DirectoryInfo(sourcePath);
-            var parentDirectory = directoryInfo.Parent != null ? directoryInfo.Parent.FullName : SourcePath;
+            var result = new List<string>();
+            var qtPaths = GetQuickTemplateProjects(startPath);
 
-            return QueryDirectoryStructure(parentDirectory, n => n.StartsWith("QT"), "bin", "obj");
+            foreach (var qtPath in qtPaths)
+            {
+                var di = new DirectoryInfo(qtPath);
+
+                if (di.GetFiles().Any(f => Path.GetExtension(f.Name).Equals(".sln", StringComparison.CurrentCultureIgnoreCase)))
+                {
+                    result.Add(qtPath);
+                }
+            }
+            return result.ToArray();
+        }
+        internal static string[] GetQuickTemplateProjects(string startPath)
+        {
+            return QueryDirectoryStructure(startPath, n => n.StartsWith("QT"), "bin", "obj", "node_modules");
+        }
+        internal static string[] GetQuickTemplatePaths(string startPath, params string[] includePaths)
+        {
+            var qtProjects = GetQuickTemplateProjects(startPath).Union(includePaths).ToArray();
+            var qtPaths = qtProjects.Select(p => Program.GetParentDirectory(p))
+                                    .Distinct()
+                                    .OrderBy(p => p);
+
+            return qtPaths.ToArray();
+        }
+        internal static string[] GetQuickTemplateParentPaths(string startPath, params string[] includePaths)
+        {
+            var result = new List<string>();
+            var qtProjects = GetQuickTemplateProjects(startPath).Union(includePaths).ToArray();
+            var qtPaths = qtProjects.Select(p => Program.GetParentDirectory(p))
+                                    .Distinct()
+                                    .OrderBy(p => p);
+
+            foreach (var qtPath in qtPaths)
+            {
+                if (result.Any(x => qtPath.Length > x.Length && qtPath.Contains(x)) == false)
+                {
+                    result.Add(qtPath);
+                }
+            }
+            return result.ToArray();
         }
         #region CLI Argument methods
         internal static void OpenSolutionFolder(string solutionPath)

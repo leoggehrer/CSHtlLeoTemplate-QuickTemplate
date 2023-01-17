@@ -67,16 +67,16 @@ namespace TemplateTools.ConApp
                     if (select == 1)
                     {
                         var solutionPath = Program.GetCurrentSolutionPath();
-                        var qtProjects = Program.GetQuickTemplateProjects(Program.UserPath).Union(new[] { solutionPath }).ToArray();
+                        var qtSolutions = Program.GetQuickTemplateSolutions(Program.UserPath).Union(new[] { solutionPath }).ToArray();
 
-                        for (int i = 0; i < qtProjects.Length; i++)
+                        for (int i = 0; i < qtSolutions.Length; i++)
                         {
                             if (i == 0)
                             {
                                 Console.WriteLine();
                             }
 
-                            Console.WriteLine($"Change path to: [{i + 1,2}] {qtProjects[i]}");
+                            Console.WriteLine($"Change path to: [{i + 1,2}] {qtSolutions[i]}");
                         }
                         Console.WriteLine();
                         Console.Write("Select or enter source path: ");
@@ -84,9 +84,9 @@ namespace TemplateTools.ConApp
 
                         if (Int32.TryParse(selectOrPath, out int number))
                         {
-                            if ((number - 1) >= 0 && (number - 1) < qtProjects.Length)
+                            if ((number - 1) >= 0 && (number - 1) < qtSolutions.Length)
                             {
-                                SolutionPath = qtProjects[number - 1];
+                                SolutionPath = qtSolutions[number - 1];
                             }
                         }
                         else if (Directory.Exists(selectOrPath))
