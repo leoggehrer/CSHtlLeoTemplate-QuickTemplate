@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "QuickTemplate.CodeGenApp": {
+    "CodeGenApp": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

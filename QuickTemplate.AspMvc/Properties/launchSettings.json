@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "QuickTemplate.AspMvc": {
+    "AspMvc": {
       "commandName": "Project",
       "launchBrowser": true,
       "applicationUrl": "https://localhost:7063;http://localhost:5063",

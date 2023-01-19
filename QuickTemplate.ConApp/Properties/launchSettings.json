@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "QuickTemplate.ConApp": {
+    "ConApp": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
