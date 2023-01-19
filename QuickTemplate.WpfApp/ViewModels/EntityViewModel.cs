@@ -2,26 +2,34 @@
 //MdStart
 namespace QuickTemplate.WpfApp.ViewModels
 {
-    using QuickTemplate.Logic.Contracts;
     using System;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
 
     public abstract partial class EntityViewModel<T> : BaseViewModel
-        where T : Logic.Entities.EntityObject, new()
+        where T : Logic.Contracts.IIdentifyable, new()
     {
         #region fields
         private ICommand? cmdSave = null;
         private ICommand? cmdClose = null;
+        private T entity = new();
         #endregion fields
 
         #region properties
+        public T Entity
+        {
+            get => entity ??= new T();
+            set
+            {
+                entity = value;
+                OnPropertiesChanged();
+            }
+        }
         public IdType Id
         {
             get { return Entity.Id; }
         }
-        protected T Entity { get; set; } = new();
         public virtual ICommand CommandSave
         {
             get
@@ -47,52 +55,60 @@ namespace QuickTemplate.WpfApp.ViewModels
         #endregion properties
 
         #region methods
-        public abstract IDataAccess<T> CreateController();
+        public abstract Logic.Contracts.IDataAccess<T> CreateController();
         protected virtual void OnPropertiesChanged()
         {
             OnPropertyChanged(nameof(Id));
         }
-        public virtual void Load(IdType id)
+        protected void BeforeLoad() { }
+        public virtual async Task LoadAsync(IdType id)
         {
             using var ctrl = CreateController();
-            var entity = ctrl.GetByIdAsync(id).Result;
+            var entity = await ctrl.GetByIdAsync(id).ConfigureAwait(false);
 
+            BeforeLoad();
             if (entity != null)
             {
                 Entity.CopyFrom(entity);
                 OnPropertiesChanged();
             }
+            AfterLoad();
         }
+        protected virtual void AfterLoad() { }
+        protected virtual void BeforeSave() { }
         public virtual void Save()
         {
             var error = false;
 
+            BeforeSave();
             Task.Run(async () =>
             {
                 using var ctrl = CreateController();
 
                 try
                 {
+                    var dbEntity = default(T);
+
                     if (Entity.Id != default(IdType))
                     {
-                        var dbEntity = await ctrl.GetByIdAsync(Entity.Id);
+                        dbEntity = await ctrl.GetByIdAsync(Entity.Id).ConfigureAwait(false);
 
                         if (dbEntity != null)
                         {
                             dbEntity.CopyFrom(this);
-                            dbEntity = await ctrl.UpdateAsync(dbEntity);
-                            Entity.CopyFrom(dbEntity);
+                            dbEntity = await ctrl.UpdateAsync(dbEntity).ConfigureAwait(false);
                         }
                     }
                     else
                     {
-                        var dbEntity = new T();
+                        dbEntity = new T();
 
                         dbEntity.CopyFrom(this);
-                        dbEntity = await ctrl.InsertAsync(dbEntity);
-                        Entity.CopyFrom(dbEntity);
+                        dbEntity = await ctrl.InsertAsync(dbEntity).ConfigureAwait(false);
                     }
-                    var count = await ctrl.SaveChangesAsync();
+                    await ctrl.SaveChangesAsync().ConfigureAwait(false);
+
+                    Entity.CopyFrom(dbEntity!);
                 }
                 catch (Exception ex)
                 {
@@ -100,12 +116,15 @@ namespace QuickTemplate.WpfApp.ViewModels
                     MessageBox.Show(ex.Message, "Save", MessageBoxButton.OK, MessageBoxImage.Stop);
                 }
             }).Wait();
+            AfterSave();
 
             if (error == false)
             {
                 Window?.Close();
             }
         }
+        protected virtual void AfterSave() { }
+        protected virtual void BeforeDelete() { }
         public virtual void Delete(IdType id)
         {
             var error = false;
@@ -119,8 +138,10 @@ namespace QuickTemplate.WpfApp.ViewModels
 
                     try
                     {
-                        await ctrl.DeleteAsync(id);
-                        await ctrl.SaveChangesAsync();
+                        BeforeDelete();
+                        await ctrl.DeleteAsync(id).ConfigureAwait(false);
+                        await ctrl.SaveChangesAsync().ConfigureAwait(false);
+                        AfterDelete();
                     }
                     catch (Exception ex)
                     {
@@ -135,6 +156,7 @@ namespace QuickTemplate.WpfApp.ViewModels
                 OnPropertiesChanged();
             }
         }
+        protected virtual void AfterDelete() { }
         #endregion methods
     }
 }
