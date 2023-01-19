@@ -145,7 +145,7 @@ namespace TemplateTools.ConApp
                 }
             } while (deleteError != false);
 
-            var arguments = $"build \"{solutionProperties.LogicCSProjectFilePath}\" -c Release -o {compilePath}";
+            var arguments = $"build \"{solutionProperties.LogicCSProjectFilePath}\" -c Release -o \"{compilePath}\"";
 
             Console.WriteLine($"dotnet {arguments}");
 
@@ -176,7 +176,7 @@ namespace TemplateTools.ConApp
         {
             var maxWaiting = 10 * 60 * 1000;    // 10 minutes
             var projectPath = $"{solutionProperties.SolutionName}.CodeGenApp{Path.DirectorySeparatorChar}{solutionProperties.SolutionName}.CodeGenApp.csproj";
-            var arguments = $"run --project {solutionProperties.SolutionPath}{Path.DirectorySeparatorChar}{projectPath} {executeArgs}";
+            var arguments = $"run --project \"{solutionProperties.SolutionPath}{Path.DirectorySeparatorChar}{projectPath}\" {executeArgs}";
 
             Console.WriteLine($"dotnet {arguments}");
 
