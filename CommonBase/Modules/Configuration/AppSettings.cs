@@ -6,6 +6,14 @@ namespace CommonBase.Modules.Configuration
 {
     public partial class AppSettings
     {
+        static AppSettings()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+
         private static IConfiguration? configuration;
 
         public static IConfiguration Configuration

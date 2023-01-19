@@ -1,12 +1,18 @@
 ﻿//@BaseCode
 //MdStart
 using Microsoft.Extensions.Configuration;
-using System;
 
 namespace CommonBase.Modules.Configuration
 {
     public static partial class Configurator
     {
+        static Configurator()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
         public static IConfigurationRoot LoadAppSettings()
         {
             var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
