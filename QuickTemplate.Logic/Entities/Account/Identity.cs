@@ -14,9 +14,7 @@ namespace QuickTemplate.Logic.Entities.Account
     [Index(nameof(Email), IsUnique = true)]
     public abstract partial class Identity : VersionExtendedEntity, IIdentity
     {
-#if GUID_OFF
         public Guid Guid { get; internal set; }
-#endif
         [MaxLength(128)]
         public string Name { get; set; } = string.Empty;
         [MaxLength(128)]

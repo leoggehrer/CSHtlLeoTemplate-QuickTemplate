@@ -8,7 +8,7 @@ namespace QuickTemplate.WebApi.Models.Account
     /// <summary>
     /// This model represents an account identity.
     /// </summary>
-    public class IdentityEdit
+    public partial class IdentityEdit
     {
         /// <summary>
         /// Gets or sets the Guid.

@@ -27,13 +27,11 @@ namespace QuickTemplate.Logic.Models.Account
             get => (TEntity)(_source ??= new TEntity());
             set => _source = value;
         }
-#if GUID_OFF
         public Guid Guid
         {
             get => Source.Guid;
             set => Source.Guid = value;
         }
-#endif
         public String Designation
         {
             get => Source.Designation;

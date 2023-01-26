@@ -6,7 +6,7 @@ namespace QuickTemplate.Logic.Entities.TestPublic
 #else
     [Table("Members", Schema = "testpublic")]
 #endif
-    public class Member : VersionExtendedEntity
+    public partial class Member : VersionExtendedEntity
     {
         [MaxLength(128)]
         public string FirstName { get; set; } = string.Empty;

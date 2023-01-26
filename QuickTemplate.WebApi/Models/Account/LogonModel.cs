@@ -6,7 +6,7 @@ namespace QuickTemplate.WebApi.Models.Account
     /// <summary>
     /// This model represents the logon data.
     /// </summary>
-    public class LogonModel
+    public partial class LogonModel
     {
         /// <summary>
         /// Gets or sets the email for logon.

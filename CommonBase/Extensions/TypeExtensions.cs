@@ -10,7 +10,7 @@ namespace CommonBase.Extensions
 {
     public static partial class TypeExtensions
     {
-        public class Extend
+        public partial class Extend
         {
             public Type? Type { get; set; }
             public List<Extend> Extends { get; set; } = new();

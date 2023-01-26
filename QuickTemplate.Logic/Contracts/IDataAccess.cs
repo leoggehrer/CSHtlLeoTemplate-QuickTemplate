@@ -14,7 +14,7 @@ namespace QuickTemplate.Logic.Contracts
         /// <param name="predicate">A string to test each element for a condition.</param>
         /// <param name="includeItems">The include items</param>
         /// <returns>Number of entities in the collection.</returns>
-        Task<int> CountAsync(string predicate, params string[] includeItems);
+        Task<int> CountAsync(string predicate, string[] includeItems);
 
         /// <summary>
         /// Returns the element of type T with the identification of id.
@@ -22,20 +22,20 @@ namespace QuickTemplate.Logic.Contracts
         /// <param name="id">The identification.</param>
         /// <param name="includeItems">The include items</param>
         /// <returns>The element of the type T with the corresponding identification (with includes).</returns>
-        Task<T?> GetByIdAsync(IdType id, params string[] includeItems);
+        Task<T?> GetByIdAsync(IdType id, string[] includeItems);
         /// <summary>
         /// Returns all interfaces of the elements in the collection.
         /// </summary>
         /// <param name="includeItems">The include items</param>
         /// <returns>All interfaces of the element collection.</returns>
-        Task<T[]> GetAllAsync(params string[] includeItems);
+        Task<T[]> GetAllAsync(string[] includeItems);
         /// <summary>
         /// Returns all elements in the collection.
         /// </summary>
         /// <param name="orderBy">Sorts the elements of a sequence according to a sort clause.</param>
         /// <param name="includeItems">The include items</param>
         /// <returns>All interfaces of the element collection.</returns>
-        Task<T[]> GetAllAsync(string orderBy, params string[] includeItems);
+        Task<T[]> GetAllAsync(string orderBy, string[] includeItems);
         /// <summary>
         /// Gets a subset of items from the repository.
         /// </summary>
@@ -43,7 +43,7 @@ namespace QuickTemplate.Logic.Contracts
         /// <param name="pageSize">The pagesize.</param>
         /// <param name="includeItems">The include items</param>
         /// <returns>Subset in accordance with the parameters.</returns>
-        Task<T[]> GetPageListAsync(int pageIndex, int pageSize, params string[] includeItems);
+        Task<T[]> GetPageListAsync(int pageIndex, int pageSize, string[] includeItems);
         /// <summary>
         /// Gets a subset of items from the repository.
         /// </summary>
@@ -52,7 +52,7 @@ namespace QuickTemplate.Logic.Contracts
         /// <param name="pageSize">The pagesize.</param>
         /// <param name="includeItems">The include items</param>
         /// <returns>Subset in accordance with the parameters.</returns>
-        Task<T[]> GetPageListAsync(string orderBy, int pageIndex, int pageSize, params string[] includeItems);
+        Task<T[]> GetPageListAsync(string orderBy, int pageIndex, int pageSize, string[] includeItems);
 
         /// <summary>
         /// Filters a sequence of elements based on a predicate.
@@ -60,7 +60,7 @@ namespace QuickTemplate.Logic.Contracts
         /// <param name="predicate">A string to test each element for a condition.</param>
         /// <param name="includeItems">The include items</param>
         /// <returns>The filter result.</returns>
-        Task<T[]> QueryAsync(string predicate, params string[] includeItems);
+        Task<T[]> QueryAsync(string predicate, string[] includeItems);
         /// <summary>
         /// Filters a subset of elements based on a predicate.
         /// </summary>
@@ -69,7 +69,7 @@ namespace QuickTemplate.Logic.Contracts
         /// <param name="pageSize">The pagesize.</param>
         /// <param name="includeItems">The include items</param>
         /// <returns>Subset in accordance with the parameters.</returns>
-        Task<T[]> QueryAsync(string predicate, int pageIndex, int pageSize, params string[] includeItems);
+        Task<T[]> QueryAsync(string predicate, int pageIndex, int pageSize, string[] includeItems);
         /// <summary>
         /// Filters a subset of elements based on a predicate.
         /// </summary>
@@ -79,7 +79,7 @@ namespace QuickTemplate.Logic.Contracts
         /// <param name="pageSize">The pagesize.</param>
         /// <param name="includeItems">The include items</param>
         /// <returns>Subset in accordance with the parameters.</returns>
-        Task<T[]> QueryAsync(string predicate, string orderBy, int pageIndex, int pageSize, params string[] includeItems);
+        Task<T[]> QueryAsync(string predicate, string orderBy, int pageIndex, int pageSize, string[] includeItems);
 
         /// <summary>
         /// The elements are being tracked by the context but does not yet exist in the repository. 

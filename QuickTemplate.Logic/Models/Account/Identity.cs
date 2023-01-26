@@ -26,13 +26,11 @@ namespace QuickTemplate.Logic.Models.Account
             get => (TEntity)(_source ??= new Entities.Account.SecureIdentity());
             set => _source = value;
         }
-#if GUID_OFF
         public Guid Guid
         {
             get => Source.Guid;
             set => Source.Guid = value;
         }
-#endif
         public System.String Name
         {
             get => Source.Name;

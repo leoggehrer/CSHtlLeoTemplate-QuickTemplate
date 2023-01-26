@@ -8,7 +8,7 @@ using TAccessType = QuickTemplate.Logic.Models.TestPublic.Member;
 namespace QuickTemplate.Logic.UnitTest
 {
     [TestClass]
-    public class MemberUnitTest : DataAccessUnitTest<TAccessType>
+    public partial class MemberUnitTest : DataAccessUnitTest<TAccessType>
     {
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)

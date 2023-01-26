@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace QuickTemplate.AspMvc.Models.Account
 {
-    public class IdentityCreate : ModelObject
+    public partial class IdentityCreate : ModelObject
     {
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;

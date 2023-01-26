@@ -10,7 +10,7 @@ using TAccessType = QuickTemplate.Logic.Models.TestInternal.Company;
 namespace QuickTemplate.Logic.UnitTest
 {
     [TestClass]
-    public class CompanyUnitTest : DataAccessUnitTest<Logic.Models.TestInternal.Company>
+    public partial class CompanyUnitTest : DataAccessUnitTest<Logic.Models.TestInternal.Company>
     {
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)

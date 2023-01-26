@@ -7,7 +7,7 @@ namespace QuickTemplate.WebApi.Models.Account
     /// <summary>
     /// This model represents an account identity.
     /// </summary>
-    public class Identity : VersionModel
+    public partial class Identity : VersionModel
     {
 #if !GUID_ON
         /// <summary>

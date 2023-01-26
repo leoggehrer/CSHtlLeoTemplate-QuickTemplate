@@ -2,7 +2,7 @@
 //MdStart
 namespace TemplateTools.ConApp
 {
-	public class DockerApp
+	public partial class DockerApp
 	{
 	}
 }
