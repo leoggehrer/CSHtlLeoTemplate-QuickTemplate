@@ -23,6 +23,7 @@ namespace CommonBase
                 ".AspMvc",
                 ".AngularApp",
                 ".WpfApp",
+                ".MvvMApp",
             };
             SolutionToolProjects = new[]
             {

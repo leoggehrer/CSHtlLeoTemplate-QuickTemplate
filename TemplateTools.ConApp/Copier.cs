@@ -66,6 +66,7 @@ namespace TemplateTooles.ConApp
             ,".md"
             ,".template"
             ,".xaml"
+            ,".axaml"
         };
         private static string[] ReplaceFiles { get; } = new string[]
         {
@@ -96,7 +97,10 @@ namespace TemplateTooles.ConApp
             ,".template"
             ,".jpg"
             ,".png"
+            ,".ico"
             ,".xaml"
+            ,".axaml"
+            ,".manifest"
         };
         private static string[] SolutionExtenions { get; } = new string[]
         {
