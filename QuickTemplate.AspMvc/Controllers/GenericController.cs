@@ -18,7 +18,7 @@ namespace QuickTemplate.AspMvc.Controllers
         where TAccessModel : IIdentifyable, new()
         where TViewModel : class, new()
     {
-        public enum ActionMode : int
+        protected enum ActionMode : int
         {
             Index = 1,
             Details = 2,
@@ -52,6 +52,7 @@ namespace QuickTemplate.AspMvc.Controllers
 #endif
         protected virtual RedirectToActionResult RedirectAfterAction(ActionMode actionMode, TAccessModel accessModel)
         {
+            // ReSharper disable once Mvc.ActionNotResolved
             return RedirectToAction(nameof(Index));
         }
         protected virtual TAccessModel ToAccessModel(TViewModel viewModel)
@@ -88,6 +89,7 @@ namespace QuickTemplate.AspMvc.Controllers
         // GET: Items
         public virtual IActionResult BackToIndex()
         {
+            // ReSharper disable once Mvc.ActionNotResolved
             return RedirectToAction(nameof(Index));
         }
         // GET: Item/Details/5

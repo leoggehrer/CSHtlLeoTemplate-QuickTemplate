@@ -19,13 +19,12 @@ namespace QuickTemplate.AspMvc.Controllers
         }
         static partial void ClassConstructing();
         static partial void ClassConstructed();
-        protected static string FilterName => typeof(TFilterModel).Name;
+        private string OrderByName => $"{ControllerName}.OrderBy";
+        private static string FilterName => typeof(TFilterModel).Name;
         protected abstract string ControllerName { get; }
-        protected string OrderByName => $"{ControllerName}.OrderBy";
         protected FilterGenericController(TAccessContract dataAccess)
             : base(dataAccess)
         {
-
         }
         partial void BeforeToViewModel(TAccessModel accessModel, ActionMode actionMode, ref TViewModel? viewModel, ref bool handled);
         partial void AfterToViewModel(TViewModel viewModel, ActionMode actionMode);
@@ -34,6 +33,7 @@ namespace QuickTemplate.AspMvc.Controllers
             var filter = new TFilterModel();
             ViewBag.Filter = filter;
             SessionWrapper.Set<TFilterModel>(FilterName, filter);
+            // ReSharper disable once Mvc.ActionNotResolved
             return RedirectToAction("Index");
         }
 
@@ -68,11 +68,13 @@ namespace QuickTemplate.AspMvc.Controllers
         public IActionResult Filter(TFilterModel filter)
         {
             SessionWrapper.Set<TFilterModel>(FilterName, filter);
+            // ReSharper disable once Mvc.ActionNotResolved
             return RedirectToAction("Index");
         }
         public IActionResult OrderBy(string orderBy)
         {
             SessionWrapper.Set<string>(OrderByName, orderBy);
+            // ReSharper disable once Mvc.ActionNotResolved
             return RedirectToAction("Index");
         }
     }

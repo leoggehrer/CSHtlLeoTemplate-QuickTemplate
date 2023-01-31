@@ -10,6 +10,7 @@
     <DefineConstants>ACCOUNT_OFF;DBOPERATION_ON;ROWVERSION_OFF;IDINT_ON;IDLONG_OFF;IDGUID_OFF;SQLSERVER_OFF;SQLITE_ON;GENERATEDCODE_OFF</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'AspMvc' " />
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.2" />

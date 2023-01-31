@@ -1,0 +1,16 @@
+@*@BaseCode*@
+@model QuickTemplate.AspMvc.Models.ModelObject
+
+<tr>
+    <td>
+        @Html.DisplayFor(model => model.Id)
+    </td>
+    <td>
+        @* ReSharper disable once Mvc.ActionNotResolved *@
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @* ReSharper disable once Mvc.ActionNotResolved *@
+        @Html.ActionLink("Details", "Details", new { id = Model.Id }) |
+        @* ReSharper disable once Mvc.ActionNotResolved *@
+        @Html.ActionLink("Delete", "Delete", new { id = Model.Id })
+    </td>
+</tr>

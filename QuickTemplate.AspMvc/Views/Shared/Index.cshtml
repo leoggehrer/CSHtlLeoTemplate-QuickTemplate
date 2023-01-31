@@ -12,17 +12,7 @@
     var type = Model.GetType();
     var filter = ViewBag.Filter as QuickTemplate.AspMvc.Models.View.IFilterModel;
 
-    if (type != null)
-    {
-        if (type.IsArray)
-        {
-            title = type.GetElementType()!.Name;
-        }
-        else
-        {
-            title = type.GetGenericArguments()[0].Name;
-        }
-    }
+    title = type.IsArray ? type.GetElementType()!.Name : type.GetGenericArguments()[0].Name;
     ViewData["Title"] = title;
     if (modelCount > pageSize)
     {
@@ -34,7 +24,7 @@
 <img class="card-img-top" src="@($"/img/{image}")" style="margin-top: -20px; margin-bottom: -50px" alt="Banner">
 <h1>@title</h1>
 
-@if (filter != null && filter.Show)
+@if (filter is {Show: true })
 {
     <div class="row" style="margin: 1em 0em 1em 0em;">
         <div class="btn-group" role="group" aria-label="Basic outlined filter">
