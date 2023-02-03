@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" 
+        x:Class="QuickTemplate.MvvMApp.Views.MessageBox"
+        MinWidth="400"
+        MinHeight="100"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight" CanResize="False">
+  
+  <Grid Margin="10">
+    <Grid.RowDefinitions>
+      <RowDefinition></RowDefinition>
+      <RowDefinition></RowDefinition>
+    </Grid.RowDefinitions>
+
+    <TextBlock Grid.Row="0" HorizontalAlignment="Center" Name="Text"/>
+
+    <StackPanel Grid.Row="1"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal"
+                Name="Buttons">
+      
+      <StackPanel.Styles>
+        <Style Selector="Button">
+          <Setter Property="Margin" Value="5"/>
+        </Style>
+      </StackPanel.Styles>
+
+    </StackPanel>
+  </Grid>
+</Window>
