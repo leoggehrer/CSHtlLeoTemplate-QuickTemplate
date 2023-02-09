@@ -342,6 +342,13 @@ namespace TemplateCodeGenerator.Logic.Generation
             result.AddRange(CreatePartialStaticConstrutor(controllerName));
             result.AddRange(CreatePartialConstrutor("public", controllerName));
             result.AddRange(CreatePartialConstrutor("public", controllerName, "ControllerObject other", "base(other)", null, false));
+
+            result.AddRange(CreateComment(type));
+            result.Add($"internal override TOutModel ToModel(TEntity entity)");
+            result.Add("{");
+            result.Add("return new TOutModel(entity);");
+            result.Add("}");
+
             result.Add("}");
             result.EnvelopeWithANamespace(ItemProperties.CreateControllerNamespace(type));
             result.FormatCSharpCode();

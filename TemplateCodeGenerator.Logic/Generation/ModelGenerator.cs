@@ -254,7 +254,8 @@ namespace TemplateCodeGenerator.Logic.Generation
             result.Add($"public partial class {modelName}");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(modelName));
-            result.AddRange(CreatePartialConstrutor("public", modelName));
+            result.AddRange(CreatePartialConstrutor("public", modelName, initStatements: new string[] { $"_source = new {entityType}();" }));
+            result.AddRange(CreatePartialConstrutor("internal", modelName, argumentList: $"{entityType} source", initStatements: new string[] { $"_source = source;" }, withPartials: false));
 
             result.Add(string.Empty);
             result.Add($"new internal {entityType} Source");
