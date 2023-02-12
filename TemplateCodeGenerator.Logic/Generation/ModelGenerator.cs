@@ -260,7 +260,8 @@ namespace TemplateCodeGenerator.Logic.Generation
             result.Add(string.Empty);
             result.Add($"new internal {entityType} Source");
             result.Add("{");
-            result.Add($"get => ({entityType})(_source ??= new {entityType}());");
+            //result.Add($"get => ({entityType})(_source ??= new {entityType}());");
+            result.Add($"get => ({entityType})(_source!);");
             result.Add("set => _source = value;");
             result.Add("}");
 

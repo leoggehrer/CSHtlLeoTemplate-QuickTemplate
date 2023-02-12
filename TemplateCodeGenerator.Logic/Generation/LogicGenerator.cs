@@ -346,8 +346,19 @@ namespace TemplateCodeGenerator.Logic.Generation
             result.AddRange(CreateComment(type));
             result.Add($"internal override TOutModel ToModel(TEntity entity)");
             result.Add("{");
-            result.Add("return new TOutModel(entity);");
+            result.Add("var handled = false;");
+            result.Add("TOutModel? result = default;");
+            result.Add(string.Empty);
+            result.Add("BeforeToOutModel(entity, ref result, ref handled);");
+            result.Add("if (handled == false || result == default)");
+            result.Add("{");
+            result.Add("result = new TOutModel(entity);");
             result.Add("}");
+            result.Add("AfterToOutModel(entity, result);");
+            result.Add("return result;");
+            result.Add("}");
+            result.Add("partial void BeforeToOutModel(TEntity entity, ref TOutModel? result, ref bool handled);");
+            result.Add("partial void AfterToOutModel(TEntity entity, TOutModel result);");
 
             result.Add("}");
             result.EnvelopeWithANamespace(ItemProperties.CreateControllerNamespace(type));
