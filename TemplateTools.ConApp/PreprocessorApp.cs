@@ -272,156 +272,54 @@ namespace TemplateTools.ConApp
 
         private static void SetPreprocessorDefinesInRazorFiles(string path, params string[] defineItems)
         {
-            foreach (var directive in defineItems)
+            foreach (var define in defineItems.Select(d => d.ToUpper()))
             {
-                var analyzeDirective = directive.ToUpper();
-
-                if (analyzeDirective.EndsWith("_OFF", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    SetPreprocessorDefinesCommentsInRazorFiles(path, directive.Replace("_OFF", "_ON"));
-                    RemovePreprocessorDefinesCommentsInRazorFiles(path, directive);
-                }
-                else if (analyzeDirective.EndsWith("_ON", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    SetPreprocessorDefinesCommentsInRazorFiles(path, directive.Replace("_ON", "_OFF"));
-                    RemovePreprocessorDefinesCommentsInRazorFiles(path, directive);
-                }
+                SetPreprocessorDefinesCommentsInRazorFiles(path, define);
             }
         }
-        private static void SetPreprocessorDefinesCommentsInRazorFiles(string path, params string[] defineItems)
+        private static void SetPreprocessorDefinesCommentsInRazorFiles(string path, string define)
         {
             var files = Directory.GetFiles(path, "*.cshtml", SearchOption.AllDirectories);
+            var searchIfStart = define.EndsWith("_ON") ? $"@*#if {define}*@@*{Environment.NewLine}"
+                                                       : $"@*#if {define.Replace("_OFF", "_ON")}*@{Environment.NewLine}";
+            var replaceIfStart = define.EndsWith("_ON") ? $"@*#if {define}*@{Environment.NewLine}"
+                                                        : $"@*#if {define.Replace("_OFF", "_ON")}*@@*{Environment.NewLine}";
+            var searchIfEnd = define.EndsWith("_ON") ? $"{Environment.NewLine}*@@*#endif*@"
+                                                     : $"{Environment.NewLine}@*#endif*@";
+            var replaceIfEnd = define.EndsWith("_ON") ? $"{Environment.NewLine}@*#endif*@"
+                                                      : $"{Environment.NewLine}*@@*#endif*@";
 
-            foreach (var directive in defineItems)
+            foreach (var file in files)
             {
-                foreach (var file in files)
-                {
-                    var startIndex = 0;
-                    var hasChanged = false;
-                    var result = string.Empty;
-                    var text = File.ReadAllLines(file, Encoding.Default)
-                                   .Select(l =>
-                                   {
-                                       if (l.Contains($"@*#if {directive}*@") || l.Contains("@*#endif*@"))
-                                       {
-                                           l = l.Trim();
-                                       }
-                                       return l;
-                                   }).ToText();
+                var startIndex = 0;
+                var hasChanged = false;
+                var result = string.Empty;
+                var text = File.ReadAllText(file, Encoding.Default);
 
-                    foreach (var tag in text.GetAllTags($"@*#if {directive}*@", "@*#endif*@"))
+                foreach (var tag in text.GetAllTags(searchIfStart, searchIfEnd))
+                {
+                    hasChanged = true;
+
+                    if (tag.StartTagIndex > startIndex)
                     {
-                        if (tag.StartTagIndex > startIndex)
-                        {
-                            result += text.Partialstring(startIndex, tag.StartTagIndex - 1);
-                            result += tag.StartTag;
-                            if (tag.InnerText.Trim().StartsWith("@*"))
-                            {
-                                result += tag.InnerText;
-                            }
-                            else
-                            {
-                                hasChanged = true;
-                                result += /*Environment.NewLine + */"@*";
-                                result += tag.InnerText;
-                                result += "*@";// + Environment.NewLine;
-                            }
-                            result += tag.EndTag;
-                            startIndex += tag.EndTagIndex + tag.EndTag.Length;
-                        }
+                        result += text.Partialstring(startIndex, tag.StartTagIndex - 1);
+                        result += replaceIfStart;
+                        result += tag.InnerText;
+                        result += replaceIfEnd;
+
+                        startIndex += tag.EndTagIndex + tag.EndTag.Length;
                     }
-                    if (hasChanged && startIndex < text.Length)
-                    {
-                        result += text.Partialstring(startIndex, text.Length);
-                    }
-                    if (hasChanged)
-                    {
-                        File.WriteAllText(file, result, Encoding.Default);
-                    }
+                }
+                if (hasChanged && startIndex < text.Length)
+                {
+                    result += text.Partialstring(startIndex, text.Length);
+                }
+                if (hasChanged)
+                {
+                    File.WriteAllText(file, result, Encoding.Default);
                 }
             }
         }
-        private static void RemovePreprocessorDefinesCommentsInRazorFiles(string path, params string[] defineItems)
-        {
-            var files = Directory.GetFiles(path, "*.cshtml", SearchOption.AllDirectories);
-
-            foreach (var directive in defineItems)
-            {
-                foreach (var file in files)
-                {
-                    var startIndex = 0;
-                    var hasChanged = false;
-                    var result = string.Empty;
-                    var text = File.ReadAllText(file, Encoding.Default);
-
-                    foreach (var tag in text.GetAllTags($"@*#if {directive}*@", "@*#endif*@"))
-                    {
-                        if (tag.StartTagIndex > startIndex)
-                        {
-                            result += text.Partialstring(startIndex, tag.StartTagIndex - 1);
-                            result += tag.StartTag;
-                            var innerText = tag.InnerText.Trim(Environment.NewLine.ToCharArray());
-                            if (innerText.Trim().StartsWith("@*") && innerText.Trim().EndsWith("*@"))
-                            {
-                                hasChanged = true;
-                                result += innerText.Partialstring(2, innerText.Length - 5);
-                                result += Environment.NewLine;
-                            }
-                            else
-                            {
-                                result += tag.InnerText;
-                            }
-                            startIndex += tag.EndTagIndex + tag.EndTag.Length;
-                            result += tag.EndTag;
-                        }
-                    }
-                    if (hasChanged && startIndex < text.Length)
-                    {
-                        result += text.Partialstring(startIndex, text.Length);
-                    }
-                    if (hasChanged)
-                    {
-                        File.WriteAllText(file, result, Encoding.Default);
-                    }
-                }
-            }
-        }
-        private static void ReplacePreprocessorDefinesInRazorFiles(string path, params string[] defineItems)
-        {
-            var files = Directory.GetFiles(path, "*.cshtml", SearchOption.AllDirectories);
-
-            foreach (var directive in defineItems)
-            {
-                var labels = new[] { $"#if {directive}", "#endif" };
-
-                foreach (var file in files)
-                {
-                    var hasChanged = false;
-                    var result = new List<string>();
-                    var lines = File.ReadAllLines(file, Encoding.Default);
-
-                    foreach (var line in lines)
-                    {
-                        var targetLine = line;
-
-                        foreach (var label in labels)
-                        {
-                            if (line.StartsWith(label))
-                            {
-                                hasChanged = true;
-                                targetLine = line.Replace(label, $"@*{label}*@");
-                            }
-                        }
-                        result.Add(targetLine);
-                    }
-                    if (hasChanged)
-                    {
-                        File.WriteAllLines(file, result, Encoding.Default);
-                    }
-                }
-            }
-        }
-
     }
 }
 //MdEnd

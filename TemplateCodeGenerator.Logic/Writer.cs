@@ -16,6 +16,7 @@ namespace TemplateCodeGenerator.Logic
         static partial void ClassConstructing();
         static partial void ClassConstructed();
         #endregion Class-Constructors
+
         public static bool WriteToGroupFile { get; set; } = true;
         public static void WriteAll(string solutionPath, ISolutionProperties solutionProperties, IEnumerable<IGeneratedItem> generatedItems)
         {
@@ -195,6 +196,20 @@ namespace TemplateCodeGenerator.Logic
             }));
             #endregion WriteAspMvcModels
 
+            #region WriteMVVMComponents
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.MVVMAppProjectName);
+                if (Directory.Exists(projectPath))
+                {
+                    var writeItems = generatedItems.Where(e => e.UnitType == UnitType.MVVM && e.ItemType == ItemType.Model);
+
+                    Console.WriteLine("Write MVVM-Models...");
+                    WriteItems(projectPath, writeItems, false);
+                }
+            }));
+            #endregion WriteMVVMComponents
+
             #region WriteAngularComponents
             tasks.Add(Task.Factory.StartNew(() =>
             {
@@ -343,7 +358,7 @@ namespace TemplateCodeGenerator.Logic
                     canCreate = false;
                 }
             }
-            else if (string.IsNullOrEmpty(sourcePath) == false 
+            else if (string.IsNullOrEmpty(sourcePath) == false
                      && Directory.Exists(sourcePath) == false)
             {
                 Directory.CreateDirectory(sourcePath);

@@ -9,6 +9,7 @@ namespace TemplateCodeGenerator.Logic.Generation
         public string WebApiPostfix => ".WebApi";
         public string AspMvcPostfix => ".AspMvc";
         public string AngularPostfix => ".AngularApp";
+        public string MVVMPostfix => ".MvvMApp";
         #endregion Project-postfixes
 
         public string SolutionPath { get; }
@@ -47,6 +48,9 @@ namespace TemplateCodeGenerator.Logic.Generation
         public string AspMvcAppProjectName => ProjectNames.First(e => e.EndsWith($"{AspMvcPostfix}"));
         public string AspMvcAppSubPath => AspMvcAppProjectName;
         public string AspMvcControllersSubPath => Path.Combine(AspMvcAppSubPath, StaticLiterals.ControllersFolder);
+
+        public string MVVMAppProjectName => ProjectNames.First(e => e.EndsWith($"{MVVMPostfix}"));
+        public string MVVMAppSubPath => MVVMAppProjectName;
 
         public string AngularAppProjectName => ProjectNames.First(e => e.EndsWith($"{AngularPostfix}"));
 

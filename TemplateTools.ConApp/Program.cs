@@ -43,17 +43,22 @@ namespace TemplateTools.ConApp
 
             while (input.Equals("x") == false)
             {
+                int mnuIdx = 1;
+
                 Console.Clear();
                 Console.ForegroundColor = ForegroundColor;
                 Console.WriteLine("Template Tools");
                 Console.WriteLine("==============");
                 Console.WriteLine();
+                Console.WriteLine($"Source Path: {SourcePath}");
+                Console.WriteLine();
                 Console.WriteLine("Choose a tool:");
                 Console.WriteLine();
-                Console.WriteLine("[1] Copier..........Copy a quick template to a project");
-                Console.WriteLine("[2] Preprocessor....Setting defines for project options");
-                Console.WriteLine("[3] CodeGenerator...Generate code for template solutions");
-                Console.WriteLine("[4] Comparison......compares a project with the template and compares it");
+                Console.WriteLine($"[{mnuIdx++}] Path............Change source path");
+                Console.WriteLine($"[{mnuIdx++}] Copier..........Copy a quick template to a project");
+                Console.WriteLine($"[{mnuIdx++}] Preprocessor....Setting defines for project options");
+                Console.WriteLine($"[{mnuIdx++}] CodeGenerator...Generate code for template solutions");
+                Console.WriteLine($"[{mnuIdx++}] Comparison......compares a project with the template and compares it");
                 Console.WriteLine("[x|X] Exit");
                 Console.WriteLine();
                 Console.Write("Choose: ");
@@ -64,21 +69,50 @@ namespace TemplateTools.ConApp
                 {
                     if (select == 1)
                     {
-                        CopierApp.RunApp();
+                        var solutionPath = Program.GetCurrentSolutionPath();
+                        var qtSolutions = Program.GetQuickTemplateSolutions(Program.UserPath).Union(new[] { solutionPath }).ToArray();
+
+                        for (int i = 0; i < qtSolutions.Length; i++)
+                        {
+                            if (i == 0)
+                            {
+                                Console.WriteLine();
+                            }
+
+                            Console.WriteLine($"Change path to: [{i + 1,2}] {qtSolutions[i]}");
+                        }
+                        Console.WriteLine();
+                        Console.Write("Select or enter source path: ");
+                        var selectOrPath = Console.ReadLine();
+
+                        if (Int32.TryParse(selectOrPath, out int number))
+                        {
+                            if ((number - 1) >= 0 && (number - 1) < qtSolutions.Length)
+                            {
+                                SourcePath = qtSolutions[number - 1];
+                            }
+                        }
+                        else if (Directory.Exists(selectOrPath))
+                        {
+                            SourcePath = selectOrPath;
+                        }
                     }
                     else if (select == 2)
                     {
-                        PreprocessorApp.RunApp();
+                        CopierApp.RunApp();
                     }
                     else if (select == 3)
                     {
-                        CodeGeneratorApp.RunApp();
+                        PreprocessorApp.RunApp();
                     }
                     else if (select == 4)
                     {
+                        CodeGeneratorApp.RunApp();
+                    }
+                    else if (select == 5)
+                    {
                         ComparisonApp.RunApp();
                     }
-
                 }
             }
         }

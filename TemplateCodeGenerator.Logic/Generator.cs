@@ -67,6 +67,22 @@ namespace TemplateCodeGenerator.Logic
             }
             #endregion AspMvcApp
 
+            #region MVVMApp
+            if (configuration.QuerySettingValue<bool>(Common.UnitType.MVVM.ToString(), "All", "All", "Generate", "True"))
+            {
+                var generator = new Generation.MVVMGenerator(solutionProperties);
+
+                tasks.Add(Task.Factory.StartNew(() =>
+                {
+                    var generatedItems = new List<IGeneratedItem>();
+
+                    Console.WriteLine("Create MVVM-Components...");
+                    generatedItems.AddRange(generator.GenerateAll());
+                    result.AddRangeSafe(generatedItems);
+                }));
+            }
+            #endregion MVVMApp
+
             #region AngularApp
             if (configuration.QuerySettingValue<bool>(Common.UnitType.Angular.ToString(), "All", "All", "Generate", "True"))
             {
@@ -86,6 +102,7 @@ namespace TemplateCodeGenerator.Logic
             Task.WaitAll(tasks.ToArray());
             return result;
         }
+
         public static void DeleteGeneratedFiles(string path)
         {
             Console.WriteLine("Delete all generation files...");

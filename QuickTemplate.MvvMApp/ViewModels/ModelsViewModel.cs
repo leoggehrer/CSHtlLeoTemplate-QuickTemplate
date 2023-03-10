@@ -10,7 +10,7 @@ using System.Windows.Input;
 
 namespace QuickTemplate.MvvMApp.ViewModels
 {
-    public abstract class DelegateViewModel<TModel, TEntity> : ModelViewModel<TModel, TEntity>
+    public abstract class ModelsViewModel<TModel, TEntity> : ModelViewModel<TModel, TEntity>
         where TModel : Models.ModelObject, new()
         where TEntity : Logic.Models.ModelObject, new()
     {
@@ -52,7 +52,7 @@ namespace QuickTemplate.MvvMApp.ViewModels
         #endregion commands
 
         #region constructions
-        protected DelegateViewModel(BaseViewModel otherViewModel)
+        protected ModelsViewModel(BaseViewModel otherViewModel)
         {
             OtherViewModel = otherViewModel;
             OnPropertiesChanged(nameof(Models));

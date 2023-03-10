@@ -1,11 +1,11 @@
 @*@BaseCode*@
 @*#if ACCOUNT_ON*@@*
-@{
-    @using Microsoft.AspNetCore.Mvc.Rendering
-    @using QuickTemplate.AspMvc.Models.View
-    @using QuickTemplate.AspMvc.Modules.Session
-    @model QuickTemplate.AspMvc.Models.Account.IdentityCreate
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using QuickTemplate.AspMvc.Models.View
+@using QuickTemplate.AspMvc.Modules.Session
+@model QuickTemplate.AspMvc.Models.Account.IdentityCreate
 
+@{
     var sessionWrapper = new SessionWrapper(Context.Session);
     var controller = ViewContext.RouteData?.Values["controller"]?.ToString() ?? string.Empty;
     var action = ViewContext.RouteData?.Values["action"]?.ToString() ?? string.Empty;

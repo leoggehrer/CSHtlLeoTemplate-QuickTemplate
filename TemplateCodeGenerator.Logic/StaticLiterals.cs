@@ -28,7 +28,8 @@ namespace TemplateCodeGenerator.Logic
         #region Project Extensions
         public static string LogicExtension => ".Logic";
         public static string WebApiExtension => ".WebApi";
-        public static string AspMvsExtension => ".AspMvc";
+        public static string AspMvcExtension => ".AspMvc";
+        public static string MVVMExtension => ".MvvMApp";
         #endregion Project Extensions
 
         #region Entity and service properties

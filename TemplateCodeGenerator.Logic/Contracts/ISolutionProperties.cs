@@ -8,6 +8,7 @@ namespace TemplateCodeGenerator.Logic.Contracts
         string LogicPostfix { get; }
         string WebApiPostfix { get; }
         string AspMvcPostfix { get; }
+        string MVVMPostfix { get; }
         #endregion Project-postfixes
 
         string SolutionPath { get; }
@@ -35,8 +36,10 @@ namespace TemplateCodeGenerator.Logic.Contracts
         string AspMvcAppSubPath { get; }
         string AspMvcControllersSubPath { get; }
 
-        string AngularAppProjectName { get; }
+        string MVVMAppProjectName { get; }
+        string MVVMAppSubPath { get; }
 
+        string AngularAppProjectName { get; }
     }
 }
 //MdEnd

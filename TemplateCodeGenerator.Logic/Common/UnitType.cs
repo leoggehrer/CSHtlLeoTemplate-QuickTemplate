@@ -12,6 +12,8 @@ namespace TemplateCodeGenerator.Logic.Common
 
         AspMvc = 2 * WebApi,
         Angular = 2 * AspMvc,
+
+        MVVM = 2 * Angular,
     }
 }
 //MdEnd

@@ -9,7 +9,7 @@ namespace TemplateCodeGenerator.Logic.Generation
     internal sealed partial class AspMvcGenerator : ModelGenerator
     {
         private ItemProperties? _itemProperties;
-        protected override ItemProperties ItemProperties => _itemProperties ??= new ItemProperties(SolutionProperties.SolutionName, StaticLiterals.AspMvsExtension);
+        protected override ItemProperties ItemProperties => _itemProperties ??= new ItemProperties(SolutionProperties.SolutionName, StaticLiterals.AspMvcExtension);
         public bool GenerateModels { get; set; }
         public bool GenerateFilterModels { get; set; }
         public bool GenerateControllers { get; set; }
