@@ -41,10 +41,11 @@ namespace TemplateCodeGenerator.Logic.Generation
                 var modelType = ItemProperties.ConvertEntityToModelType(propertyInfo.PropertyType.GenericTypeArguments[0].FullName!);
 
                 result.Add(string.Empty);
+                result.Add($"private CommonBase.Modules.Collection.DelegateList<{entityType}, {modelType}>? {CreateFieldName(propertyInfo, "_")};");
                 CreatePropertyAttributes(propertyInfo, result);
                 result.Add($"public System.Collections.Generic.IList<{modelType}> {propertyInfo.Name}");
                 result.Add("{");
-                result.Add($"get => new CommonBase.Modules.Collection.DelegateList<{entityType}, {modelType}>({delegateObjectName}.{delegatePropertyInfo.Name}, e => {modelType}.Create(e));");
+                result.Add($"get => {CreateFieldName(propertyInfo, "_")} ??= new CommonBase.Modules.Collection.DelegateList<{entityType}, {modelType}>({delegateObjectName}.{delegatePropertyInfo.Name}, e => {modelType}.Create(e));");
                 result.Add("}");
             }
             else
@@ -266,14 +267,16 @@ namespace TemplateCodeGenerator.Logic.Generation
         private IGeneratedItem CreateAccessContract(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
             var contractName = ItemProperties.CreateAccessContractName(type);
+            var outModelType = ItemProperties.CreateModelSubType(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = ItemProperties.CreateAccessContractType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
                 SubFilePath = ItemProperties.CreateAccessContractSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
             };
+            result.Add($"using TOutModel = {outModelType};");
             result.AddRange(CreateComment(type));
-            result.Add($"public partial interface {contractName}<T> : Contracts.IDataAccess<T>");
+            result.Add($"public partial interface {contractName} : Contracts.IDataAccess<TOutModel>");
             result.Add("{");
             result.Add("}");
             result.EnvelopeWithANamespace(ItemProperties.CreateContractNamespace(type));
@@ -337,7 +340,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             result.AddRange(CreateComment(type));
             CreateControllerAttributes(type, result.Source);
             result.Add($"{(attributes.HasContent() ? $"[{attributes}]" : string.Empty)}");
-            result.Add($"{visibility} sealed partial class {controllerName} : {controllerGenericType}<TEntity, TOutModel>, {contractSubType}<TOutModel>");
+            result.Add($"{visibility} sealed partial class {controllerName} : {controllerGenericType}<TEntity, TOutModel>, {contractSubType}");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(controllerName));
             result.AddRange(CreatePartialConstrutor("public", controllerName));
@@ -447,7 +450,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             facadeGenericType = QuerySetting<string>(itemType, type, StaticLiterals.FacadeGenericType, facadeGenericType);
             result.Add($"using TOutModel = {outModelType};");
             result.AddRange(CreateComment(type));
-            result.Add($"public sealed partial class {facadeName} : {facadeGenericType}<TOutModel>, {contractSubType}<TOutModel>");
+            result.Add($"public sealed partial class {facadeName} : {facadeGenericType}<TOutModel>, {contractSubType}");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(facadeName));
             result.AddRange(CreatePartialConstrutor("public", facadeName, null, $"base(new {controllerType}())"));

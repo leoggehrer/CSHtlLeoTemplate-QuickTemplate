@@ -126,7 +126,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             result.Add($"{visibility} sealed partial class {controllerName} : {genericType}<{accessType}, {editModelType}, {modelType}>");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(controllerName));
-            result.AddRange(CreatePartialConstrutor("public", controllerName, $"{contractType}<{accessType}> other", "base(other)", null, true));
+            result.AddRange(CreatePartialConstrutor("public", controllerName, $"{contractType} other", "base(other)", null, true));
 
             result.AddRange(CreateComment(type));
             result.Add($"protected override {modelType} ToOutModel({accessType} accessModel)");
@@ -173,20 +173,18 @@ namespace TemplateCodeGenerator.Logic.Generation
                 if (generate && type.IsPublic)
                 {
                     var logicProject = $"{ItemProperties.SolutionName}{StaticLiterals.LogicExtension}";
-                    var accessType = $"{logicProject}.{ItemProperties.CreateModelSubType(type)}";
                     var contractType = ItemProperties.CreateAccessContractType(type);
                     var controllerType = ItemProperties.CreateLogicControllerType(type);
 
-                    result.Add($"builder.Services.AddTransient<{contractType}<{accessType}>, {controllerType}>();");
+                    result.Add($"builder.Services.AddTransient<{contractType}, {controllerType}>();");
                 }
                 else if (generate)
                 {
                     var logicProject = $"{ItemProperties.SolutionName}{StaticLiterals.LogicExtension}";
-                    var accessType = $"{logicProject}.{ItemProperties.CreateModelSubType(type)}";
                     var contractType = ItemProperties.CreateAccessContractType(type);
                     var facadeType = $"{logicProject}.{ItemProperties.CreateFacadeSubType(type)}";
 
-                    result.Add($"builder.Services.AddTransient<{contractType}<{accessType}>, {facadeType}>();");
+                    result.Add($"builder.Services.AddTransient<{contractType}, {facadeType}>();");
                 }
             }
             result.Add("}");

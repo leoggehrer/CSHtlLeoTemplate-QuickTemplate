@@ -250,7 +250,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             var filterAlias = "TFilterModel";
             var filterTypeUsing = $"using {filterAlias} = {CreateFilterModelType(type)};";
             var contractAlias = "TAccessContract";
-            var contractTypeUsing = $"using {contractAlias} = {contractType}<{accessType}>;";
+            var contractTypeUsing = $"using {contractAlias} = {contractType};";
             var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = $"{ItemProperties.CreateControllerType(type)}",
@@ -263,7 +263,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(controllerClassName));
             result.Add($"protected override string ControllerName => \"{controllerName}\";");
-            result.AddRange(CreatePartialConstrutor("public", controllerClassName, $"{contractType}<{accessAlias}> other", "base(other)", null, true));
+            result.AddRange(CreatePartialConstrutor("public", controllerClassName, $"{contractType} other", "base(other)", null, true));
             result.AddRange(CreateComment(type));
             result.Add($"protected override {modelAlias} ToViewModel({accessAlias} accessModel, ActionMode actionMode)");
             result.Add("{");
@@ -437,20 +437,18 @@ namespace TemplateCodeGenerator.Logic.Generation
                 if (generate && type.IsPublic)
                 {
                     var logicProject = $"{ItemProperties.SolutionName}{StaticLiterals.LogicExtension}";
-                    var accessType = $"{logicProject}.{ItemProperties.CreateModelSubType(type)}";
                     var contractType = ItemProperties.CreateAccessContractType(type);
                     var controllerType = ItemProperties.CreateLogicControllerType(type);
 
-                    result.Add($"builder.Services.AddTransient<{contractType}<{accessType}>, {controllerType}>();");
+                    result.Add($"builder.Services.AddTransient<{contractType}, {controllerType}>();");
                 }
                 else if (generate)
                 {
                     var logicProject = $"{ItemProperties.SolutionName}{StaticLiterals.LogicExtension}";
-                    var accessType = $"{logicProject}.{ItemProperties.CreateModelSubType(type)}";
                     var contractType = ItemProperties.CreateAccessContractType(type);
                     var facadeType = $"{logicProject}.{ItemProperties.CreateFacadeSubType(type)}";
 
-                    result.Add($"builder.Services.AddTransient<{contractType}<{accessType}>, {facadeType}>();");
+                    result.Add($"builder.Services.AddTransient<{contractType}, {facadeType}>();");
                 }
             }
             foreach (var type in entityProject.ServiceTypes)
@@ -602,7 +600,7 @@ namespace TemplateCodeGenerator.Logic.Generation
 
             foreach (var item in viewProperties)
             {
-                var attribute = StaticLiterals.ExtendedProperties.Any(e => e.Equals(item.Name)) ? "readonly=\"readonly\"" : string.Empty; 
+                var attribute = StaticLiterals.ExtendedProperties.Any(e => e.Equals(item.Name)) ? "readonly=\"readonly\"" : string.Empty;
 
                 result.Add("  <div class=\"form-group\">");
                 result.Add($"   <label asp-for=\"{item.Name}\" class=\"control-label\"></label>");
