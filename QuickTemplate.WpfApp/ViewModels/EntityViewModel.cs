@@ -34,7 +34,7 @@ namespace QuickTemplate.WpfApp.ViewModels
         {
             get
             {
-                return RelayCommand.CreateCommand(ref cmdSave, p =>
+                return RelayCommand.Create(ref cmdSave, p =>
                 {
                     Save();
                 },
@@ -45,7 +45,7 @@ namespace QuickTemplate.WpfApp.ViewModels
         {
             get
             {
-                return RelayCommand.CreateCommand(ref cmdClose, p =>
+                return RelayCommand.Create(ref cmdClose, p =>
                 {
                     Window?.Close();
                 },
