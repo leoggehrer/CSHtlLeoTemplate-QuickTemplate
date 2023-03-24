@@ -4,7 +4,8 @@
 namespace QuickTemplate.Logic.Contracts.Access
 {
     using QuickTemplate.Logic.Contracts.Account;
-    public partial interface IAccessRulesAccess<T>
+
+    public partial interface IAccessRulesAccess
     {
         Task<bool> CanBeCreatedAsync(Type type, IIdentity identity);
         Task<bool> CanBeReadAsync(IIdentifyable item, IIdentity identity);

@@ -4,6 +4,7 @@
 namespace QuickTemplate.Logic.Contracts.Account
 {
     using QuickTemplate.Logic.Modules.Common;
+
     public partial interface IIdentity
     {
         IdType Id { get; }

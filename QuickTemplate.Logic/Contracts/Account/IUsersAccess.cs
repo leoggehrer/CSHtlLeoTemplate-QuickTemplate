@@ -3,7 +3,9 @@
 #if ACCOUNT_ON
 namespace QuickTemplate.Logic.Contracts.Account
 {
-    public partial interface IUsersAccess<T> : IDataAccess<T>
+    using TOutModel = Models.Account.User;
+
+    public partial interface IUsersAccess : IDataAccess<TOutModel>
     {
     }
 }
