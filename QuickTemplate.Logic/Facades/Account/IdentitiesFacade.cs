@@ -4,9 +4,9 @@
 namespace QuickTemplate.Logic.Facades.Account
 {
     using TOutModel = Models.Account.Identity;
-    public sealed partial class IdentitiesFacade : ControllerFacade<TOutModel>, Contracts.Account.IIdentitiesAccess<TOutModel>
+    public sealed partial class IdentitiesFacade : ControllerFacade<TOutModel>, Contracts.Account.IIdentitiesAccess
     {
-        new private Contracts.Account.IIdentitiesAccess<TOutModel> Controller => (ControllerObject as Contracts.Account.IIdentitiesAccess<TOutModel>)!;
+        new private Contracts.Account.IIdentitiesAccess Controller => (ControllerObject as Contracts.Account.IIdentitiesAccess)!;
 
         public IdentitiesFacade()
             : base(new Controllers.Account.IdentitiesController())

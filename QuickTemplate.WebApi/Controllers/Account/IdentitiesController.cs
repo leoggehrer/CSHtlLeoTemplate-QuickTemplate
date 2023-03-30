@@ -24,7 +24,7 @@ namespace QuickTemplate.WebApi.Controllers.Account
         ///
         /// Implemented from template developer
         ///
-        public IdentitiesController(QuickTemplate.Logic.Contracts.Account.IIdentitiesAccess<TAccessModel> other)
+        public IdentitiesController(QuickTemplate.Logic.Contracts.Account.IIdentitiesAccess other)
         : base(other)
         {
             Constructing();

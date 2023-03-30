@@ -6,7 +6,7 @@ namespace QuickTemplate.AspMvc.Controllers.Account
     using TAccessModel = Logic.Models.Account.Identity;
     using TViewModel = AspMvc.Models.Account.Identity;
     using TFilterModel = AspMvc.Models.Account.IdentityFilter;
-    using TAccessContract = Logic.Contracts.Account.IIdentitiesAccess<Logic.Models.Account.Identity>;
+    using TAccessContract = Logic.Contracts.Account.IIdentitiesAccess;
     using Microsoft.AspNetCore.Mvc;
     public partial class IdentitiesController : Controllers.FilterGenericController<TAccessModel, TViewModel, TFilterModel, TAccessContract>
     {

@@ -7,7 +7,7 @@ namespace QuickTemplate.Logic.Controllers.Account
     using TOutModel = Models.Account.LoginSession;
 
     [Modules.Security.Authorize("SysAdmin", "AppAdmin")]
-    internal sealed partial class LoginSessionsController : EntitiesController<TEntity, TOutModel>, Contracts.Account.ILoginSessionsAccess<TOutModel>
+    internal sealed partial class LoginSessionsController : EntitiesController<TEntity, TOutModel>, Contracts.Account.ILoginSessionsAccess
     {
         static LoginSessionsController()
         {

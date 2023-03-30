@@ -6,7 +6,7 @@ namespace QuickTemplate.AspMvc.Controllers.Account
     using TAccessModel = Logic.Models.Account.User;
     using TViewModel = AspMvc.Models.Account.IdentityUser;
     using TFilterModel = AspMvc.Models.Account.IdentityUserFilter;
-    using TAccessContract = Logic.Contracts.Account.IUsersAccess<Logic.Models.Account.User>;
+    using TAccessContract = Logic.Contracts.Account.IUsersAccess;
     using System.Diagnostics.Metrics;
 
     public partial class IdentityUsersController : Controllers.FilterGenericController<TAccessModel, TViewModel, TFilterModel, TAccessContract>
@@ -60,7 +60,7 @@ namespace QuickTemplate.AspMvc.Controllers.Account
                 if (identityList == null)
                 {
                     var services = HttpContext.RequestServices;
-                    using var ctrl = (Logic.Contracts.Account.IIdentitiesAccess<Logic.Models.Account.Identity>)services.GetService(typeof(Logic.Contracts.Account.IIdentitiesAccess<Logic.Models.Account.Identity>))!;
+                    using var ctrl = (Logic.Contracts.Account.IIdentitiesAccess)services.GetService(typeof(Logic.Contracts.Account.IIdentitiesAccess))!;
 
                     ctrl.SessionToken = SessionWrapper.SessionToken;
 

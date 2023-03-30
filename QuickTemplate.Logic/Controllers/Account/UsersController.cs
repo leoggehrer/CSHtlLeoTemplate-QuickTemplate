@@ -7,7 +7,7 @@ namespace QuickTemplate.Logic.Controllers.Account
     using OutModelUser = Models.Account.User;
 
     [Modules.Security.Authorize("SysAdmin", "AppAdmin")]
-    internal sealed partial class UsersController : EntitiesController<EntityUser, OutModelUser>, Contracts.Account.IUsersAccess<OutModelUser>
+    internal sealed partial class UsersController : EntitiesController<EntityUser, OutModelUser>, Contracts.Account.IUsersAccess
     {
         public UsersController()
         {

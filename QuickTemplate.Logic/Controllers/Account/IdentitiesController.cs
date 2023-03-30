@@ -9,7 +9,7 @@ namespace QuickTemplate.Logic.Controllers.Account
     using TOutModel = Models.Account.Identity;
 
     [Modules.Security.Authorize("SysAdmin", "AppAdmin")]
-    internal sealed partial class IdentitiesController : EntitiesController<TEntity, TOutModel>, Contracts.Account.IIdentitiesAccess<TOutModel>
+    internal sealed partial class IdentitiesController : EntitiesController<TEntity, TOutModel>, Contracts.Account.IIdentitiesAccess
     {
         private List<IdType> identityIds = new();
         public IdentitiesController()
