@@ -398,17 +398,12 @@ namespace TemplateTooles.ConApp
                 Extensions.Add(extension);
             }
 
-            if (targetDirectory != null && Directory.Exists(targetDirectory) == false)
-            {
-                Directory.CreateDirectory(targetDirectory);
-            }
-
             if (sourceFilePath.EndsWith(DockerfileName, StringComparison.CurrentCultureIgnoreCase))
             {
                 var sourceLines = File.ReadAllLines(sourceFilePath, Encoding.Default);
                 var targetLines = sourceLines.Select(l => l.Replace(sourceSolutionName, targetSolutionName));
 
-                File.WriteAllLines(targetFilePath, targetLines.ToArray(), Encoding.Default);
+                WriteAllLines(targetFilePath, targetLines.ToArray(), Encoding.Default);
             }
             else if (sourceFilePath.EndsWith(DockerComposefileName, StringComparison.CurrentCultureIgnoreCase))
             {
@@ -416,7 +411,7 @@ namespace TemplateTooles.ConApp
                 var targetLines = sourceLines.Select(l => l.Replace(sourceSolutionName, targetSolutionName))
                                              .Select(l => l.Replace(sourceSolutionName.ToLower(), targetSolutionName.ToLower()));
 
-                File.WriteAllLines(targetFilePath, targetLines.ToArray(), Encoding.Default);
+                WriteAllLines(targetFilePath, targetLines.ToArray(), Encoding.Default);
             }
             else if (ReplaceFiles.Any(f => f.Equals(fileName, StringComparison.CurrentCultureIgnoreCase))
                      || ReplaceExtensions.Any(i => i.Equals(extension, StringComparison.CurrentCultureIgnoreCase)))
@@ -450,11 +445,12 @@ namespace TemplateTooles.ConApp
                         targetLine = targetLine.Replace(StaticLiterals.BaseCodeLabel, StaticLiterals.CodeCopyLabel);
                         targetLines.Add(targetLine);
                     }
-                    File.WriteAllLines(targetFilePath, targetLines.ToArray(), Encoding.UTF8);
+                    WriteAllLines(targetFilePath, targetLines.ToArray(), Encoding.UTF8);
                 }
             }
             else if (File.Exists(targetFilePath) == false)
             {
+                EnsureExistsDirectory(targetDirectory!);
                 File.Copy(sourceFilePath, targetFilePath);
             }
         }
@@ -500,6 +496,24 @@ namespace TemplateTooles.ConApp
                 }
             }
             xml.Save(filePath);
+        }
+
+        static void WriteAllLines(string filePath, IEnumerable<string> lines, Encoding encoding)
+        {
+            var targetDirectory = Path.GetDirectoryName(filePath);
+
+            if (targetDirectory != null && Directory.Exists(targetDirectory) == false)
+            {
+                Directory.CreateDirectory(targetDirectory);
+            }
+            File.WriteAllLines(filePath, lines.ToArray(), encoding);
+        }
+        static void EnsureExistsDirectory(string path)
+        {
+            if (path != null && Directory.Exists(path) == false)
+            {
+                Directory.CreateDirectory(path);
+            }
         }
     }
 }
