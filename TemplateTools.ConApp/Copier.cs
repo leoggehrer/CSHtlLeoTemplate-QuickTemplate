@@ -5,6 +5,8 @@ namespace TemplateTooles.ConApp
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml;
+    using TemplateCodeGenerator.Logic.Preprocessor;
+
     internal partial class Copier
     {
         #region Class-Constructors
@@ -368,7 +370,7 @@ namespace TemplateTooles.ConApp
             }
             if (string.IsNullOrEmpty(projectFilePath) == false)
             {
-                ReplaceProjectGuids(projectFilePath);
+                ProjectGuids.AddRange(ReplaceProjectGuids(projectFilePath));
             }
         }
         private void CopyProjectDirectoryWorkFiles(string sourceDirectory, string sourceSolutionDirectory, string targetSolutionDirectory)
@@ -391,7 +393,6 @@ namespace TemplateTooles.ConApp
         {
             var fileName = Path.GetFileName(sourceFilePath);
             var extension = Path.GetExtension(sourceFilePath);
-            var targetDirectory = Path.GetDirectoryName(targetFilePath);
 
             if (Extensions.SingleOrDefault(i => i.Equals(extension, StringComparison.CurrentCultureIgnoreCase)) == null)
             {
@@ -450,11 +451,37 @@ namespace TemplateTooles.ConApp
             }
             else if (File.Exists(targetFilePath) == false)
             {
-                EnsureExistsDirectory(targetDirectory!);
-                File.Copy(sourceFilePath, targetFilePath);
+                CopyFile(sourceFilePath, targetFilePath);
             }
         }
 
+        private static string[] ReplaceProjectGuids(string filePath)
+        {
+            var result = new List<string>();
+            var xml = new XmlDocument();
+
+            xml.Load(filePath);
+
+            if (xml.DocumentElement != null)
+            {
+                foreach (XmlNode node in xml.DocumentElement.ChildNodes)
+                {
+                    // first node is the url ... have to go to nexted loc node
+                    foreach (XmlNode item in node)
+                    {
+                        if (item.Name.Equals("ProjectGuid") == true)
+                        {
+                            string newGuid = Guid.NewGuid().ToString().ToUpper();
+
+                            result.Add($"{item.InnerText}{Separator}{newGuid}");
+                            item.InnerText = "{" + newGuid + "}";
+                        }
+                    }
+                }
+            }
+            xml.Save(filePath);
+            return result.ToArray();
+        }
         private static string CreateTargetFilePath(string sourceFilePath, string sourceSolutionDirectory, string targetSolutionDirectory)
         {
             var result = targetSolutionDirectory;
@@ -471,49 +498,33 @@ namespace TemplateTooles.ConApp
             }
             return result;
         }
-        private void ReplaceProjectGuids(string filePath)
-        {
-            var xml = new XmlDocument();
 
-            xml.Load(filePath);
-
-            if (xml.DocumentElement != null)
-            {
-                foreach (XmlNode node in xml.DocumentElement.ChildNodes)
-                {
-                    // first node is the url ... have to go to nexted loc node
-                    foreach (XmlNode item in node)
-                    {
-                        if (item.Name.Equals("ProjectGuid") == true)
-                        {
-                            string newGuid = Guid.NewGuid().ToString().ToUpper();
-
-                            ProjectGuids.Add($"{item.InnerText}{Separator}{newGuid}");
-
-                            item.InnerText = "{" + newGuid + "}";
-                        }
-                    }
-                }
-            }
-            xml.Save(filePath);
-        }
-
-        static void WriteAllLines(string filePath, IEnumerable<string> lines, Encoding encoding)
-        {
-            var targetDirectory = Path.GetDirectoryName(filePath);
-
-            if (targetDirectory != null && Directory.Exists(targetDirectory) == false)
-            {
-                Directory.CreateDirectory(targetDirectory);
-            }
-            File.WriteAllLines(filePath, lines.ToArray(), encoding);
-        }
-        static void EnsureExistsDirectory(string path)
+        private static void EnsureExistsDirectory(string path)
         {
             if (path != null && Directory.Exists(path) == false)
             {
                 Directory.CreateDirectory(path);
             }
+        }
+        private static void CopyFile(string sourceFilePath, string targetFilePath)
+        {
+            var directory = Path.GetDirectoryName(targetFilePath);
+
+            if (directory != null)
+            {
+                EnsureExistsDirectory(directory);
+            }
+            File.Copy(sourceFilePath, targetFilePath);
+        }
+        private static void WriteAllLines(string filePath, IEnumerable<string> lines, Encoding encoding)
+        {
+            var directory = Path.GetDirectoryName(filePath);
+
+            if (directory != null)
+            {
+                EnsureExistsDirectory(directory);
+            }
+            File.WriteAllLines(filePath, lines.ToArray(), encoding);
         }
     }
 }
