@@ -40,7 +40,7 @@ namespace TemplateTools.ConApp
                 Console.WriteLine("Template Copier");
                 Console.WriteLine("===============");
                 Console.WriteLine();
-                Console.WriteLine($"Copy '{sourceSolutionName}' from: {Program.SourcePath}");
+                Console.WriteLine($"Copy '{sourceSolutionName}' from: {SourcePath}");
                 Console.WriteLine($"Copy to '{targetSolutionName}':   {Path.Combine(TargetPath, targetSolutionName)}");
                 Console.WriteLine();
                 Console.WriteLine("[1] Change source path");

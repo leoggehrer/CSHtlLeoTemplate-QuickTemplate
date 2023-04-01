@@ -1,8 +1,6 @@
 ﻿//@BaseCode
 //MdStart
-using System;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 using TemplateCodeGenerator.Logic.Generation;
 
 namespace TemplateTools.ConApp
