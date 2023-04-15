@@ -9,6 +9,7 @@ namespace CommonBase
             BeforeClassInitialize();
             SolutionProjects = new string[]
             {
+                "CleanDirectories.ConApp",
                 "CommonBase",
                 "TemplateCodeGenerator.Logic",
                 "TemplateTools.ConApp",
