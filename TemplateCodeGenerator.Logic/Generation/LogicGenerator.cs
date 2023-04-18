@@ -39,13 +39,14 @@ namespace TemplateCodeGenerator.Logic.Generation
             {
                 var entityType = propertyInfo.PropertyType.GenericTypeArguments[0].FullName;
                 var modelType = ItemProperties.ConvertEntityToModelType(propertyInfo.PropertyType.GenericTypeArguments[0].FullName!);
+                var internalPropertyName = $"Internal{propertyInfo.Name}";
 
                 result.Add(string.Empty);
-                result.Add($"private CommonBase.Modules.Collection.DelegateList<{entityType}, {modelType}>? {CreateFieldName(propertyInfo, "_")};");
+                result.Add($"internal CommonBase.Modules.Collection.DelegateList<{entityType}, {modelType}>? {internalPropertyName}" + " { get; set; }");
                 CreatePropertyAttributes(propertyInfo, result);
                 result.Add($"public System.Collections.Generic.IList<{modelType}> {propertyInfo.Name}");
                 result.Add("{");
-                result.Add($"get => {CreateFieldName(propertyInfo, "_")} ??= new CommonBase.Modules.Collection.DelegateList<{entityType}, {modelType}>({delegateObjectName}.{delegatePropertyInfo.Name}, e => {modelType}.Create(e));");
+                result.Add($"get => {internalPropertyName} ??= new CommonBase.Modules.Collection.DelegateList<{entityType}, {modelType}>({delegateObjectName}.{delegatePropertyInfo.Name}, e => {modelType}.Create(e));");
                 result.Add("}");
             }
             else
