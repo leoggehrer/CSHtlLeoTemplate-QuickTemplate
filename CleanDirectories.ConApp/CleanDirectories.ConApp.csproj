@@ -7,4 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DefineConstants>ACCOUNT_OFF;DBOPERATION_ON;ROWVERSION_OFF;IDINT_ON;IDLONG_OFF;IDGUID_OFF;SQLSERVER_OFF;SQLITE_ON;GENERATEDCODE_OFF</DefineConstants>
+  </PropertyGroup>
+
 </Project>
