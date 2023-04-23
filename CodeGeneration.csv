@@ -10,7 +10,7 @@ Logic;Controller;All;Visibility;internal
 
 Logic;ServiceContract;All;Generate;True
 Logic;Service;All;Generate;True
-Logic;Facade;All;Generate;True
+Logic;Facade;All;Generate;False
 Logic;Factory;All;Generate;False
 
 Logic;DbContext;Test.Company;Generate;True
