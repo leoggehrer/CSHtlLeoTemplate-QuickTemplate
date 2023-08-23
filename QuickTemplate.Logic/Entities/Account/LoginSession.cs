@@ -4,9 +4,9 @@
 namespace QuickTemplate.Logic.Entities.Account
 {
 #if SQLITE_ON
-    [Table("LoginSessions")]
+    [System.ComponentModel.DataAnnotations.Schema.Table("LoginSessions")]
 #else
-    [Table("LoginSessions", Schema = "account")]
+    [System.ComponentModel.DataAnnotations.Schema.Table("LoginSessions", Schema = "account")]
 #endif
     internal partial class LoginSession : VersionEntity
     {

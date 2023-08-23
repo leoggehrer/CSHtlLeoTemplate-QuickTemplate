@@ -5,16 +5,17 @@ namespace QuickTemplate.Logic.Entities.Account
 {
     using QuickTemplate.Logic.Contracts.Account;
     using QuickTemplate.Logic.Modules.Common;
-
 #if SQLITE_ON
-    [Table("Identities")]
+    [System.ComponentModel.DataAnnotations.Schema.Table("Identities")]
 #else
-    [Table("Identities", Schema = "account")]
+    [System.ComponentModel.DataAnnotations.Schema.Table("Identities", Schema = "account")]
 #endif
-    [Index(nameof(Email), IsUnique = true)]
+    [Microsoft.EntityFrameworkCore.Index(nameof(Email), IsUnique = true)]
     public abstract partial class Identity : VersionExtendedEntity, IIdentity
     {
+#if GUID_OFF
         public Guid Guid { get; internal set; }
+#endif
         [MaxLength(128)]
         public string Name { get; set; } = string.Empty;
         [MaxLength(128)]

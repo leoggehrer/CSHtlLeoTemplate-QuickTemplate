@@ -1,13 +1,11 @@
 ﻿//@BaseCode
 //MdStart
-using System;
-using System.Text;
 using CodeGenPreprocessor = TemplateCodeGenerator.Logic.Preprocessor;
 
 namespace TemplateTools.ConApp
 {
-	public partial class PreprocessorApp
-	{
+    public partial class PreprocessorApp
+    {
         #region Class-Constructors
         static PreprocessorApp()
         {
@@ -104,7 +102,7 @@ namespace TemplateTools.ConApp
                     {
                         Program.PrintBusyProgress();
                         CodeGenPreprocessor.ProjectFile.WriteDefinesInProjectFiles(SourcePath, Defines);
-                        SetPreprocessorDefinesInRazorFiles(SourcePath, Defines);
+                        CodeGenPreprocessor.RazorFile.SetPreprocessorDefineCommentsInRazorFiles(SourcePath, Defines);
                     }
                 }
 
@@ -112,7 +110,7 @@ namespace TemplateTools.ConApp
                 {
                     Program.PrintBusyProgress();
                     CodeGenPreprocessor.ProjectFile.WriteDefinesInProjectFiles(SourcePath, Defines);
-                    SetPreprocessorDefinesInRazorFiles(SourcePath, Defines);
+                    CodeGenPreprocessor.RazorFile.SetPreprocessorDefineCommentsInRazorFiles(SourcePath, Defines);
                 }
 
                 changedDefines = false;
@@ -189,28 +187,6 @@ namespace TemplateTools.ConApp
             Console.WriteLine($"[{++menuIndex,-2}] Start assignment process...");
             Console.WriteLine("[x|X] Exit");
         }
-        private static void PrintSolutionDirectives(string path, params string[] excludeDirectives)
-        {
-            var files = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
-
-            foreach (var file in files)
-            {
-                var idx = 0;
-                var lines = File.ReadAllLines(file, Encoding.Default);
-
-                foreach (var line in lines)
-                {
-                    if (line.Trim().StartsWith("#if ") && excludeDirectives.Any(e => line.Contains(e)) == false)
-                    {
-                        var message = $"{line} in line {idx} of the {file} file";
-
-                        //Console.WriteLine(message);
-                        //Debug.WriteLine(message);
-                    }
-                    idx++;
-                }
-            }
-        }
         #endregion Console methods
 
         internal static void SwitchDefine(string[] defines, int idx)
@@ -268,57 +244,6 @@ namespace TemplateTools.ConApp
         internal static void SwitchDefine(string[] defines, string definePrefix, string definePostfix)
         {
             CodeGenPreprocessor.ProjectFile.SwitchDefine(defines, definePrefix, definePostfix);
-        }
-
-        private static void SetPreprocessorDefinesInRazorFiles(string path, params string[] defineItems)
-        {
-            foreach (var define in defineItems.Select(d => d.ToUpper()))
-            {
-                SetPreprocessorDefinesCommentsInRazorFiles(path, define);
-            }
-        }
-        private static void SetPreprocessorDefinesCommentsInRazorFiles(string path, string define)
-        {
-            var files = Directory.GetFiles(path, "*.cshtml", SearchOption.AllDirectories);
-            var searchIfStart = define.EndsWith("_ON") ? $"@*#if {define}*@@*{Environment.NewLine}"
-                                                       : $"@*#if {define.Replace("_OFF", "_ON")}*@{Environment.NewLine}";
-            var replaceIfStart = define.EndsWith("_ON") ? $"@*#if {define}*@{Environment.NewLine}"
-                                                        : $"@*#if {define.Replace("_OFF", "_ON")}*@@*{Environment.NewLine}";
-            var searchIfEnd = define.EndsWith("_ON") ? $"{Environment.NewLine}*@@*#endif*@"
-                                                     : $"{Environment.NewLine}@*#endif*@";
-            var replaceIfEnd = define.EndsWith("_ON") ? $"{Environment.NewLine}@*#endif*@"
-                                                      : $"{Environment.NewLine}*@@*#endif*@";
-
-            foreach (var file in files)
-            {
-                var startIndex = 0;
-                var hasChanged = false;
-                var result = string.Empty;
-                var text = File.ReadAllText(file, Encoding.Default);
-
-                foreach (var tag in text.GetAllTags(searchIfStart, searchIfEnd))
-                {
-                    hasChanged = true;
-
-                    if (tag.StartTagIndex > startIndex)
-                    {
-                        result += text.Partialstring(startIndex, tag.StartTagIndex - 1);
-                        result += replaceIfStart;
-                        result += tag.InnerText;
-                        result += replaceIfEnd;
-
-                        startIndex += tag.EndTagIndex + tag.EndTag.Length;
-                    }
-                }
-                if (hasChanged && startIndex < text.Length)
-                {
-                    result += text.Partialstring(startIndex, text.Length);
-                }
-                if (hasChanged)
-                {
-                    File.WriteAllText(file, result, Encoding.Default);
-                }
-            }
         }
     }
 }

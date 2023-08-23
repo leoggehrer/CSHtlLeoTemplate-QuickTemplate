@@ -1,21 +1,25 @@
 ﻿//@BaseCode
 //MdStart
-using System;
-using System.Reflection;
 using TemplateCodeGenerator.Logic.Contracts;
 
 namespace TemplateCodeGenerator.Logic.Generation
 {
     internal sealed partial class MVVMGenerator : ModelGenerator
     {
+        #region fields
         private ItemProperties? _itemProperties;
+        #endregion fields
         protected override ItemProperties ItemProperties => _itemProperties ??= new ItemProperties(SolutionProperties.SolutionName, StaticLiterals.MVVMExtension);
 
+        #region properties
         public bool GenerateModels { get; set; }
+        #endregion properties
 
         public MVVMGenerator(ISolutionProperties solutionProperties) : base(solutionProperties)
         {
-            GenerateModels = QuerySetting<bool>(Common.ItemType.Model, StaticLiterals.AllItems, StaticLiterals.Generate, "True");
+            string generateAll = QuerySetting<string>(Common.ItemType.AllItems, StaticLiterals.AllItems, StaticLiterals.Generate, "True");
+
+            GenerateModels = QuerySetting<bool>(Common.ItemType.AccessModel, StaticLiterals.AllItems, StaticLiterals.Generate, generateAll);
         }
 
         public IEnumerable<IGeneratedItem> GenerateAll()
@@ -34,66 +38,23 @@ namespace TemplateCodeGenerator.Logic.Generation
 
             foreach (var type in createTypes)
             {
-                var generate = CanCreate(type) && QueryModelSetting<bool>(Common.UnitType.MVVM, Common.ItemType.Model, type, StaticLiterals.Generate, GenerateModels.ToString());
+                var generate = CanCreate(type) && base.QuerySetting<bool>(Common.UnitType.MVVM, Common.ItemType.AccessModel, type, StaticLiterals.Generate, GenerateModels.ToString());
 
                 if (generate)
                 {
-                    result.Add(CreateModelFromType(type, Common.UnitType.MVVM, Common.ItemType.Model));
-                    result.Add(CreateModelInheritance(type, Common.UnitType.MVVM, Common.ItemType.Model));
+                    result.Add(CreateModelFromType(type, Common.UnitType.MVVM, Common.ItemType.AccessModel));
+                    result.Add(CreateModelInheritance(type, Common.UnitType.MVVM, Common.ItemType.AccessModel));
                 }
             }
             return result;
         }
-        private IGeneratedItem CreateModelInheritance(Type type, Common.UnitType unitType, Common.ItemType itemType)
-        {
-            var result = new Models.GeneratedItem(unitType, itemType)
-            {
-                FullName = CreateModelFullNameFromType(type),
-                FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = ItemProperties.CreateModelSubPath(type, "Inheritance", StaticLiterals.CSharpFileExtension),
-            };
-            result.Source.Add($"partial class {CreateModelName(type)} : {GetBaseClassByType(type, StaticLiterals.ModelsFolder)}");
-            result.Source.Add("{");
-            result.Source.Add("}");
-            result.EnvelopeWithANamespace(ItemProperties.CreateModelNamespace(type));
-            result.FormatCSharpCode();
-            return result;
-        }
 
-        private T QuerySetting<T>(Common.ItemType itemType, Type type, string valueName, string defaultValue)
-        {
-            return QuerySetting<T>(Common.UnitType.MVVM, itemType, type, valueName, defaultValue);
-        }
-        private T QuerySetting<T>(Common.UnitType unitType, Common.ItemType itemType, Type type, string valueName, string defaultValue)
-        {
-            T result;
-
-            try
-            {
-                result = (T)Convert.ChangeType(QueryGenerationSettingValue(unitType, itemType, CreateEntitiesSubTypeFromType(type), valueName, defaultValue), typeof(T));
-            }
-            catch (Exception ex)
-            {
-                result = (T)Convert.ChangeType(defaultValue, typeof(T));
-                System.Diagnostics.Debug.WriteLine($"Error in {MethodBase.GetCurrentMethod()!.Name}: {ex.Message}");
-            }
-            return result;
-        }
+        #region query configuration
         private T QuerySetting<T>(Common.ItemType itemType, string itemName, string valueName, string defaultValue)
         {
-            T result;
-
-            try
-            {
-                result = (T)Convert.ChangeType(QueryGenerationSettingValue(Common.UnitType.MVVM, itemType, itemName, valueName, defaultValue), typeof(T));
-            }
-            catch (Exception ex)
-            {
-                result = (T)Convert.ChangeType(defaultValue, typeof(T));
-                System.Diagnostics.Debug.WriteLine($"Error in {MethodBase.GetCurrentMethod()!.Name}: {ex.Message}");
-            }
-            return result;
+            return QuerySetting<T>(Common.UnitType.AspMvc, itemType, itemName, valueName, defaultValue);
         }
+        #endregion query configuration
     }
 }
 //MdEnd

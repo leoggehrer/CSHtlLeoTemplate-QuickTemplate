@@ -1,7 +1,9 @@
 ﻿//@BaseCode
 //MdStart
+using CommonBase.Contracts;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+
 namespace QuickTemplate.Logic.Controllers
 {
     /// <summary>
@@ -11,16 +13,16 @@ namespace QuickTemplate.Logic.Controllers
 #if ACCOUNT_ON
     [Modules.Security.Authorize]
 #endif
-    public abstract partial class EntitiesController<TEntity, TOutModel> : ControllerObject, Contracts.IDataAccess<TOutModel>
+    public abstract partial class EntitiesController<TEntity, TOutModel> : ControllerObject, IDataAccess<TOutModel>
         where TEntity : Entities.EntityObject, new()
         where TOutModel : Models.ModelObject, new()
     {
         protected enum ActionType
         {
-            Insert,
-            Update,
-            Delete,
-            Save,
+            Insert = 1,
+            Update = 2 * Insert,
+            Delete = 2 * Update,
+            Save = 2 * Delete,
         }
         static EntitiesController()
         {
@@ -58,6 +60,10 @@ namespace QuickTemplate.Logic.Controllers
             }
         }
         /// <summary>
+        /// Gets the internal entity set as queryable.
+        /// </summary>
+        internal IQueryable<TEntity> QuerySet => EntitySet.AsQueryable();
+        /// <summary>
         /// Gets the internal includes.
         /// </summary>
         /// <returns></returns>
@@ -66,19 +72,17 @@ namespace QuickTemplate.Logic.Controllers
         /// <summary>
         /// Creates an instance.
         /// </summary>
-        public EntitiesController()
+        protected EntitiesController()
             : base(new DataContext.ProjectDbContext())
         {
-
         }
         /// <summary>
         /// Creates an instance.
         /// </summary>
         /// <param name="other">A reference to an other controller</param>
-        public EntitiesController(ControllerObject other)
+        protected EntitiesController(ControllerObject other)
             : base(other)
         {
-
         }
 
         #region MaxPageSize and Count
@@ -883,7 +887,7 @@ namespace QuickTemplate.Logic.Controllers
             
             return ExecuteUpdate(entity);
 #else
-            return await Task.Run(() =>ExecuteUpdate(entity)).ConfigureAwait(false);
+            return await Task.Run(() => ExecuteUpdate(entity)).ConfigureAwait(false);
 #endif
         }
         /// <summary>
@@ -996,7 +1000,7 @@ namespace QuickTemplate.Logic.Controllers
         /// Saves any changes in the underlying persistence (without authorization).
         /// </summary>
         /// <returns>The number of state entries written to the underlying database.</returns>
-        internal async Task<int> ExecuteSaveChangesAsync()
+        internal virtual async Task<int> ExecuteSaveChangesAsync()
         {
             var result = 0;
 

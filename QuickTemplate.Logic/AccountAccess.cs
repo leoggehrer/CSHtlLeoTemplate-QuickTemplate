@@ -79,7 +79,7 @@ namespace QuickTemplate.Logic
             using var ctrl = new Controllers.Account.IdentitiesController() { SessionToken = sessionToken };
             var entity = await ctrl.GetByIdAsync(id).ConfigureAwait(false);
 
-            return entity != null ? Identity.Create(entity) : throw new Modules.Exceptions.LogicException(Modules.Exceptions.ErrorType.InvalidId);
+            return entity != null ? Identity.Create(entity) : throw new Modules.Exceptions.LogicException(CommonBase.Modules.Exceptions.ErrorType.InvalidId);
         }
         public static async Task<Identity[]> GetIdentitiesAsync(string sessionToken)
         {
@@ -95,7 +95,7 @@ namespace QuickTemplate.Logic
 
             if (entity == null)
             {
-                throw new Modules.Exceptions.LogicException(Modules.Exceptions.ErrorType.InvalidId);
+                throw new Modules.Exceptions.LogicException(CommonBase.Modules.Exceptions.ErrorType.InvalidId);
             }
 
             entity.CopyFrom(identity, n => n.Equals("Guid", StringComparison.InvariantCultureIgnoreCase) == false);
@@ -112,7 +112,7 @@ namespace QuickTemplate.Logic
 
             if (entity == null)
             {
-                throw new Modules.Exceptions.LogicException(Modules.Exceptions.ErrorType.InvalidId);
+                throw new Modules.Exceptions.LogicException(CommonBase.Modules.Exceptions.ErrorType.InvalidId);
             }
 
             await ctrl.DeleteAsync(id).ConfigureAwait(false);

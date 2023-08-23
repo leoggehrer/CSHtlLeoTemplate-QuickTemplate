@@ -13,7 +13,7 @@ namespace CommonBase.Modules.PlantUML
         InterfaceExtends = 2 * TypeExtends,
 
         ImplementedInterfaces = 2 * InterfaceExtends,
-        
+
         ClassRelations = 2 * ImplementedInterfaces,
         InterfaceRelations = 2 * ClassRelations,
     }

@@ -4,11 +4,11 @@
 namespace QuickTemplate.Logic.Entities.Account
 {
 #if SQLITE_ON
-    [Table("SecureIdentities")]
+    [System.ComponentModel.DataAnnotations.Schema.Table("SecureIdentities")]
 #else
-    [Table("SecureIdentities", Schema = "account")]
+    [System.ComponentModel.DataAnnotations.Schema.Table("SecureIdentities", Schema = "account")]
 #endif
-    [Index(nameof(Email), IsUnique = true)]
+    [Microsoft.EntityFrameworkCore.Index(nameof(Email), IsUnique = true)]
     internal partial class SecureIdentity : Identity
     {
         [Required]

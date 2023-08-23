@@ -47,7 +47,7 @@ namespace QuickTemplate.MvvMApp.ViewModels
         #endregion commands
 
         #region methods
-        public abstract Logic.Contracts.IDataAccess<TEntity> CreateController();
+        public abstract BaseContracts.IDataAccess<TEntity> CreateController();
         protected virtual void BeforeSave(ref bool handled) { }
         private async void Save()
         {

@@ -2,8 +2,7 @@
 //MdStart
 namespace QuickTemplate.Logic.Models
 {
-    using Logic.Contracts;
-    public abstract partial class VersionModel : ModelObject, IVersionable
+    public abstract partial class VersionModel : ModelObject, BaseContracts.IVersionable
     {
         new internal virtual Entities.VersionEntity Source
         {
@@ -29,7 +28,7 @@ namespace QuickTemplate.Logic.Models
 
         protected override int GetHashCode(List<object?> values)
         {
-#if REVISION_ON
+#if ROWVERSION_ON
             if (RowVersion != null)
             {
                 values.Add(RowVersion);
@@ -37,7 +36,6 @@ namespace QuickTemplate.Logic.Models
 #endif
             return base.GetHashCode(values);
         }
-
     }
 }
 //MdEnd

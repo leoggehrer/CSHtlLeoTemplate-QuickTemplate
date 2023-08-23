@@ -105,6 +105,7 @@ namespace TemplateTools.ConApp
                         }
                     }
                 }
+                AfterGetTargetPaths(Program.UserPath, targetPaths);
             } while (running);
         }
         private static void PrintHeader(string sourcePath, string[] targetPaths)

@@ -1,0 +1,48 @@
+﻿@*@CodeCopy*@
+@*#if ACCESSRULES_ON*@@*
+@model QuickTemplate.AspMvc.Models.Access.AccessRule
+
+<tr>
+ <td>
+  @Html.DisplayFor(model => model.Type)
+ </td>
+ <td>
+  @Html.DisplayFor(model => model.EntityType)
+ </td>
+ <td>
+  @Html.DisplayFor(model => model.RelationshipEntityType)
+ </td>
+ <td>
+  @Html.DisplayFor(model => model.PropertyName)
+ </td>
+ <td>
+  @Html.DisplayFor(model => model.EntityValue)
+ </td>
+ <td>
+  @Html.DisplayFor(model => model.AccessType)
+ </td>
+ <td>
+  @Html.DisplayFor(model => model.AccessValue)
+ </td>
+ <td>
+  @Html.DisplayFor(model => model.Creatable)
+ </td>
+ <td>
+  @Html.DisplayFor(model => model.Readable)
+ </td>
+ <td>
+  @Html.DisplayFor(model => model.Updatable)
+ </td>
+ <td>
+  @Html.DisplayFor(model => model.Deletable)
+ </td>
+ <td>
+  @Html.DisplayFor(model => model.Viewable)
+ </td>
+ <td>
+  @Html.ActionLink("Edit", "Edit", new { id=Model.Id }) |
+  @Html.ActionLink("Details", "Details", new { id=Model.Id }) |
+  @Html.ActionLink("Delete", "Delete", new { id=Model.Id })
+ </td>
+</tr>
+*@@*#endif*@

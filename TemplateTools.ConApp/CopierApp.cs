@@ -1,5 +1,6 @@
 ﻿//@BaseCode
 //MdStart
+using TemplateCodeGenerator.Logic;
 using TemplateTooles.ConApp;
 
 namespace TemplateTools.ConApp
@@ -31,9 +32,9 @@ namespace TemplateTools.ConApp
 
             while (input.Equals("x") == false)
             {
-                var sourceSolutionName = Program.GetSolutionNameByPath(SourcePath);
-                var sourceProjects = StaticLiterals.SolutionProjects
-                                                   .Concat(StaticLiterals.ProjectExtensions.Select(e => $"{sourceSolutionName}{e}"));
+                var solutionProperties = SolutionProperties.Create(SourcePath);
+                var sourceSolutionName = solutionProperties.SolutionName;
+                var allSourceProjectNames = solutionProperties.AllTemplateProjectNames;
 
                 Console.Clear();
                 Console.ForegroundColor = Program.ForegroundColor;
@@ -85,7 +86,6 @@ namespace TemplateTools.ConApp
                     }
                     else if (select == 2)
                     {
-                        var solutionPath = Program.GetCurrentSolutionPath();
                         var qtParentPaths = Program.GetQuickTemplateParentPaths(Program.UserPath, SourcePath);
 
                         for (int i = 0; i < qtParentPaths.Length; i++)
@@ -122,7 +122,7 @@ namespace TemplateTools.ConApp
                         var targetSolutionPath = Path.Combine(TargetPath, targetSolutionName);
 
                         Program.PrintBusyProgress();
-                        copier.Copy(SourcePath, targetSolutionPath, sourceProjects);
+                        copier.Copy(SourcePath, targetSolutionPath, allSourceProjectNames);
                         Program.RunBusyProgress = false;
 
                         Program.OpenSolutionFolder(targetSolutionPath);

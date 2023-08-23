@@ -3,13 +3,15 @@
 namespace QuickTemplate.CodeGenApp
 {
     using TemplateCodeGenerator.Logic;
-    using TemplateCodeGenerator.Logic.Generation;
+    using TemplateCodeGenerator.Logic.Git;
+
     internal partial class Program
     {
         static Program()
         {
             ClassConstructing();
             ToGroupFile = false;
+            IgnoreFiles = true;
             HomePath = (Environment.OSVersion.Platform == PlatformID.Unix ||
                         Environment.OSVersion.Platform == PlatformID.MacOSX)
                        ? Environment.GetEnvironmentVariable("HOME")
@@ -24,7 +26,8 @@ namespace QuickTemplate.CodeGenApp
         static partial void ClassConstructed();
 
         #region Properties
-        private static bool ToGroupFile { get; set; } = false;
+        private static bool ToGroupFile { get; set; }
+        private static bool IgnoreFiles { get; set; }
         private static string? HomePath { get; set; }
         private static string UserPath { get; set; }
         private static string SourcePath { get; set; }
@@ -59,10 +62,12 @@ namespace QuickTemplate.CodeGenApp
                 Console.WriteLine();
                 Console.WriteLine($"From file path:  {SourcePath}");
                 Console.WriteLine($"Generation into: {(ToGroupFile ? "Group files" : "Single files")}");
+                Console.WriteLine($"Ignore files:    {(IgnoreFiles ? "Yes" : "No")}");
                 Console.WriteLine();
                 Console.WriteLine("[1..] Change group file flag");
-                Console.WriteLine("[2..] Delete generation files...");
-                Console.WriteLine("[3..] Start code generation...");
+                Console.WriteLine("[2..] Change ignore files flag");
+                Console.WriteLine("[3..] Delete generation files...");
+                Console.WriteLine("[4..] Start code generation...");
                 Console.WriteLine("[x|X] Exit");
                 Console.WriteLine();
                 Console.Write("Choose: ");
@@ -79,11 +84,24 @@ namespace QuickTemplate.CodeGenApp
             {
                 ToGroupFile = !ToGroupFile;
             }
-            else if (command == "2")
+            if (command == "2")
             {
-                Generator.DeleteGeneratedFiles(SourcePath);
+                IgnoreFiles = !IgnoreFiles;
+                if (IgnoreFiles)
+                {
+                    GitIgnoreManager.Run(SourcePath);
+                }
+                else
+                {
+                    GitIgnoreManager.DeleteIgnoreEntries(SourcePath);
+                }
             }
             else if (command == "3")
+            {
+                Generator.DeleteGeneratedFiles(SourcePath);
+                GitIgnoreManager.Run(SourcePath);
+            }
+            else if (command == "4")
             {
                 var logicAssemblyTypes = Logic.Modules.CodeGenerator.AssemblyAccess.AllTypes;
                 var solutionProperties = SolutionProperties.Create(SourcePath, logicAssemblyTypes);
@@ -92,6 +110,14 @@ namespace QuickTemplate.CodeGenApp
                 Generator.DeleteGeneratedFiles(SourcePath);
                 Writer.WriteToGroupFile = ToGroupFile;
                 Writer.WriteAll(SourcePath, solutionProperties, generatedItems);
+                if (IgnoreFiles)
+                {
+                    GitIgnoreManager.Run(SourcePath);
+                }
+                else
+                {
+                    GitIgnoreManager.DeleteIgnoreEntries(SourcePath);
+                }
                 Thread.Sleep(700);
             }
         }
@@ -100,8 +126,8 @@ namespace QuickTemplate.CodeGenApp
         #region Helpers
         private static string GetCurrentSolutionPath()
         {
-            int endPos = AppContext.BaseDirectory
-                                   .IndexOf("QuickTemplate.CodeGenApp", StringComparison.CurrentCultureIgnoreCase);
+            var codeGenApp = $"{nameof(QuickTemplate)}.{nameof(CodeGenApp)}";
+            var endPos = AppContext.BaseDirectory.IndexOf(codeGenApp, StringComparison.CurrentCultureIgnoreCase);
 
             return AppContext.BaseDirectory[..endPos];
         }

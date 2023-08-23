@@ -1,16 +1,13 @@
 ﻿//@BaseCode
 //MdStart
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Reflection;
 
 namespace CommonBase.Extensions
 {
     public static partial class TypeExtensions
     {
-        public partial class Extend
+        public class Extend
         {
             public Type? Type { get; set; }
             public List<Extend> Extends { get; set; } = new();
@@ -37,19 +34,25 @@ namespace CommonBase.Extensions
         /// </summary>
         public static bool IsSimpleType(this Type type)
         {
-            return
-               type.IsValueType ||
-               type.IsPrimitive ||
-               new[]
-               {
-               typeof(String),
-               typeof(Decimal),
-               typeof(DateTime),
-               typeof(DateTimeOffset),
-               typeof(TimeSpan),
-               typeof(Guid)
-               }.Contains(type) ||
-               (Convert.GetTypeCode(type) != TypeCode.Object);
+            var checkType = type;
+
+            if (type.IsNullableType())
+            {
+                checkType = Nullable.GetUnderlyingType(type);
+            }
+
+            return checkType!.IsValueType ||
+                   checkType!.IsPrimitive ||
+                   new[]
+                   {
+                       typeof(String),
+                       typeof(Decimal),
+                       typeof(DateTime),
+                       typeof(DateTimeOffset),
+                       typeof(TimeSpan),
+                       typeof(Guid)
+                   }.Contains(checkType) ||
+                   (Convert.GetTypeCode(checkType) != TypeCode.Object);
         }
 
         public static Type? GetUnderlyingType(this MemberInfo member)
@@ -254,6 +257,18 @@ namespace CommonBase.Extensions
 
             return GetRelationsRec(type, result, maxDeep, 0);
         }
+        public static IEnumerable<Type> GetBaseTypes(this Type type)
+        {
+            var result = new List<Type>();
+            var run = type.BaseType;
+
+            while (run != null)
+            {
+                result.Add(run);
+                run = run.BaseType;
+            }
+            return result;
+        }
         public static IEnumerable<Type> GetBaseInterfaces(this Type type)
         {
             static void GetBaseInterfaces(Type type, List<Type> interfaces)
@@ -337,8 +352,6 @@ namespace CommonBase.Extensions
 
         public static IEnumerable<PropertyInfo> GetAllPropertyInfos(this Type type)
         {
-            type.CheckArgument(nameof(type));
-
             return type.IsInterface == false ? type.GetAllTypePropertyInfos() : type.GetAllInterfacePropertyInfos();
         }
         public static IEnumerable<PropertyInfo> GetAllTypePropertyInfos(this Type type)

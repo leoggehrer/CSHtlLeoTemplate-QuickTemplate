@@ -11,19 +11,19 @@ namespace QuickTemplate.Logic.Modules.Exceptions
         /// <summary>
         /// Initializes a new instance of the AuthorizationException class with a specified error message.
         /// </summary>
-        /// <param name="errorType">Identification of the error message.</param>
-        public AuthorizationException(ErrorType errorType)
-            : base(errorType)
+        /// <param name="errorId">Identification of the error message.</param>
+        public AuthorizationException(int errorId)
+            : base(errorId)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the AuthorizationException class with a specified error message.
         /// </summary>
-        /// <param name="errorType">Identification of the error message.</param>
+        /// <param name="errorId">Identification of the error message.</param>
         /// <param name="message">The message that describes the error.</param>
-        public AuthorizationException(ErrorType errorType, string message)
-            : base(errorType, message)
+        public AuthorizationException(int errorId, string message)
+            : base(errorId, message)
         {
         }
     }

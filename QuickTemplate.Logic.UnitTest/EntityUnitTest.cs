@@ -1,6 +1,6 @@
 ﻿//@BaseCode
 //MdStart
-using QuickTemplate.Logic.Contracts;
+using CommonBase.Contracts;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,8 +20,8 @@ namespace QuickTemplate.Logic.UnitTest
 
         public abstract IDataAccess<T> CreateController();
 
-        public List<string> IgnoreUpdateProperties = new() 
-        { 
+        public List<string> IgnoreUpdateProperties = new()
+        {
             nameof(Entities.EntityObject.Id),
 #if ROWVERSION_ON
             nameof(Entities.VersionEntity.RowVersion)

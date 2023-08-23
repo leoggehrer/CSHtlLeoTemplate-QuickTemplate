@@ -4,13 +4,12 @@
 namespace QuickTemplate.Logic.Entities.Account
 {
     using QuickTemplate.Logic.Contracts.Account;
-
 #if SQLITE_ON
-    [Table("IdentityXRoles")]
+    [System.ComponentModel.DataAnnotations.Schema.Table("IdentityXRoles")]
 #else
-    [Table("IdentityXRoles", Schema = "account")]
+    [System.ComponentModel.DataAnnotations.Schema.Table("IdentityXRoles", Schema = "account")]
 #endif
-    [Index(nameof(IdentityId), nameof(RoleId), IsUnique = true)]
+    [Microsoft.EntityFrameworkCore.Index(nameof(IdentityId), nameof(RoleId), IsUnique = true)]
     public partial class IdentityXRole : VersionEntity, IIdentityXRole
     {
         public IdType IdentityId { get; set; }

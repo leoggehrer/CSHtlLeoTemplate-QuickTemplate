@@ -2,7 +2,7 @@
 //MdStart
 namespace QuickTemplate.Logic.Entities
 {
-    using QuickTemplate.Logic.Contracts;
+    using CommonBase.Contracts;
 #if ACCOUNT_ON
     using QuickTemplate.Logic.Entities.Account;
 #endif

@@ -1,7 +1,5 @@
 ﻿//@BaseCode
 //MdStart
-using System.Collections.Generic;
-
 namespace CommonBase.Extensions
 {
     public static partial class ListExtensions

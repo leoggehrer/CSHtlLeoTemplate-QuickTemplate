@@ -6,6 +6,7 @@ namespace TemplateTools.ConApp
 {
     partial class Program
     {
+        #region Class-Constructors
         static Program()
         {
             ClassConstructing();
@@ -20,6 +21,7 @@ namespace TemplateTools.ConApp
         }
         static partial void ClassConstructing();
         static partial void ClassConstructed();
+        #endregion Class-Constructors
 
         #region Properties
         internal static string? HomePath { get; set; }
@@ -31,7 +33,7 @@ namespace TemplateTools.ConApp
         internal static ConsoleColor ForegroundColor { get; set; } = Console.ForegroundColor;
         #endregion Properties
 
-        static void Main(string[] args)
+        static void Main(/*string[] args*/)
         {
             RunApp();
         }
@@ -184,25 +186,25 @@ namespace TemplateTools.ConApp
 
             for (int i = 0; i < data.Length && result == string.Empty; i++)
             {
-                for (int j = 0; j < StaticLiterals.SolutionProjects.Length; j++)
+                for (int j = 0; j < StaticLiterals.TemplateProjects.Length; j++)
                 {
-                    if (data[i].Equals(StaticLiterals.SolutionProjects[j]))
+                    if (data[i].Equals(StaticLiterals.TemplateProjects[j]))
                     {
                         result = data[i];
                     }
                 }
-                for (int j = 0; j < StaticLiterals.SolutionToolProjects.Length; j++)
+                for (int j = 0; j < StaticLiterals.TemplateToolProjects.Length; j++)
                 {
-                    if (data[i].Equals(StaticLiterals.SolutionToolProjects[j]))
+                    if (data[i].Equals(StaticLiterals.TemplateToolProjects[j]))
                     {
                         result = data[i];
                     }
                 }
                 if (string.IsNullOrEmpty(result))
                 {
-                    for (int j = 0; j < StaticLiterals.ProjectExtensions.Length; j++)
+                    for (int j = 0; j < StaticLiterals.TemplateProjectExtensions.Length; j++)
                     {
-                        if (data[i].Equals($"{solutionName}{StaticLiterals.ProjectExtensions[j]}"))
+                        if (data[i].Equals($"{solutionName}{StaticLiterals.TemplateProjectExtensions[j]}"))
                         {
                             result = data[i];
                         }
@@ -292,6 +294,7 @@ namespace TemplateTools.ConApp
             }
             return result.ToArray();
         }
+
         #region CLI Argument methods
         internal static void OpenSolutionFolder(string solutionPath)
         {

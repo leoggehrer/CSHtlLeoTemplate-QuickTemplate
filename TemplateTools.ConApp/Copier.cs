@@ -5,8 +5,6 @@ namespace TemplateTooles.ConApp
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml;
-    using TemplateCodeGenerator.Logic.Preprocessor;
-
     internal partial class Copier
     {
         #region Class-Constructors
@@ -68,7 +66,6 @@ namespace TemplateTooles.ConApp
             ,".md"
             ,".template"
             ,".xaml"
-            ,".axaml"
         };
         private static string[] ReplaceFiles { get; } = new string[]
         {
@@ -99,10 +96,7 @@ namespace TemplateTooles.ConApp
             ,".template"
             ,".jpg"
             ,".png"
-            ,".ico"
             ,".xaml"
-            ,".axaml"
-            ,".manifest"
         };
         private static string[] SolutionExtenions { get; } = new string[]
         {
@@ -142,6 +136,8 @@ namespace TemplateTooles.ConApp
                 {
                     System.Diagnostics.Debug.WriteLine($",\"{ext}\"");
                 }
+
+                TemplateCodeGenerator.Logic.Generator.DeleteGeneratedFiles(targetDirectory);
 
                 if (result)
                 {
@@ -436,7 +432,8 @@ namespace TemplateTooles.ConApp
                 }
 
                 if (sourceLines.Any()
-                    && sourceLines.First().Contains(StaticLiterals.IgnoreLabel) == false)
+                    && sourceLines.First().Contains(StaticLiterals.IgnoreLabel) == false
+                    && sourceLines.First().Contains(StaticLiterals.GeneratedCodeLabel) == false)
                 {
                     foreach (var sourceLine in sourceLines)
                     {

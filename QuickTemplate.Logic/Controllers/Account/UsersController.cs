@@ -3,11 +3,11 @@
 #if ACCOUNT_ON
 namespace QuickTemplate.Logic.Controllers.Account
 {
-    using EntityUser = Entities.Account.User;
-    using OutModelUser = Models.Account.User;
+    using TEntity = Entities.Account.User;
+    using TOutModel = Models.Account.User;
 
     [Modules.Security.Authorize("SysAdmin", "AppAdmin")]
-    internal sealed partial class UsersController : EntitiesController<EntityUser, OutModelUser>, Contracts.Account.IUsersAccess
+    internal sealed partial class UsersController : EntitiesController<TEntity, TOutModel>, Contracts.Account.IUsersAccess
     {
         public UsersController()
         {

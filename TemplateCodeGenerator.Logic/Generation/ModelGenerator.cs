@@ -3,23 +3,24 @@
 namespace TemplateCodeGenerator.Logic.Generation
 {
     using System.Reflection;
+    using TemplateCodeGenerator.Logic.Common;
     using TemplateCodeGenerator.Logic.Contracts;
     internal abstract partial class ModelGenerator : ClassGenerator
     {
         protected abstract ItemProperties ItemProperties { get; }
-        public ModelGenerator(ISolutionProperties solutionProperties)
+
+        protected ModelGenerator(ISolutionProperties solutionProperties)
             : base(solutionProperties)
         {
         }
 
-
         #region overrides
-        public override string GetPropertyType(PropertyInfo propertyInfo)
+        protected override string GetPropertyType(PropertyInfo propertyInfo)
         {
-            var result = base.GetPropertyType(propertyInfo);
-            var modelType = ItemProperties.ConvertEntityToModelType(result);
+            var propertyType = base.GetPropertyType(propertyInfo);
+            var result = ItemProperties.ConvertEntityToModelType(propertyType);
 
-            return modelType;
+            return ConvertPropertyType(result);
         }
         protected override string CopyProperty(string copyType, PropertyInfo propertyInfo)
         {
@@ -77,7 +78,272 @@ namespace TemplateCodeGenerator.Logic.Generation
         }
         #endregion overrides
 
-        protected T QueryModelSetting<T>(Common.UnitType unitType, Common.ItemType itemType, Type type, string valueName, string defaultValue)
+        #region can creates
+        protected virtual bool CanCreate(Type type)
+        {
+            bool create = EntityProject.IsNotAGenerationEntity(type) == false;
+
+            CanCreateModel(type, ref create);
+            return create;
+        }
+        protected virtual bool CanCreate(PropertyInfo propertyInfo)
+        {
+            bool create = true;
+
+            CanCreateProperty(propertyInfo, ref create);
+            return create;
+        }
+        partial void CanCreateModel(Type type, ref bool create);
+        partial void CanCreateProperty(PropertyInfo propertyInfo, ref bool create);
+        #endregion can creates
+
+        #region create attributes
+        partial void CreateModelAttributes(Type type, List<string> codeLines);
+        protected virtual void CreateModelPropertyAttributes(PropertyInfo propertyInfo, UnitType unitType, List<string> codeLines)
+        {
+            var handled = false;
+
+            BeforeCreateModelPropertyAttributes(propertyInfo, unitType, codeLines, ref handled);
+            if (handled == false)
+            {
+                var itemName = $"{propertyInfo.DeclaringType!.Name}.{propertyInfo.Name}";
+                var attributes = QuerySetting<string>(unitType, ItemType.ModelProperty, itemName, StaticLiterals.Attributes, string.Empty);
+
+                if (string.IsNullOrEmpty(attributes) == false)
+                {
+                    codeLines.Add($"[{attributes}]");
+                }
+            }
+            AfterCreateModelPropertyAttributes(propertyInfo, unitType, codeLines);
+        }
+        partial void BeforeCreateModelPropertyAttributes(PropertyInfo propertyInfo, UnitType unitType, List<string> codeLines, ref bool handled);
+        partial void AfterCreateModelPropertyAttributes(PropertyInfo propertyInfo, UnitType unitType, List<string> codeLines);
+        #endregion create attributes
+
+        #region converters
+        protected virtual string ConvertModelName(string modelName) => modelName;
+        protected virtual string ConvertModelSubType(string modelSubType) => modelSubType;
+        protected virtual string ConvertModelNamespace(string modelNamespace) => modelNamespace;
+        protected virtual string ConvertModelFullName(string modelFullName) => modelFullName;
+        protected virtual string ConvertModelSubPath(string modelSubPath) => modelSubPath;
+        protected virtual string ConvertModelBaseType(string modelBaseType) => modelBaseType;
+        #endregion converters
+
+        protected virtual IGeneratedItem CreateModelFromType(Type type, UnitType unitType, ItemType itemType)
+        {
+            var modelName = ConvertModelName(CreateModelName(type));
+            var modelSubType = ConvertModelSubType(ItemProperties.CreateModelSubType(type));
+            var modelNamespace = ConvertModelNamespace(ItemProperties.CreateModelNamespace(type));
+            var modelFullName = ConvertModelFullName(CreateModelFullName(type));
+            var modelSubFilePath = ConvertModelSubPath(ItemProperties.CreateModelSubPath(type, string.Empty, StaticLiterals.CSharpFileExtension));
+            var visibility = QuerySetting<string>(unitType, itemType, type, StaticLiterals.Visibility, "public");
+            var attributes = QuerySetting<string>(unitType, itemType, type, StaticLiterals.Attributes, string.Empty);
+            var typeProperties = type.GetAllPropertyInfos();
+            var generateProperties = typeProperties.Where(e => StaticLiterals.NoGenerationProperties.Any(p => p.Equals(e.Name)) == false) ?? Array.Empty<PropertyInfo>();
+            var result = new Models.GeneratedItem(unitType, itemType)
+            {
+                FullName = modelFullName,
+                FileExtension = StaticLiterals.CSharpFileExtension,
+                SubFilePath = modelSubFilePath,
+            };
+            result.AddRange(CreateComment(type));
+            CreateModelAttributes(type, result.Source);
+            result.Add($"{(attributes.HasContent() ? $"[{attributes}]" : string.Empty)}");
+            result.Add($"{visibility} partial class {modelName}");
+            result.Add("{");
+            result.AddRange(CreatePartialStaticConstrutor(modelName));
+            result.AddRange(CreatePartialConstrutor("public", modelName));
+
+            foreach (var propertyInfo in generateProperties)
+            {
+                if (CanCreate(propertyInfo)
+                    && QuerySetting<bool>(unitType, ItemType.ModelProperty, type, StaticLiterals.Generate, "True"))
+                {
+                    result.AddRange(CreateComment(propertyInfo));
+                    CreateModelPropertyAttributes(propertyInfo, unitType, result.Source);
+                    result.AddRange(CreateProperty(type, propertyInfo));
+                }
+            }
+
+            var lambda = QuerySetting<string>(unitType, itemType, type, ItemType.Lambda.ToString(), string.Empty);
+
+            if (lambda.HasContent())
+            {
+                result.Add($"{lambda};");
+            }
+
+            if (unitType == UnitType.Logic)
+            {
+                var copyType = type.FullName!;
+                var modelType = ItemProperties.CreateModelType(type);
+
+                result.AddRange(CreateFactoryMethod(false, ItemProperties.CreateModelType(type)));
+                result.AddRange(CreateFactoryMethod(false, modelType, copyType));
+                result.AddRange(CreateCopyProperties("internal", type, copyType));
+                result.AddRange(CreateCopyProperties("public", type, modelType));
+            }
+            else if (unitType == UnitType.WebApi)
+            {
+                result.AddRange(CreateFactoryMethod(false, ItemProperties.CreateModelType(type)));
+                if (type.IsPublic)
+                {
+                    var logicProject = $"{ItemProperties.SolutionName}{StaticLiterals.LogicExtension}";
+                    var copyType = $"{logicProject}.{ItemProperties.CreateModelSubType(type)}";
+                    var modelType = ItemProperties.CreateModelType(type);
+
+                    result.AddRange(CreateFactoryMethod(false, modelType, copyType));
+                    result.AddRange(CreateCopyProperties("public", type, copyType));
+                    result.AddRange(CreateCopyProperties("public", type, modelType));
+                }
+                else
+                {
+                    var logicProject = $"{ItemProperties.SolutionName}{StaticLiterals.LogicExtension}";
+                    var copyType = $"{logicProject}.{ItemProperties.CreateModelSubType(type)}";
+
+                    result.AddRange(CreateCopyProperties("public", type, copyType));
+                }
+            }
+            else if (unitType == UnitType.AspMvc)
+            {
+                result.AddRange(CreateFactoryMethod(false, ItemProperties.CreateModelType(type)));
+                if (type.IsPublic)
+                {
+                    var logicProject = $"{ItemProperties.SolutionName}{StaticLiterals.LogicExtension}";
+                    var copyType = $"{logicProject}.{ItemProperties.CreateModelSubType(type)}";
+                    var modelType = ItemProperties.CreateModelType(type);
+
+                    result.AddRange(CreateFactoryMethod(false, modelType, copyType));
+                    result.AddRange(CreateCopyProperties("public", type, copyType));
+                    result.AddRange(CreateCopyProperties("public", type, modelType));
+                }
+                else
+                {
+                    var logicProject = $"{ItemProperties.SolutionName}{StaticLiterals.LogicExtension}";
+                    var copyType = $"{logicProject}.{ItemProperties.CreateModelSubType(type)}";
+
+                    result.AddRange(CreateCopyProperties("public", type, copyType));
+                }
+            }
+            else if (unitType == UnitType.ClientBlazor)
+            {
+            }
+            else
+            {
+                result.AddRange(CreateFactoryMethod(false, ItemProperties.CreateModelType(type)));
+            }
+            result.AddRange(CreateEquals(type, modelSubType));
+            result.AddRange(CreateGetHashCode(type));
+            result.Add("}");
+            result.EnvelopeWithANamespace(modelNamespace, "using System;");
+            result.FormatCSharpCode();
+            return result;
+        }
+        protected virtual IGeneratedItem CreateModelInheritance(Type type, UnitType unitType, ItemType itemType)
+        {
+            var modelName = ConvertModelName(CreateModelName(type));
+            var modelNamespace = ConvertModelNamespace(ItemProperties.CreateModelNamespace(type));
+            var modelFullName = ConvertModelFullName(CreateModelFullName(type));
+            var modelSubFilePath = ConvertModelSubPath(ItemProperties.CreateModelSubPath(type, "Inheritance", StaticLiterals.CSharpFileExtension));
+            var modelBaseType = ConvertModelBaseType(GetBaseClassByType(type));
+            var result = new Models.GeneratedItem(unitType, itemType)
+            {
+                FullName = modelFullName,
+                FileExtension = StaticLiterals.CSharpFileExtension,
+                SubFilePath = modelSubFilePath,
+            };
+            result.Source.Add($"partial class {modelName} : {modelBaseType}");
+            result.Source.Add("{");
+            result.Source.Add("}");
+            result.EnvelopeWithANamespace(modelNamespace);
+            result.FormatCSharpCode();
+            return result;
+        }
+        protected virtual IGeneratedItem CreateDelegateModelFromType(Type type, UnitType unitType, ItemType itemType)
+        {
+            var modelName = CreateModelName(type);
+            var modelType = ItemProperties.CreateModelType(type);
+            var modelSubType = ItemProperties.CreateModelSubType(type);
+            var entitySubType = ItemProperties.CreateSolutionTypeSubName(type);
+            var typeProperties = type.GetAllPropertyInfos();
+            var generateProperties = typeProperties.Where(e => StaticLiterals.NoGenerationProperties.Any(p => p.Equals(e.Name)) == false) ?? Array.Empty<PropertyInfo>();
+            var result = new Models.GeneratedItem(unitType, itemType)
+            {
+                FullName = CreateModelFullName(type),
+                FileExtension = StaticLiterals.CSharpFileExtension,
+                SubFilePath = ItemProperties.CreateModelSubPath(type, string.Empty, StaticLiterals.CSharpFileExtension),
+            };
+
+            result.AddRange(CreateComment(type));
+            CreateModelAttributes(type, result.Source);
+            result.Add($"public partial class {modelName}");
+            result.Add("{");
+            result.AddRange(CreatePartialStaticConstrutor(modelName));
+            result.AddRange(CreatePartialConstrutor("public", modelName, initStatements: new string[] { $"_source = new {entitySubType}();" }));
+            result.AddRange(CreatePartialConstrutor("internal", modelName, argumentList: $"{entitySubType} source", initStatements: new string[] { $"_source = source;" }, withPartials: false));
+
+            result.Add(string.Empty);
+            result.Add($"new internal {entitySubType} Source");
+            result.Add("{");
+            result.Add($"get => ({entitySubType})(_source!);");
+            result.Add("set => _source = value;");
+            result.Add("}");
+
+            foreach (var modelItem in generateProperties)
+            {
+                if (QuerySetting<bool>(unitType, ItemType.ModelProperty, modelItem.DeclaringName(), StaticLiterals.Generate, "True"))
+                {
+                    CreateModelPropertyAttributes(modelItem, unitType, result.Source);
+                    result.AddRange(CreateDelegateProperty(modelItem, "Source", modelItem));
+                }
+            }
+            if (unitType == UnitType.Logic)
+            {
+                var visibility = type.IsPublic ? "public" : "internal";
+
+                result.AddRange(CreateDelegateCopyProperties("internal", type, entitySubType));
+                result.AddRange(CreateDelegateCopyProperties(visibility, type, modelType));
+            }
+            else if (unitType == UnitType.WebApi)
+            {
+                result.AddRange(CreateCopyProperties("public", type, modelType));
+            }
+            else if (unitType == UnitType.AspMvc)
+            {
+                result.AddRange(CreateCopyProperties("public", type, modelType, p => true));
+            }
+            result.AddRange(CreateEquals(type, modelSubType));
+            result.AddRange(CreateGetHashCode(type));
+            result.AddRange(CreateDelegateFactoryMethods(modelType, entitySubType, type.IsPublic, false));
+            result.Add("}");
+            result.EnvelopeWithANamespace(ItemProperties.CreateModelNamespace(type));
+            result.FormatCSharpCode();
+            return result;
+        }
+
+        protected static string GetBaseClassByType(Type type)
+        {
+            var result = "object";
+            var found = false;
+            var runType = type.BaseType;
+
+            while (runType != null && found == false)
+            {
+                if (StaticLiterals.BaseClassMapping.ContainsKey(runType.Name))
+                {
+                    found = true;
+                    result = StaticLiterals.BaseClassMapping[runType.Name];
+                }
+                runType = runType.BaseType;
+            }
+            return result;
+        }
+        protected string CreateModelFullName(Type type)
+        {
+            return $"{ItemProperties.CreateModelNamespace(type)}.{type.Name}";
+        }
+
+        #region query settings
+        protected T QuerySetting<T>(UnitType unitType, ItemType itemType, Type type, string valueName, string defaultValue)
         {
             T result;
 
@@ -92,7 +358,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             }
             return result;
         }
-        protected T QueryModelSetting<T>(Common.UnitType unitType, Common.ItemType itemType, Type type, string itemSubName, string valueName, string defaultValue)
+        protected T QuerySetting<T>(UnitType unitType, ItemType itemType, Type type, string itemSubName, string valueName, string defaultValue)
         {
             T result;
 
@@ -107,7 +373,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             }
             return result;
         }
-        protected T QueryModelSetting<T>(Common.UnitType unitType, Common.ItemType itemType, string itemName, string valueName, string defaultValue)
+        protected T QuerySetting<T>(UnitType unitType, ItemType itemType, string itemName, string valueName, string defaultValue)
         {
             T result;
 
@@ -122,211 +388,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             }
             return result;
         }
-
-        protected virtual bool CanCreate(Type type)
-        {
-            bool create = EntityProject.IsNotAGenerationEntity(type) == false;
-
-            CanCreateModel(type, ref create);
-            return create;
-        }
-        partial void CanCreateModel(Type type, ref bool create);
-        partial void CreateModelAttributes(Type type, List<string> codeLines);
-        protected virtual void CreateModelPropertyAttributes(PropertyInfo propertyInfo, List<string> codeLines)
-        {
-            var handled = false;
-
-            BeforeCreateModelPropertyAttributes(propertyInfo, codeLines, ref handled);
-            if (handled == false)
-            {
-            }
-            AfterCreateModelPropertyAttributes(propertyInfo, codeLines);
-        }
-
-        partial void BeforeCreateModelPropertyAttributes(PropertyInfo propertyInfo, List<string> codeLines, ref bool handled);
-        partial void AfterCreateModelPropertyAttributes(PropertyInfo propertyInfo, List<string> codeLines);
-
-        protected virtual IGeneratedItem CreateModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
-        {
-            var modelName = CreateModelName(type);
-            var visibility = QueryModelSetting<string>(unitType, itemType, type, StaticLiterals.Visibility, "public");
-            var attributes = QueryModelSetting<string>(unitType, itemType, type, StaticLiterals.Attributes, string.Empty);
-            var typeProperties = type.GetAllPropertyInfos();
-            var generateProperties = typeProperties.Where(e => StaticLiterals.NoGenerationProperties.Any(p => p.Equals(e.Name)) == false) ?? Array.Empty<PropertyInfo>();
-            var result = new Models.GeneratedItem(unitType, itemType)
-            {
-                FullName = CreateModelFullNameFromType(type),
-                FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = ItemProperties.CreateModelSubPath(type, string.Empty, StaticLiterals.CSharpFileExtension),
-            };
-            result.AddRange(CreateComment(type));
-            CreateModelAttributes(type, result.Source);
-            result.Add($"{(attributes.HasContent() ? $"[{attributes}]" : string.Empty)}");
-            result.Add($"{visibility} partial class {modelName}");
-            result.Add("{");
-            result.AddRange(CreatePartialStaticConstrutor(modelName));
-            result.AddRange(CreatePartialConstrutor("public", modelName));
-
-            foreach (var propertyInfo in generateProperties)
-            {
-                var propertyAttributes = QueryModelSetting<string>(unitType, Common.ItemType.Property, type, propertyInfo.Name, StaticLiterals.Attributes, string.Empty);
-
-                result.AddRange(CreateComment(propertyInfo));
-                CreateModelPropertyAttributes(propertyInfo, result.Source);
-                result.Add($"{(propertyAttributes.HasContent() ? $"[{propertyAttributes}]" : string.Empty)}");
-                result.AddRange(CreateProperty(type, propertyInfo));
-            }
-
-            result.AddRange(CreateFactoryMethod(false, ItemProperties.CreateModelType(type)));
-
-            if (unitType == Common.UnitType.Logic)
-            {
-                var accessType = type.FullName!;
-                var modelType = ItemProperties.CreateModelType(type);
-
-                result.AddRange(CreateFactoryMethod(false, modelType, accessType));
-                result.AddRange(CreateCopyProperties("internal", type, accessType));
-                result.AddRange(CreateCopyProperties("public", type, modelType));
-            }
-            else if (unitType == Common.UnitType.WebApi)
-            {
-                if (type.IsPublic)
-                {
-                    var logicProject = $"{ItemProperties.SolutionName}{StaticLiterals.LogicExtension}";
-                    var accessType = $"{logicProject}.{ItemProperties.CreateModelSubType(type)}";
-                    var modelType = ItemProperties.CreateModelType(type);
-
-                    result.AddRange(CreateFactoryMethod(false, modelType, accessType));
-                    result.AddRange(CreateCopyProperties("public", type, accessType));
-                    result.AddRange(CreateCopyProperties("public", type, modelType));
-                }
-                else
-                {
-                    var logicProject = $"{ItemProperties.SolutionName}{StaticLiterals.LogicExtension}";
-                    var accessType = $"{logicProject}.{ItemProperties.CreateModelSubType(type)}";
-
-                    result.AddRange(CreateCopyProperties("public", type, accessType));
-                }
-            }
-            else if (unitType == Common.UnitType.AspMvc)
-            {
-                if (type.IsPublic)
-                {
-                    var logicProject = $"{ItemProperties.SolutionName}{StaticLiterals.LogicExtension}";
-                    var accessType = $"{logicProject}.{ItemProperties.CreateModelSubType(type)}";
-                    var modelType = ItemProperties.CreateModelType(type);
-
-                    result.AddRange(CreateFactoryMethod(false, modelType, accessType));
-                    result.AddRange(CreateCopyProperties("public", type, accessType));
-                    result.AddRange(CreateCopyProperties("public", type, modelType));
-                }
-                else
-                {
-                    var logicProject = $"{ItemProperties.SolutionName}{StaticLiterals.LogicExtension}";
-                    var accessType = $"{logicProject}.{ItemProperties.CreateModelSubType(type)}";
-
-                    result.AddRange(CreateCopyProperties("public", type, accessType));
-                }
-            }
-            result.AddRange(OverrideEquals(type));
-            result.AddRange(CreateGetHashCode(type));
-            result.Add("}");
-            result.EnvelopeWithANamespace(ItemProperties.CreateModelNamespace(type), "using System;");
-            result.FormatCSharpCode();
-            return result;
-        }
-        protected virtual IGeneratedItem CreateDelegateModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
-        {
-            var entityType = ItemProperties.CreateSubType(type);
-            var modelType = ItemProperties.CreateModelType(type);
-            var modelName = CreateModelName(type);
-            var typeProperties = type.GetAllPropertyInfos();
-            var generateProperties = typeProperties.Where(e => StaticLiterals.NoGenerationProperties.Any(p => p.Equals(e.Name)) == false) ?? Array.Empty<PropertyInfo>();
-            var result = new Models.GeneratedItem(unitType, itemType)
-            {
-                FullName = CreateModelFullNameFromType(type),
-                FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = ItemProperties.CreateModelSubPath(type, string.Empty, StaticLiterals.CSharpFileExtension),
-            };
-
-            result.AddRange(CreateComment(type));
-            CreateModelAttributes(type, result.Source);
-            result.Add($"public partial class {modelName}");
-            result.Add("{");
-            result.AddRange(CreatePartialStaticConstrutor(modelName));
-            result.AddRange(CreatePartialConstrutor("public", modelName, initStatements: new string[] { $"_source = new {entityType}();" }));
-            result.AddRange(CreatePartialConstrutor("internal", modelName, argumentList: $"{entityType} source", initStatements: new string[] { $"_source = source;" }, withPartials: false));
-
-            result.Add(string.Empty);
-            result.Add($"new internal {entityType} Source");
-            result.Add("{");
-            //result.Add($"get => ({entityType})(_source ??= new {entityType}());");
-            result.Add($"get => ({entityType})(_source!);");
-            result.Add("set => _source = value;");
-            result.Add("}");
-
-            foreach (var modelItem in generateProperties)
-            {
-                if (QueryModelSetting<bool>(unitType, Common.ItemType.ModelProperty, modelItem.DeclaringName(), StaticLiterals.Generate, "True"))
-                {
-                    CreateModelPropertyAttributes(modelItem, result.Source);
-                    result.AddRange(CreateDelegateProperty(modelItem, "Source", modelItem));
-                }
-            }
-            if (unitType == Common.UnitType.Logic)
-            {
-                var visibility = type.IsPublic ? "public" : "internal";
-
-                result.AddRange(CreateDelegateCopyProperties("internal", type, entityType));
-                result.AddRange(CreateDelegateCopyProperties(visibility, type, modelType));
-            }
-            else if (unitType == Common.UnitType.WebApi)
-            {
-                result.AddRange(CreateCopyProperties("public", type, modelType));
-            }
-            else if (unitType == Common.UnitType.AspMvc)
-            {
-                result.AddRange(CreateCopyProperties("public", type, modelType, p => true));
-            }
-            result.AddRange(OverrideEquals(type));
-            result.AddRange(CreateGetHashCode(type));
-            result.AddRange(CreateDelegateFactoryMethods(modelType, entityType, type.IsPublic, false));
-            result.Add("}");
-            result.EnvelopeWithANamespace(ItemProperties.CreateModelNamespace(type));
-            result.FormatCSharpCode();
-            return result;
-        }
-
-        protected string GetBaseClassByType(Type type, string subNamespace)
-        {
-            var result = "object";
-
-            while (type.BaseType != null
-                   && StaticLiterals.BaseClasses.Any(e => e.Equals(type.BaseType.Name)) == false)
-            {
-                type = type.BaseType;
-            }
-
-            if (type.BaseType != null)
-            {
-                var idx = StaticLiterals.BaseClasses.IndexOf(e => e.Equals(type.BaseType.Name)) % 2;
-
-                if (idx > -1 && idx < StaticLiterals.ModelBaseClasses.Length)
-                {
-                    var ns = ItemProperties.Namespace;
-
-                    if (string.IsNullOrEmpty(subNamespace) == false)
-                        ns = $"{ns}.{subNamespace}";
-
-                    result = $"{ns}.{StaticLiterals.ModelBaseClasses[idx]}";
-                }
-            }
-            return result;
-        }
-        protected string CreateModelFullNameFromType(Type type)
-        {
-            return $"{ItemProperties.CreateModelNamespace(type)}.{type.Name}";
-        }
+        #endregion query settings
     }
 }
 //MdEnd

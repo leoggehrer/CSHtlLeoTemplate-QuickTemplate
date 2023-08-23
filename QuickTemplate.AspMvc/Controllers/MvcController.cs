@@ -26,11 +26,11 @@ namespace QuickTemplate.AspMvc.Controllers
         partial void Constructing();
         partial void Constructed();
 
-#region SessionInfo
+        #region SessionInfo
         public bool IsSessionAvailable => HttpContext?.Session != null;
         private ISessionWrapper? sessionWrapper = null;
         internal ISessionWrapper SessionWrapper => sessionWrapper ??= new SessionWrapper(HttpContext.Session);
-#endregion SessionInfo
+        #endregion SessionInfo
 
 #if ACCOUNT_ON
         protected virtual bool CheckSessionToken { get; set; } = true; 
@@ -53,7 +53,7 @@ namespace QuickTemplate.AspMvc.Controllers
         }
 #endif
 
-#region Error-helpers
+        #region Error-helpers
         protected string GetModelStateError()
         {
             var errors = GetModelStateErrors();
@@ -82,7 +82,7 @@ namespace QuickTemplate.AspMvc.Controllers
         {
             return source.GetError();
         }
-#endregion Error-Helpers
+        #endregion Error-Helpers
     }
 }
 //MdEnd

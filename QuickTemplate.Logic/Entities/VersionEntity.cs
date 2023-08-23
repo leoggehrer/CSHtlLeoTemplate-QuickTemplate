@@ -1,8 +1,9 @@
 ﻿//@BaseCode
 //MdStart
+using CommonBase.Contracts;
+
 namespace QuickTemplate.Logic.Entities
 {
-    using Logic.Contracts;
     public abstract partial class VersionEntity : EntityObject, IVersionable
     {
 #if ROWVERSION_ON

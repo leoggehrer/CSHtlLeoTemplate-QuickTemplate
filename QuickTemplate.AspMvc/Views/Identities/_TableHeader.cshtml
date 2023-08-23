@@ -1,96 +1,96 @@
-@*@BaseCode*@
+﻿@*@BaseCode*@
 @*#if ACCOUNT_ON*@@*
-@model IEnumerable<QuickTemplate.AspMvc.Models.Account.Identity>
-@{
-    var orderBy = (string)ViewBag.OrderBy ?? string.Empty;
-}
-<thead>
-    <tr>
-        <th>
-            @if (orderBy.StartsWith("Name") && orderBy.EndsWith("ASC"))
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="Name DESC" class="btn btn-outline"><strong>Name</strong> <i class="fa fa-sort-desc"></i></a>
-            }
-            else if (orderBy.StartsWith("Name") && orderBy.EndsWith("DESC"))
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="" class="btn btn-outline"><strong>Name</strong> <i class="fa fa-sort-asc"></i></a>
-            }
-            else
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="Name ASC" class="btn btn-outline"><strong>Name</strong></a>
-            }
-        </th>
-        <th>
-            @if (orderBy.StartsWith("Email") && orderBy.EndsWith("ASC"))
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="Email DESC" class="btn btn-outline"><strong>Email</strong> <i class="fa fa-sort-desc"></i></a>
-            }
-            else if (orderBy.StartsWith("Email") && orderBy.EndsWith("DESC"))
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="" class="btn btn-outline"><strong>Email</strong> <i class="fa fa-sort-asc"></i></a>
-            }
-            else
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="Email ASC" class="btn btn-outline"><strong>Email</strong></a>
-            }
-        </th>
-        <th>
-            @if (orderBy.StartsWith("TimeOutInMinutes") && orderBy.EndsWith("ASC"))
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="TimeOutInMinutes DESC" class="btn btn-outline"><strong>TimeOutInMinutes</strong> <i class="fa fa-sort-desc"></i></a>
-            }
-            else if (orderBy.StartsWith("TimeOutInMinutes") && orderBy.EndsWith("DESC"))
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="" class="btn btn-outline"><strong>TimeOutInMinutes</strong> <i class="fa fa-sort-asc"></i></a>
-            }
-            else
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="TimeOutInMinutes ASC" class="btn btn-outline"><strong>TimeOutInMinutes</strong></a>
-            }
-        </th>
-        <th>
-            @if (orderBy.StartsWith("AccessFailedCount") && orderBy.EndsWith("ASC"))
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="AccessFailedCount DESC" class="btn btn-outline"><strong>AccessFailedCount</strong> <i class="fa fa-sort-desc"></i></a>
-            }
-            else if (orderBy.StartsWith("AccessFailedCount") && orderBy.EndsWith("DESC"))
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="" class="btn btn-outline"><strong>AccessFailedCount</strong> <i class="fa fa-sort-asc"></i></a>
-            }
-            else
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="AccessFailedCount ASC" class="btn btn-outline"><strong>AccessFailedCount</strong></a>
-            }
-        </th>
-        <th>
-            @if (orderBy.StartsWith("State") && orderBy.EndsWith("ASC"))
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="State DESC" class="btn btn-outline"><strong>State</strong> <i class="fa fa-sort-desc"></i></a>
-            }
-            else if (orderBy.StartsWith("State") && orderBy.EndsWith("DESC"))
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="" class="btn btn-outline"><strong>State</strong> <i class="fa fa-sort-asc"></i></a>
-            }
-            else
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="State ASC" class="btn btn-outline"><strong>State</strong></a>
-            }
-        </th>
-        <th>
-            @if (orderBy.StartsWith("Password") && orderBy.EndsWith("ASC"))
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="Password DESC" class="btn btn-outline"><strong>Password</strong> <i class="fa fa-sort-desc"></i></a>
-            }
-            else if (orderBy.StartsWith("Password") && orderBy.EndsWith("DESC"))
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="" class="btn btn-outline"><strong>Password</strong> <i class="fa fa-sort-asc"></i></a>
-            }
-            else
-            {
-                <a asp-action="OrderBy" asp-route-orderBy="Password ASC" class="btn btn-outline"><strong>Password</strong></a>
-            }
-        </th>
-        <th></th>
-    </tr>
-</thead>
+    @model IEnumerable<QuickTemplate.AspMvc.Models.Account.Identity>
+    @{
+        var orderBy = (string)ViewBag.OrderBy ?? string.Empty;
+    }
+    <thead>
+        <tr>
+            <th>
+                @if (orderBy.StartsWith("Name") && orderBy.EndsWith("ASC"))
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="Name DESC" class="btn btn-outline"><strong>Name</strong> <i class="fa fa-sort-desc"></i></a>
+                }
+                else if (orderBy.StartsWith("Name") && orderBy.EndsWith("DESC"))
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="" class="btn btn-outline"><strong>Name</strong> <i class="fa fa-sort-asc"></i></a>
+                }
+                else
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="Name ASC" class="btn btn-outline"><strong>Name</strong></a>
+                }
+            </th>
+            <th>
+                @if (orderBy.StartsWith("Email") && orderBy.EndsWith("ASC"))
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="Email DESC" class="btn btn-outline"><strong>Email</strong> <i class="fa fa-sort-desc"></i></a>
+                }
+                else if (orderBy.StartsWith("Email") && orderBy.EndsWith("DESC"))
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="" class="btn btn-outline"><strong>Email</strong> <i class="fa fa-sort-asc"></i></a>
+                }
+                else
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="Email ASC" class="btn btn-outline"><strong>Email</strong></a>
+                }
+            </th>
+            <th>
+                @if (orderBy.StartsWith("TimeOutInMinutes") && orderBy.EndsWith("ASC"))
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="TimeOutInMinutes DESC" class="btn btn-outline"><strong>TimeOutInMinutes</strong> <i class="fa fa-sort-desc"></i></a>
+                }
+                else if (orderBy.StartsWith("TimeOutInMinutes") && orderBy.EndsWith("DESC"))
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="" class="btn btn-outline"><strong>TimeOutInMinutes</strong> <i class="fa fa-sort-asc"></i></a>
+                }
+                else
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="TimeOutInMinutes ASC" class="btn btn-outline"><strong>TimeOutInMinutes</strong></a>
+                }
+            </th>
+            <th>
+                @if (orderBy.StartsWith("AccessFailedCount") && orderBy.EndsWith("ASC"))
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="AccessFailedCount DESC" class="btn btn-outline"><strong>AccessFailedCount</strong> <i class="fa fa-sort-desc"></i></a>
+                }
+                else if (orderBy.StartsWith("AccessFailedCount") && orderBy.EndsWith("DESC"))
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="" class="btn btn-outline"><strong>AccessFailedCount</strong> <i class="fa fa-sort-asc"></i></a>
+                }
+                else
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="AccessFailedCount ASC" class="btn btn-outline"><strong>AccessFailedCount</strong></a>
+                }
+            </th>
+            <th>
+                @if (orderBy.StartsWith("State") && orderBy.EndsWith("ASC"))
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="State DESC" class="btn btn-outline"><strong>State</strong> <i class="fa fa-sort-desc"></i></a>
+                }
+                else if (orderBy.StartsWith("State") && orderBy.EndsWith("DESC"))
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="" class="btn btn-outline"><strong>State</strong> <i class="fa fa-sort-asc"></i></a>
+                }
+                else
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="State ASC" class="btn btn-outline"><strong>State</strong></a>
+                }
+            </th>
+            <th>
+                @if (orderBy.StartsWith("Password") && orderBy.EndsWith("ASC"))
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="Password DESC" class="btn btn-outline"><strong>Password</strong> <i class="fa fa-sort-desc"></i></a>
+                }
+                else if (orderBy.StartsWith("Password") && orderBy.EndsWith("DESC"))
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="" class="btn btn-outline"><strong>Password</strong> <i class="fa fa-sort-asc"></i></a>
+                }
+                else
+                {
+                    <a asp-action="OrderBy" asp-route-orderBy="Password ASC" class="btn btn-outline"><strong>Password</strong></a>
+                }
+            </th>
+            <th></th>
+        </tr>
+    </thead>
 *@@*#endif*@

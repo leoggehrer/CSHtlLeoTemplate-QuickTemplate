@@ -2,8 +2,9 @@
 //MdStart
 namespace QuickTemplate.Logic.Entities
 {
-    using Logic.Contracts;
+    using CommonBase.Contracts;
     using System.Collections;
+
     public abstract partial class EntityObject : IIdentifyable
     {
         /// <summary>

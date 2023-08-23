@@ -13,7 +13,7 @@ namespace TemplateCodeGenerator.Logic.Generation
         {
             var path = Path.GetDirectoryName(filePath);
             var customFileName = $"{Path.GetFileNameWithoutExtension(filePath)}{StaticLiterals.CustomFileExtension}";
-            
+
             return Path.Combine(path!, customFileName);
         }
 
@@ -80,8 +80,14 @@ namespace TemplateCodeGenerator.Logic.Generation
             var result = CreateCustomFilePath(filePath);
             var lines = ReadAngularCustomParts(filePath);
 
-            File.WriteAllLines(result, lines, Encoding.UTF8);
-
+            if (File.Exists(result))
+            {
+                File.Delete(result);
+            }
+            if (lines.Any())
+            {
+                File.WriteAllLines(result, lines, Encoding.UTF8);
+            }
             return result;
         }
         public static IEnumerable<string> ReadAndDelete(string filePath)

@@ -10,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
+using Error = CommonBase.Modules.Exceptions.ErrorType;
 
 namespace QuickTemplate.Logic.Modules.Account
 {
@@ -32,7 +33,7 @@ namespace QuickTemplate.Logic.Modules.Account
         public static async Task InitAppAccessAsync(string name, string email, string password, bool enableJwtAuth)
         {
             if (CheckPasswordSyntax(password) == false)
-                throw new AuthorizationException(ErrorType.InvalidPasswordSyntax, PasswordRules.SyntaxRoles);
+                throw new AuthorizationException(Error.InvalidPasswordSyntax, PasswordRules.SyntaxRoles);
 
             using var identitiesCtrl = new Controllers.Account.IdentitiesController()
             {
@@ -80,13 +81,13 @@ namespace QuickTemplate.Logic.Modules.Account
             }
             else
             {
-                throw new AuthorizationException(ErrorType.InitAppAccess);
+                throw new AuthorizationException(Error.InitAppAccess);
             }
         }
         public static async Task AddAppAccessAsync(string sessionToken, string name, string email, string password, int timeOutInMinutes, bool enableJwtAuth, params string[] roles)
         {
             if (CheckPasswordSyntax(password) == false)
-                throw new AuthorizationException(ErrorType.InvalidPasswordSyntax, PasswordRules.SyntaxRoles);
+                throw new AuthorizationException(Error.InvalidPasswordSyntax, PasswordRules.SyntaxRoles);
 
             using var identitiesCtrl = new Controllers.Account.IdentitiesController()
             {
@@ -165,7 +166,7 @@ namespace QuickTemplate.Logic.Modules.Account
             if (JsonWebToken.CheckToken(jsonWebToken, out SecurityToken? validatedToken))
             {
                 if (validatedToken != null && validatedToken.ValidTo < DateTime.UtcNow)
-                    throw new AuthorizationException(ErrorType.AuthorizationTimeOut);
+                    throw new AuthorizationException(Error.AuthorizationTimeOut);
 
                 if (validatedToken is JwtSecurityToken jwtValidatedToken)
                 {
@@ -197,9 +198,9 @@ namespace QuickTemplate.Logic.Modules.Account
             }
             else
             {
-                throw new AuthorizationException(ErrorType.InvalidJsonWebToken);
+                throw new AuthorizationException(Error.InvalidJsonWebToken);
             }
-            return result ?? throw new AuthorizationException(ErrorType.InvalidAccount);
+            return result ?? throw new AuthorizationException(Error.InvalidAccount);
         }
         public static Task<LoginSession> LogonAsync(string email, string password)
         {
@@ -209,7 +210,7 @@ namespace QuickTemplate.Logic.Modules.Account
         {
             var result = await QueryLoginByEmailAsync(email, password, optionalInfo).ConfigureAwait(false);
 
-            return result ?? throw new AuthorizationException(ErrorType.InvalidAccount);
+            return result ?? throw new AuthorizationException(Error.InvalidAccount);
         }
         [Authorize]
         public static async Task LogoutAsync(string sessionToken)
@@ -300,10 +301,10 @@ namespace QuickTemplate.Logic.Modules.Account
             await Authorization.CheckAuthorizationAsync(sessionToken, typeof(AccountManager), nameof(ChangePasswordAsync)).ConfigureAwait(false);
 
             if (CheckPasswordSyntax(newPassword) == false)
-                throw new AuthorizationException(ErrorType.InvalidPasswordSyntax, PasswordRules.SyntaxRoles);
+                throw new AuthorizationException(Error.InvalidPasswordSyntax, PasswordRules.SyntaxRoles);
 
             var login = await QueryAliveSessionAsync(sessionToken).ConfigureAwait(false)
-                        ?? throw new AuthorizationException(ErrorType.InvalidToken);
+                        ?? throw new AuthorizationException(Error.InvalidToken);
 
             using var identitiesCtrl = new Controllers.Account.IdentitiesController()
             {
@@ -316,7 +317,7 @@ namespace QuickTemplate.Logic.Modules.Account
             if (identity != null)
             {
                 if (VerifyPasswordHash(oldPassword, identity.PasswordHash, identity.PasswordSalt) == false)
-                    throw new AuthorizationException(ErrorType.InvalidPassword);
+                    throw new AuthorizationException(Error.InvalidPassword);
 
                 var (Hash, Salt) = CreatePasswordHash(newPassword);
 
@@ -339,10 +340,10 @@ namespace QuickTemplate.Logic.Modules.Account
             await Authorization.CheckAuthorizationAsync(sessionToken, typeof(AccountManager), nameof(ChangePasswordForAsync)).ConfigureAwait(false);
 
             if (CheckPasswordSyntax(newPassword) == false)
-                throw new AuthorizationException(ErrorType.InvalidPasswordSyntax, PasswordRules.SyntaxRoles);
+                throw new AuthorizationException(Error.InvalidPasswordSyntax, PasswordRules.SyntaxRoles);
 
             var login = await QueryAliveSessionAsync(sessionToken).ConfigureAwait(false)
-                        ?? throw new AuthorizationException(ErrorType.InvalidToken);
+                        ?? throw new AuthorizationException(Error.InvalidToken);
 
             using var identitiesCtrl = new Controllers.Account.IdentitiesController()
             {
@@ -355,7 +356,7 @@ namespace QuickTemplate.Logic.Modules.Account
                                                .ConfigureAwait(false);
 
             if (identity == null)
-                throw new AuthorizationException(ErrorType.InvalidAccount);
+                throw new AuthorizationException(Error.InvalidAccount);
 
             var (Hash, Salt) = CreatePasswordHash(newPassword);
 
@@ -378,7 +379,7 @@ namespace QuickTemplate.Logic.Modules.Account
             await Authorization.CheckAuthorizationAsync(sessionToken, typeof(AccountManager), nameof(ResetFailedCountForAsync)).ConfigureAwait(false);
 
             var login = await QueryAliveSessionAsync(sessionToken).ConfigureAwait(false)
-                        ?? throw new AuthorizationException(ErrorType.InvalidToken);
+                        ?? throw new AuthorizationException(Error.InvalidToken);
 
             using var identitiesCtrl = new Controllers.Account.IdentitiesController()
             {
@@ -390,7 +391,7 @@ namespace QuickTemplate.Logic.Modules.Account
                                                .ConfigureAwait(false);
 
             if (identity == null)
-                throw new AuthorizationException(ErrorType.InvalidAccount);
+                throw new AuthorizationException(Error.InvalidAccount);
 
             identity.AccessFailedCount = 0;
             await identitiesCtrl.UpdateAsync(identity).ConfigureAwait(false);

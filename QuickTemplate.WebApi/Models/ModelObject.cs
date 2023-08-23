@@ -1,6 +1,6 @@
 ﻿//@BaseCode
 //MdStart
-using QuickTemplate.Logic.Contracts;
+using CommonBase.Contracts;
 using System.Collections;
 
 namespace QuickTemplate.WebApi.Models

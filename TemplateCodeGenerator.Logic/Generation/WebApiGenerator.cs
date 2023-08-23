@@ -2,6 +2,7 @@
 //MdStart
 namespace TemplateCodeGenerator.Logic.Generation
 {
+    using TemplateCodeGenerator.Logic.Common;
     using TemplateCodeGenerator.Logic.Contracts;
     internal sealed partial class WebApiGenerator : ModelGenerator
     {
@@ -13,7 +14,7 @@ namespace TemplateCodeGenerator.Logic.Generation
 
         public WebApiGenerator(ISolutionProperties solutionProperties) : base(solutionProperties)
         {
-            GenerateModels = QuerySetting<bool>(Common.ItemType.Model, "All", StaticLiterals.Generate, "True");
+            GenerateModels = QuerySetting<bool>(Common.ItemType.AccessModel, "All", StaticLiterals.Generate, "True");
             GenerateControllers = QuerySetting<bool>(Common.ItemType.Controller, "All", StaticLiterals.Generate, "True");
             GenerateAddServices = QuerySetting<bool>(Common.ItemType.AddServices, "All", StaticLiterals.Generate, "True");
         }
@@ -34,32 +35,17 @@ namespace TemplateCodeGenerator.Logic.Generation
 
             foreach (var type in entityProject.EntityTypes)
             {
-                if (CanCreate(type) && QuerySetting<bool>(Common.ItemType.Model, type, StaticLiterals.Generate, GenerateModels.ToString()))
+                if (CanCreate(type) && QuerySetting<bool>(Common.ItemType.AccessModel, type, StaticLiterals.Generate, GenerateModels.ToString()))
                 {
-                    result.Add(CreateModelFromType(type, Common.UnitType.WebApi, Common.ItemType.Model));
-                    result.Add(CreateModelInheritance(type, Common.UnitType.WebApi, Common.ItemType.Model));
+                    result.Add(CreateModelFromType(type, Common.UnitType.WebApi, Common.ItemType.AccessModel));
+                    result.Add(CreateModelInheritance(type, Common.UnitType.WebApi, Common.ItemType.AccessModel));
                     result.Add(CreateEditModelFromType(type, Common.UnitType.WebApi, Common.ItemType.EditModel));
                 }
             }
             return result;
         }
-        private IGeneratedItem CreateModelInheritance(Type type, Common.UnitType unitType, Common.ItemType itemType)
-        {
-            var result = new Models.GeneratedItem(unitType, itemType)
-            {
-                FullName = CreateModelFullNameFromType(type),
-                FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = ItemProperties.CreateModelSubPath(type, "Inheritance", StaticLiterals.CSharpFileExtension),
-            };
-            result.Source.Add($"partial class {CreateModelName(type)} : {GetBaseClassByType(type, StaticLiterals.ModelsFolder)}");
-            result.Source.Add("{");
-            result.Source.Add("}");
-            result.EnvelopeWithANamespace(ItemProperties.CreateModelNamespace(type));
-            result.FormatCSharpCode();
-            return result;
-        }
 
-        private IGeneratedItem CreateEditModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        private IGeneratedItem CreateEditModelFromType(Type type, UnitType unitType, ItemType itemType)
         {
             var modelName = ItemProperties.CreateEditModelName(type);
             var typeProperties = type.GetAllPropertyInfos();
@@ -67,13 +53,13 @@ namespace TemplateCodeGenerator.Logic.Generation
                                                             && IsListType(e.PropertyType) == false);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
-                FullName = CreateModelFullNameFromType(type),
+                FullName = CreateModelFullName(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
                 SubFilePath = ItemProperties.CreateModelSubPath(type, "Edit", StaticLiterals.CSharpFileExtension),
             };
 
             result.AddRange(CreateComment(type));
-            CreateModelAttributes(type, result.Source);
+            CreateModelAttributes(type, unitType, result.Source);
             result.Add($"public partial class {modelName}");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(modelName));
@@ -82,7 +68,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             foreach (var propertyInfo in filteredProperties.Where(pi => pi.CanWrite))
             {
                 result.AddRange(CreateComment(propertyInfo));
-                CreateModelPropertyAttributes(propertyInfo, result.Source);
+                CreateModelPropertyAttributes(propertyInfo, unitType, result.Source);
                 result.AddRange(CreateProperty(type, propertyInfo));
             }
             result.Add("}");
@@ -105,7 +91,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             }
             return result;
         }
-        private IGeneratedItem CreateControllerFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        private IGeneratedItem CreateControllerFromType(Type type, UnitType unitType, ItemType itemType)
         {
             var visibility = "public";
             var logicProject = $"{ItemProperties.SolutionName}{StaticLiterals.LogicExtension}";
@@ -122,11 +108,13 @@ namespace TemplateCodeGenerator.Logic.Generation
                 SubFilePath = ItemProperties.CreateControllersSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
             };
             result.AddRange(CreateComment(type));
-            CreateControllerAttributes(type, result.Source);
+            CreateControllerAttributes(type, unitType, result.Source);
             result.Add($"{visibility} sealed partial class {controllerName} : {genericType}<{accessType}, {editModelType}, {modelType}>");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(controllerName));
             result.AddRange(CreatePartialConstrutor("public", controllerName, $"{contractType} other", "base(other)", null, true));
+
+            result.Add($"new private {contractType}? DataAccess => base.DataAccess as {contractType};");
 
             result.AddRange(CreateComment(type));
             result.Add($"protected override {modelType} ToOutModel({accessType} accessModel)");
@@ -172,7 +160,6 @@ namespace TemplateCodeGenerator.Logic.Generation
 
                 if (generate && type.IsPublic)
                 {
-                    var logicProject = $"{ItemProperties.SolutionName}{StaticLiterals.LogicExtension}";
                     var contractType = ItemProperties.CreateAccessContractType(type);
                     var controllerType = ItemProperties.CreateLogicControllerType(type);
 
@@ -195,7 +182,8 @@ namespace TemplateCodeGenerator.Logic.Generation
             return result;
         }
 
-        private T QuerySetting<T>(Common.ItemType itemType, Type type, string valueName, string defaultValue)
+        #region query configuration
+        private T QuerySetting<T>(ItemType itemType, Type type, string valueName, string defaultValue)
         {
             T result;
 
@@ -210,7 +198,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             }
             return result;
         }
-        private T QuerySetting<T>(Common.ItemType itemType, string itemName, string valueName, string defaultValue)
+        private T QuerySetting<T>(ItemType itemType, string itemName, string valueName, string defaultValue)
         {
             T result;
 
@@ -225,10 +213,11 @@ namespace TemplateCodeGenerator.Logic.Generation
             }
             return result;
         }
+        #endregion query configuration
 
         #region Partial methods
-        partial void CreateModelAttributes(Type type, List<string> source);
-        partial void CreateControllerAttributes(Type type, List<string> codeLines);
+        partial void CreateModelAttributes(Type type, UnitType unitType, List<string> source);
+        partial void CreateControllerAttributes(Type type, UnitType unitType, List<string> codeLines);
         #endregion Partial methods
     }
 }

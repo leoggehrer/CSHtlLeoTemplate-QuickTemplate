@@ -4,6 +4,7 @@
 using QuickTemplate.Logic.Modules.Account;
 using QuickTemplate.Logic.Modules.Exceptions;
 using System.Reflection;
+using Error = CommonBase.Modules.Exceptions.ErrorType;
 
 namespace QuickTemplate.Logic.Modules.Security
 {
@@ -83,7 +84,7 @@ namespace QuickTemplate.Logic.Modules.Security
 
                 if (isRequired)
                 {
-                    throw new AuthorizationException(ErrorType.NotLogedIn);
+                    throw new AuthorizationException(Error.NotLogedIn);
                 }
             }
             else if (sessionToken.Equals(SystemAuthorizationToken) == false)
@@ -95,16 +96,16 @@ namespace QuickTemplate.Logic.Modules.Security
                     var curSession = await AccountManager.QueryAliveSessionAsync(sessionToken).ConfigureAwait(false);
 
                     if (curSession == null)
-                        throw new AuthorizationException(ErrorType.InvalidSessionToken);
+                        throw new AuthorizationException(Error.InvalidSessionToken);
 
                     if (curSession.IsTimeout)
-                        throw new AuthorizationException(ErrorType.AuthorizationTimeOut);
+                        throw new AuthorizationException(Error.AuthorizationTimeOut);
 
                     bool isAuthorized = authorization.Roles.Any() == false
                                         || curSession.Roles.Any(lr => authorization.Roles.Contains(lr.Designation));
 
                     if (isAuthorized == false)
-                        throw new AuthorizationException(ErrorType.NotAuthorized);
+                        throw new AuthorizationException(Error.NotAuthorized);
 
                     curSession.LastAccess = DateTime.UtcNow;
 #if LOGGING_ON
@@ -117,22 +118,22 @@ namespace QuickTemplate.Logic.Modules.Security
         {
             if (string.IsNullOrEmpty(sessionToken))
             {
-                throw new AuthorizationException(ErrorType.NotLogedIn);
+                throw new AuthorizationException(Error.NotLogedIn);
             }
             else if (sessionToken.Equals(SystemAuthorizationToken) == false)
             {
                 var curSession = await AccountManager.QueryAliveSessionAsync(sessionToken).ConfigureAwait(false);
 
                 if (curSession == null)
-                    throw new AuthorizationException(ErrorType.InvalidSessionToken);
+                    throw new AuthorizationException(Error.InvalidSessionToken);
 
                 if (curSession.IsTimeout)
-                    throw new AuthorizationException(ErrorType.AuthorizationTimeOut);
+                    throw new AuthorizationException(Error.AuthorizationTimeOut);
 
                 bool isAuthorized = curSession.Roles.Any(lr => roles.Contains(lr.Designation));
 
                 if (isAuthorized == false)
-                    throw new AuthorizationException(ErrorType.NotAuthorized);
+                    throw new AuthorizationException(Error.NotAuthorized);
 
                 curSession.LastAccess = DateTime.UtcNow;
 #if LOGGING_ON

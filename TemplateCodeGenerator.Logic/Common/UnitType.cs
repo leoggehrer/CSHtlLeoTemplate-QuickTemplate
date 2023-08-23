@@ -14,6 +14,8 @@ namespace TemplateCodeGenerator.Logic.Common
         Angular = 2 * AspMvc,
 
         MVVM = 2 * Angular,
+
+        ClientBlazor = 2 * MVVM,
     }
 }
 //MdEnd

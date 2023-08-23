@@ -2,7 +2,6 @@
 //MdStart
 namespace TemplateCodeGenerator.Logic.Models
 {
-    using TemplateCodeGenerator.Logic.Common;
     internal class GenerationSetting
     {
         public string UnitType { get; set; } = string.Empty;

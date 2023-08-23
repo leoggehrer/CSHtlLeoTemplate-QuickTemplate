@@ -24,9 +24,10 @@ namespace CommonBase.Extensions
 
             return (values.Length == idx) ? values[0] : values[idx];
         }
+
         public static Dictionary<int, string> ToDictionary<T>(this T src) where T : struct, Enum
         {
-            return Enum.GetValues(typeof(T))
+            return Enum.GetValues(src.GetType())
                .Cast<T>()
                .ToDictionary(t => (int)(object)t, t => t.ToString());
         }

@@ -47,15 +47,15 @@ namespace TemplateCodeGenerator.Logic.Models
             }
             Source.AddRange(codeLines);
         }
-        public void FormatCSharpCode(bool removeBlockComments = false, bool removeLineComments = false)
+        public void FormatCSharpCode()
         {
             int indent = 0;
 
             foreach (var line in Source.Eject())
             {
                 var formatLine = line.Trim();
-                var hasOpenBlock = formatLine.Contains("{");
-                var hasCloseBlock = formatLine.Contains("}");
+                var hasOpenBlock = formatLine.Contains('{');
+                var hasCloseBlock = formatLine.Contains('}');
 
                 if (hasOpenBlock && hasCloseBlock)
                 {

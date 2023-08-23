@@ -13,7 +13,6 @@ namespace CommonBase.Modules.Configuration
         }
         static partial void ClassConstructing();
         static partial void ClassConstructed();
-
         private static IConfiguration? configuration;
 
         public static IConfiguration Configuration

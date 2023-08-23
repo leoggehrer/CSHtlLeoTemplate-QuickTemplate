@@ -7,6 +7,7 @@ namespace QuickTemplate.AspMvc.Controllers.Account
     using TViewModel = AspMvc.Models.Account.IdentityUser;
     using TFilterModel = AspMvc.Models.Account.IdentityUserFilter;
     using TAccessContract = Logic.Contracts.Account.IUsersAccess;
+
     using System.Diagnostics.Metrics;
 
     public partial class IdentityUsersController : Controllers.FilterGenericController<TAccessModel, TViewModel, TFilterModel, TAccessContract>

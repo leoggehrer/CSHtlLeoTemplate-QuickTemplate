@@ -1,7 +1,6 @@
 ﻿//@BaseCode
 //MdStart
 using Microsoft.AspNetCore.Mvc;
-using System.Text;
 
 namespace QuickTemplate.WebApi.Controllers
 {

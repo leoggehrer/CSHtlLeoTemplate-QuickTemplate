@@ -1,7 +1,7 @@
 ﻿//@BaseCode
 //MdStart
+using CommonBase.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using QuickTemplate.Logic.Contracts;
 
 namespace QuickTemplate.WebApi.Controllers
 {
@@ -271,18 +271,28 @@ namespace QuickTemplate.WebApi.Controllers
         /// <param name="editModel">Model to add</param>
         /// <returns>Data about the created model (including primary key)</returns>
         /// <response code="201">Model created</response>
+        /// <response code="400">Invalid model data</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public virtual async Task<ActionResult<TOutModel>> PostAsync([FromBody] TEditModel editModel)
         {
-            var accessModel = new TAccessModel();
+            try
+            {
+                var accessModel = new TAccessModel();
+                var insertAccessModel = default(TAccessModel);
 
-            accessModel.CopyFrom(editModel);
-            var insertaccessModel = await DataAccess.InsertAsync(accessModel);
+                accessModel.CopyFrom(editModel);
+                insertAccessModel = await DataAccess.InsertAsync(accessModel);
 
-            await DataAccess.SaveChangesAsync();
+                await DataAccess.SaveChangesAsync();
 
-            return CreatedAtAction("Get", new { id = accessModel.Id }, ToOutModel(insertaccessModel));
+                return CreatedAtAction("Get", new { id = accessModel.Id }, ToOutModel(insertAccessModel));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.GetError());
+            }
         }
 
         /// <summary>
@@ -293,20 +303,30 @@ namespace QuickTemplate.WebApi.Controllers
         /// <returns>Data about the updated model</returns>
         /// <response code="200">Model updated</response>
         /// <response code="404">Model not found</response>
+        /// <response code="400">Invalid model data</response>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public virtual async Task<ActionResult<TOutModel>> PutAsync(IdType id, [FromBody] TEditModel editModel)
         {
-            var accessModel = await DataAccess.GetByIdAsync(id);
-
-            if (accessModel != null)
+            try
             {
-                accessModel.CopyFrom(editModel);
-                await DataAccess.UpdateAsync(accessModel);
-                await DataAccess.SaveChangesAsync();
+                var accessModel = await DataAccess.GetByIdAsync(id);
+                var updateAccessModel = default(TAccessModel);
+
+                if (accessModel != null)
+                {
+                    accessModel.CopyFrom(editModel);
+                    updateAccessModel = await DataAccess.UpdateAsync(accessModel);
+                    await DataAccess.SaveChangesAsync();
+                }
+                return accessModel == null ? NotFound() : Ok(ToOutModel(updateAccessModel!));
             }
-            return accessModel == null ? NotFound() : Ok(ToOutModel(accessModel));
+            catch (Exception ex)
+            {
+                return BadRequest(ex.GetError());
+            }
         }
 
         /// <summary>
@@ -315,19 +335,28 @@ namespace QuickTemplate.WebApi.Controllers
         /// <param name="id">Id of the model to delete</param>
         /// <response code="204">Model deleted</response>
         /// <response code="404">Model not found</response>
+        /// <response code="400">Model cannot be deleted</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public virtual async Task<ActionResult> DeleteAsync(IdType id)
         {
-            var accessModel = await DataAccess.GetByIdAsync(id);
-
-            if (accessModel != null)
+            try
             {
-                await DataAccess.DeleteAsync(accessModel.Id);
-                await DataAccess.SaveChangesAsync();
+                var accessModel = await DataAccess.GetByIdAsync(id);
+
+                if (accessModel != null)
+                {
+                    await DataAccess.DeleteAsync(accessModel.Id);
+                    await DataAccess.SaveChangesAsync();
+                }
+                return accessModel == null ? NotFound() : NoContent();
             }
-            return accessModel == null ? NotFound() : NoContent();
+            catch (Exception ex)
+            {
+                return BadRequest(ex.GetError());
+            }
         }
 
         #region Dispose pattern

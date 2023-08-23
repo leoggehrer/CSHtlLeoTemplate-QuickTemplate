@@ -26,34 +26,39 @@ namespace TemplateCodeGenerator.Logic
         #endregion Code-Generation
 
         #region Project Extensions
-        public static string LogicExtension => ".Logic";
-        public static string WebApiExtension => ".WebApi";
-        public static string AspMvcExtension => ".AspMvc";
-        public static string MVVMExtension => ".MvvMApp";
+        public static string LogicExtension => CommonStaticLiterals.LogicExtension;
+        public static string WebApiExtension => CommonStaticLiterals.WebApiExtension;
+        public static string AspMvcExtension => CommonStaticLiterals.AspMvcExtension;
+        public static string MVVMExtension => CommonStaticLiterals.MVVMExtension;
+        public static string AngularExtension => CommonStaticLiterals.AngularExtension;
+        public static string ClientBlazorExtension => CommonStaticLiterals.ClientBlazorExtension;
         #endregion Project Extensions
 
         #region Entity and service properties
-        public static string EntityObjectName => "EntityObject";
-        public static string VersionEntityName => "VersionEntity";
-        public static string[] EntityBaseClasses => new string[] { VersionEntityName, EntityObjectName };
-        public static string IdentityServiceName => "IdentityService";
-        public static string VersionServiceName => "VersionService";
-        public static string[] ServiceBaseClasses => new string[] { VersionServiceName, IdentityServiceName };
-        public static string[] BaseClasses => EntityBaseClasses.Union(ServiceBaseClasses).ToArray();
-        public static string IdentityProperty => "Id";
-        public static string RowVersionProperty => "RowVersion";
-        public static string[] IdentityProperties => new string[] { IdentityProperty };
-        public static string[] VersionProperties => new string[] { IdentityProperty, RowVersionProperty };
-        public static string[] ExtendedProperties = new string[] { "Guid", "CreatedOn", "ModifiedOn", "IdentityId_CreatedBy", "IdentityId_ModifiedBy" };
+        public static readonly string IdentityProperty = "Id";
+        public static readonly string EntityObjectName = "EntityObject";
+        public static readonly string VersionEntityName = "VersionEntity";
+        public static readonly string RowVersionProperty = "RowVersion";
+        public static readonly string[] IdentityProperties = new string[] { IdentityProperty };
+        public static readonly string[] VersionProperties = new string[] { IdentityProperty, RowVersionProperty };
+        public static readonly string[] ExtendedProperties = new string[] { "Guid", "CreatedOn", "ModifiedOn", "IdentityId_CreatedBy", "IdentityId_ModifiedBy" };
         public static string[] NoGenerationProperties => IdentityProperties.Union(VersionProperties).ToArray();
         #endregion Entity and service properties
 
         #region Model properties
-        public static string IdType => nameof(IdType);
-        public static string ModelObjectName => "ModelObject";
-        public static string VersionModelName => "VersionModel";
-        public static string[] ModelBaseClasses => new string[] { VersionModelName, ModelObjectName };
+        public static readonly string IdType = nameof(IdType);
+        public static readonly string ModelObjectName = "ModelObject";
+        public static readonly string VersionModelName = "VersionModel";
+        public static readonly string ServiceModelName = "ServiceModel";
         #endregion Model properties
+
+        public static readonly string[] ModelBaseClasses = new[] { ModelObjectName, VersionModelName };
+        public static readonly Dictionary<string, string> BaseClassMapping = new()
+        {
+            { EntityObjectName, ModelObjectName },
+            { VersionEntityName, VersionModelName },
+            { ServiceModelName, $"BaseModels.{ServiceModelName}" },
+        };
 
         #region Folders
         public static string EntitiesFolder => "Entities";

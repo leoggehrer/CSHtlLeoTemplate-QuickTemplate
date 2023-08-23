@@ -27,15 +27,29 @@ namespace QuickTemplate.WebApi.Controllers
             return Ok(WebApi.Models.Account.LoginSession.Create(result));
         }
 
-        /// <summary>  
-        /// This query determines the payments depending on the parameters.  
-        /// </summary>  
-        /// <param name="sessionToken">The sessionToken.</param>  
-        /// <returns>The logon session object.</returns>  
-        [HttpPost("logout")]
-        public Task LogoutByAsync([FromQuery(Name = "sessionToken")] string sessionToken)
+        /// <summary>
+        /// This method performs a logout with the appropriate token.
+        /// </summary>
+        /// <param name="sessionToken">The session token.</param>
+        /// <returns></returns>
+        [HttpPut("logout")]
+        public Task LogoutByAsync([FromBody] string sessionToken)
         {
             return Logic.AccountAccess.LogoutAsync(sessionToken);
+        }
+
+        /// <summary>
+        /// This method checks whether the session token is still valid.
+        /// </summary>
+        /// <param name="sessionToken">The session token that is checked.</param>
+        /// <returns>True if the token is still valid, false otherwise.</returns>
+        [HttpGet("issessionalive/{sessionToken}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<bool>> IsSessionAliveAsync(string sessionToken)
+        {
+            var result = await Logic.AccountAccess.IsSessionAliveAsync(sessionToken);
+
+            return Ok(result);
         }
     }
 }

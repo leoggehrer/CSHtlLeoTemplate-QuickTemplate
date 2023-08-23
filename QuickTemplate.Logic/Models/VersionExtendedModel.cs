@@ -2,8 +2,7 @@
 //MdStart
 namespace QuickTemplate.Logic.Models
 {
-    using QuickTemplate.Logic.Contracts;
-    public abstract partial class VersionExtendedModel : VersionModel, IVersionableExtendedProperties
+    public abstract partial class VersionExtendedModel : VersionModel, BaseContracts.IVersionableExtendedProperties
     {
         new internal virtual Entities.VersionExtendedEntity Source
         {
@@ -66,7 +65,7 @@ namespace QuickTemplate.Logic.Models
             }
         }
 #endif
-        protected void CopyExendedProperties(IVersionableExtendedProperties source)
+        protected static void CopyExendedProperties(BaseContracts.IVersionableExtendedProperties source)
         {
 #if CREATED_ON
             CreatedOn = source.CreatedOn;

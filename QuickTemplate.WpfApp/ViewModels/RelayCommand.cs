@@ -44,10 +44,7 @@ namespace QuickTemplate.WpfApp.ViewModels
         }
         public static ICommand Create(ref ICommand? command, Action<object?> execute, Predicate<object?>? canExecute)
         {
-            if (command == null)
-            {
-                command = new RelayCommand(execute, canExecute);
-            }
+            command ??= new RelayCommand(execute, canExecute);
             return command;
         }
         #endregion Factory methods

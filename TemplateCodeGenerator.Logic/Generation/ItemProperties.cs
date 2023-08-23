@@ -9,6 +9,7 @@ namespace TemplateCodeGenerator.Logic.Generation
         public string SolutionName { get; }
         public string ProjectExtension { get; }
         public string Namespace => $"{SolutionName}{ProjectExtension}";
+
         public ItemProperties(string solutionName, string projectExtension)
         {
             SolutionName = solutionName;
@@ -26,16 +27,26 @@ namespace TemplateCodeGenerator.Logic.Generation
         /// </summary>
         /// <param name="type">The property info object.</param>
         /// <returns>The typescript property name.</returns>
-        public static string CreateTSPropertyName (PropertyInfo propertyInfo) => $"{Char.ToLower(propertyInfo.Name[0])}{propertyInfo.Name[1..]}";
+        public static string CreateTSPropertyName(PropertyInfo propertyInfo) => $"{Char.ToLower(propertyInfo.Name[0])}{propertyInfo.Name[1..]}";
 
-        public string _RemoveSolutionName(string itemName)
+        #region Solution properties
+        public string[] TemplateProjects
         {
-            return itemName.Replace($"{SolutionName}.", string.Empty);
+            get
+            {
+                var result = new List<string>(CommonBase.StaticLiterals.TemplateProjects);
+
+                foreach (var extension in CommonBase.StaticLiterals.TemplateProjectExtensions)
+                {
+                    result.Add($"{SolutionName}{extension}");
+                }
+                result.AddRange(CommonBase.StaticLiterals.TemplateToolProjects);
+                return result.ToArray();
+            }
         }
-        public string CreateSubType(Type type)
-        {
-            return type.FullName!.Replace($"{Namespace}.", string.Empty);
-        }
+        #endregion Solution properties
+
+        #region Models properties
         public static string CreateModelName(Type type) => type.Name;
         public string CreateModelType(Type type)
         {
@@ -57,8 +68,9 @@ namespace TemplateCodeGenerator.Logic.Generation
         {
             return $"{CreateModelNamespace(type)}.{CreateFilterModelName(type)}";
         }
+        #endregion Models properties
 
-        public static string CreateModelSubType(Type type)
+        public string CreateModelSubType(Type type)
         {
             return $"{CreateModelSubNamespace(type)}.{type.Name}";
         }
@@ -66,11 +78,10 @@ namespace TemplateCodeGenerator.Logic.Generation
         {
             return $"{Namespace}.{CreateModelSubNamespace(type)}";
         }
-        public static string CreateModelSubPath(Type type, string postFix, string fileExtension)
+        public string CreateModelSubPath(Type type, string postFix, string fileExtension)
         {
             return Path.Combine(CreateModelSubNamespace(type).Replace(".", Path.DirectorySeparatorChar.ToString()), $"{type.Name}{postFix}{fileExtension}");
         }
-
         public string ConvertEntityToModelType(string typeFullname)
         {
             var result = typeFullname;
@@ -88,11 +99,11 @@ namespace TemplateCodeGenerator.Logic.Generation
         #region Contracts properties
         public string CreateAccessContractType(Type type)
         {
-            return $"{CreateContractNamespace(type)}.{CreateAccessContractName(type)}";
+            return $"{CreateLogicContractNamespace(type)}.{CreateAccessContractName(type)}";
         }
         public string CreateServiceContractType(Type type)
         {
-            return $"{CreateContractNamespace(type)}.{CreateServiceContractName(type)}";
+            return $"{CreateLogicContractNamespace(type)}.{CreateServiceContractName(type)}";
         }
         public static string CreateAccessContractName(Type type)
         {
@@ -102,39 +113,37 @@ namespace TemplateCodeGenerator.Logic.Generation
         {
             return $"I{type.Name.CreatePluralWord()}Service";
         }
-        public static string CreateAccessContractSubType(Type type)
+        public string CreateAccessContractSubType(Type type)
         {
             return $"{CreateContractSubNamespace(type)}.{CreateAccessContractName(type)}";
         }
-        public static string CreateServiceContractSubType(Type type)
+        public string CreateServiceContractSubType(Type type)
         {
             return $"{CreateContractSubNamespace(type)}.{CreateServiceContractName(type)}";
         }
-        public static string CreateFacadeContractSubType(Type type)
+        public string CreateFacadeContractSubType(Type type)
         {
             return $"{CreateContractSubNamespace(type)}.{CreateAccessContractName(type)}";
         }
-        public string CreateContractNamespace(Type type)
+        public string CreateLogicContractNamespace(Type type)
         {
             return $"{SolutionName}{StaticLiterals.LogicExtension}.{CreateContractSubNamespace(type)}";
         }
-        public static string CreateContractSubNamespace(Type type)
+        public string CreateClientBlazorContractNamespace(Type type)
         {
-            var entitySubNamespace = CreateSubNamespaceFromEntityType(type);
-
-            return entitySubNamespace.HasContent() ? $"{StaticLiterals.ContractsFolder}.{entitySubNamespace}" : StaticLiterals.ContractsFolder;
+            return $"{SolutionName}{StaticLiterals.ClientBlazorExtension}.{CreateContractSubNamespace(type)}";
         }
-        public static string CreateAccessContractSubPathFromType(Type type, string postFix, string fileExtension)
+        public string CreateAccessContractSubPathFromType(Type type, string postFix, string fileExtension)
         {
             return Path.Combine(CreateContractSubNamespace(type).Replace(".", Path.DirectorySeparatorChar.ToString()), $"{CreateAccessContractName(type)}{postFix}{fileExtension}");
         }
-        public static string CreateServiceContractSubPathFromType(Type type, string postFix, string fileExtension)
+        public string CreateServiceContractSubPathFromType(Type type, string postFix, string fileExtension)
         {
             return Path.Combine(CreateContractSubNamespace(type).Replace(".", Path.DirectorySeparatorChar.ToString()), $"{CreateServiceContractName(type)}{postFix}{fileExtension}");
         }
         #endregion Contracts properties
 
-        #region Controller and service properties
+        #region Controller properties
         public string CreateLogicControllerType(Type type)
         {
             return $"{SolutionName}{StaticLiterals.LogicExtension}.{CreateControllerSubType(type)}";
@@ -151,7 +160,7 @@ namespace TemplateCodeGenerator.Logic.Generation
         {
             return $"{CreateControllerNamespace(type)}.{CreateControllerClassName(type)}";
         }
-        public static string CreateControllerSubType(Type type)
+        public string CreateControllerSubType(Type type)
         {
             return $"{CreateControllerSubNamespace(type)}.{CreateControllerClassName(type)}";
         }
@@ -159,22 +168,29 @@ namespace TemplateCodeGenerator.Logic.Generation
         {
             return $"{Namespace}.{CreateControllerSubNamespace(type)}";
         }
-        public static string CreateControllerSubNamespace(Type type)
+        public string CreateControllerSubNamespace(Type type)
         {
-            var subNamespace = CreateSubNamespaceFromEntityType(type);
+            var subNamespace = CreateSolutionTypeSubNamespace(type);
 
-            return subNamespace.HasContent() ? $"{StaticLiterals.ControllersFolder}.{subNamespace}" : StaticLiterals.ControllersFolder;
+            return subNamespace.Replace($"{StaticLiterals.EntitiesFolder}", StaticLiterals.ControllersFolder)
+                               .Replace($"{StaticLiterals.ServiceModelsFolder}", StaticLiterals.ControllersFolder);
         }
-        public static string CreateControllersSubPathFromType(Type type, string postFix, string fileExtension)
+        public string CreateControllersSubPathFromType(Type type, string postFix, string fileExtension)
         {
             return Path.Combine(CreateControllerSubNamespace(type).Replace(".", Path.DirectorySeparatorChar.ToString()), $"{CreateControllerClassName(type)}{postFix}{fileExtension}");
         }
-        #endregion Controller service properties
+        #endregion Controller properties
 
         #region Service properties
         public string CreateLogicServiceType(Type type)
         {
             return $"{SolutionName}{StaticLiterals.LogicExtension}.{CreateServiceSubType(type)}";
+        }
+        public string CreateServiceModelSubType(Type type)
+        {
+            var subNamespace = CreateServiceModelSubNamespace(type);
+
+            return $"{subNamespace}.{type.Name}";
         }
         public static string CreateServiceName(Type type)
         {
@@ -188,7 +204,7 @@ namespace TemplateCodeGenerator.Logic.Generation
         {
             return $"{CreateServiceNamespace(type)}.{CreateServiceClassName(type)}";
         }
-        public static string CreateServiceSubType(Type type)
+        public string CreateServiceSubType(Type type)
         {
             return $"{CreateServiceSubNamespace(type)}.{CreateServiceClassName(type)}";
         }
@@ -196,13 +212,14 @@ namespace TemplateCodeGenerator.Logic.Generation
         {
             return $"{Namespace}.{CreateServiceSubNamespace(type)}";
         }
-        public static string CreateServiceSubNamespace(Type type)
+        public string CreateServiceSubNamespace(Type type)
         {
-            var subNamespace = CreateSubNamespaceFromEntityType(type);
+            var subNamespace = CreateSolutionTypeSubNamespace(type);
 
-            return subNamespace.HasContent() ? $"{StaticLiterals.ServicesFolder}.{subNamespace}" : StaticLiterals.ServicesFolder;
+            return subNamespace.Replace($"{StaticLiterals.EntitiesFolder}.", $"{StaticLiterals.ServicesFolder}.")
+                               .Replace($"{StaticLiterals.ServiceModelsFolder}.", $"{StaticLiterals.ServicesFolder}.");
         }
-        public static string CreateServicesSubPathFromType(Type type, string postFix, string fileExtension)
+        public string CreateServicesSubPathFromType(Type type, string postFix, string fileExtension)
         {
             return Path.Combine(CreateServiceSubNamespace(type).Replace(".", Path.DirectorySeparatorChar.ToString()), $"{CreateServiceClassName(type)}{postFix}{fileExtension}");
         }
@@ -213,7 +230,7 @@ namespace TemplateCodeGenerator.Logic.Generation
         {
             return $"{CreateFacadeNamespace(type)}.{CreateFactoryFacadeMethodName(type)}";
         }
-        public static string CreateFacadeSubType(Type type)
+        public string CreateFacadeSubType(Type type)
         {
             return $"{CreateFacadeSubNamespace(type)}.{CreateFactoryFacadeMethodName(type)}";
         }
@@ -221,13 +238,14 @@ namespace TemplateCodeGenerator.Logic.Generation
         {
             return $"{Namespace}.{CreateFacadeSubNamespace(type)}";
         }
-        public static string CreateFacadeSubNamespace(Type type)
+        public string CreateFacadeSubNamespace(Type type)
         {
-            var subNamespace = CreateSubNamespaceFromEntityType(type);
+            var subNamespace = CreateSolutionTypeSubNamespace(type);
 
-            return subNamespace.HasContent() ? $"{StaticLiterals.FacadesFolder}.{subNamespace}" : StaticLiterals.FacadesFolder;
+            return subNamespace.Replace($"{StaticLiterals.EntitiesFolder}.", $"{StaticLiterals.FacadesFolder}.")
+                               .Replace($"{StaticLiterals.ServiceModelsFolder}.", $"{StaticLiterals.FacadesFolder}.");
         }
-        public static string CreateFacadesSubPathFromType(Type type, string postFix, string fileExtension)
+        public string CreateFacadesSubPathFromType(Type type, string postFix, string fileExtension)
         {
             return Path.Combine(CreateFacadeSubNamespace(type).Replace(".", Path.DirectorySeparatorChar.ToString()), $"{CreateFactoryFacadeMethodName(type)}{postFix}{fileExtension}");
         }
@@ -251,9 +269,10 @@ namespace TemplateCodeGenerator.Logic.Generation
         }
         #endregion View properties
 
+        #region Query types
         public static bool IsEntityType(Type type)
         {
-            return type.FullName!.Contains($".{StaticLiterals.EntitiesFolder}.");
+            return type.GetBaseTypes().FirstOrDefault(t => t.Name.Equals(StaticLiterals.EntityObjectName)) != null;
         }
         public static bool IsModelType(Type type)
         {
@@ -263,52 +282,144 @@ namespace TemplateCodeGenerator.Logic.Generation
         {
             return strType.Contains($".{StaticLiterals.ModelsFolder}.");
         }
-
-        public static string CreateModelSubNamespace(Type type)
+        public static bool IsServiceModelType(Type type)
         {
-            var subNamespace = CreateSubNamespaceFromEntityType(type);
+            return type.GetBaseTypes().FirstOrDefault(t => t.Name.Equals(StaticLiterals.ServiceModelName)) != null;
+        }
+        public static bool IsServiceModelType(string strType)
+        {
+            return strType.Contains($".{StaticLiterals.ServiceModelsFolder}.");
+        }
+        #endregion Query types
 
-            return subNamespace.HasContent() ? $"{StaticLiterals.ModelsFolder}.{subNamespace}" : StaticLiterals.ModelsFolder;
+        /// <summary>
+        /// This method creates the sub namespace from a solution entity type. 
+        /// For example: 
+        ///     FullName QuickTemplate.Logic.Entities.Base.Artist becomes SubName Contracts.Base.Artist.
+        /// </summary>
+        /// <param name="type">The Type from which the subnamespace is created.</param>
+        /// <returns>The subnamespace as a string.</returns>
+        public string CreateContractSubNamespace(Type type)
+        {
+            var subNamespace = CreateSolutionTypeSubNamespace(type);
+
+            return ReplaceSubNamespaceFolder(subNamespace, StaticLiterals.ContractsFolder);
+        }
+        /// <summary>
+        /// This method creates the sub namespace from a solution entity type. 
+        /// For example: 
+        ///     FullName QuickTemplate.Logic.Entities.Base.Artist becomes SubName Models.Base.Artist.
+        /// </summary>
+        /// <param name="type">The Type from which the subnamespace is created.</param>
+        /// <returns>The subnamespace as a string.</returns>
+        public string CreateModelSubNamespace(Type type)
+        {
+            var subNamespace = CreateSolutionTypeSubNamespace(type);
+
+            return ReplaceSubNamespaceFolder(subNamespace, StaticLiterals.ModelsFolder, StaticLiterals.EntitiesFolder);
+        }
+        /// <summary>
+        /// This method creates the sub namespace from a solution entity type. 
+        /// For example: 
+        ///     FullName QuickTemplate.Logic.Entities.Base.Artist becomes SubName ServiceModels.Base.Artist.
+        /// </summary>
+        /// <param name="type">The Type from which the subnamespace is created.</param>
+        /// <returns>The subnamespace as a string.</returns>
+        public string CreateServiceModelSubNamespace(Type type)
+        {
+            var subNamespace = CreateSolutionTypeSubNamespace(type);
+
+            return ReplaceSubNamespaceFolder(subNamespace, StaticLiterals.ServiceModelsFolder);
         }
 
         /// <summary>
-        /// Diese Methode ermittelt den Teilnamensraum aus einem Typ.
+        /// This method creates the part name from a solution type. 
+        /// For example: 
+        ///     FullName QuickTemplate.Logic.ServiceModel.Base.Artist becomes SubName ServiceModel.Base.Artist.
         /// </summary>
-        /// <param name="type">Typ</param>
-        /// <returns>Teil-Namensraum</returns>
-        public static string CreateSubNamespaceFromType(Type type)
+        /// <param name="type">The Type from which the SubName is created.</param>
+        /// <returns>The SubName as a string.</returns>
+        public string CreateSolutionTypeSubName(Type type)
         {
-            var result = string.Empty;
-            var data = type.Namespace?.Split('.');
+            return CreateSolutionTypeSubName(type.FullName!);
+        }
+        /// <summary>
+        /// This method creates the part name from a solution type. 
+        /// For example: 
+        ///     FullName QuickTemplate.Logic.ServiceModel.Base.Artist becomes SubName ServiceModel.Base.Artist.
+        /// </summary>
+        /// <param name="typeFullName">The Fullname from which the SubName is created.</param>
+        /// <returns>The SubName as a string.</returns>
+        public string CreateSolutionTypeSubName(string typeFullName)
+        {
+            var result = typeFullName;
 
-            for (var i = 2; i < data?.Length; i++)
+            if (result.StartsWith(SolutionName))
             {
-                if (string.IsNullOrEmpty(result))
+                var data = result.Split('.');
+
+                result = string.Empty;
+                for (var i = 2; i < data?.Length; i++)
                 {
-                    result = $"{data[i]}";
-                }
-                else
-                {
-                    result = $"{result}.{data[i]}";
+                    if (string.IsNullOrEmpty(result))
+                    {
+                        result = $"{data[i]}";
+                    }
+                    else
+                    {
+                        result = $"{result}.{data[i]}";
+                    }
                 }
             }
             return result;
         }
         /// <summary>
-        /// Diese Methode ermittelt den Teilnamensraum aus einem Typ.
+        /// This method creates the part namespace from a solution type. 
+        /// For example: 
+        ///     FullName QuickTemplate.Logic.ServiceModel.Base.Artist becomes SubName ServiceModel.Base.
         /// </summary>
-        /// <param name="type">Typ</param>
-        /// <returns>Teil-Namensraum</returns>
-        public static string CreateSubNamespaceFromEntityType(Type type)
+        /// <param name="type">The Type from which the SubNamespace is created.</param>
+        /// <returns>The SubNamespace as a string.</returns>
+        public string CreateSolutionTypeSubNamespace(Type type)
         {
-            var result = CreateSubNamespaceFromType(type);
+            var result = type.Namespace!;
 
-            if (result.Equals(StaticLiterals.EntitiesFolder))
+            if (result.StartsWith(SolutionName))
             {
+                var data = result.Split('.');
+
                 result = string.Empty;
+                for (var i = 2; i < data?.Length; i++)
+                {
+                    if (string.IsNullOrEmpty(result))
+                    {
+                        result = $"{data[i]}";
+                    }
+                    else
+                    {
+                        result = $"{result}.{data[i]}";
+                    }
+                }
             }
-            return result.Replace($"{StaticLiterals.EntitiesFolder}.", string.Empty)
-                         .Replace($"{StaticLiterals.ServiceModelsFolder}.", string.Empty);
+            return result;
+        }
+
+        public static string ReplaceSubNamespaceFolder(string subNamespace, string newValue)
+        {
+            return ReplaceSubNamespaceFolder(subNamespace, newValue, StaticLiterals.EntitiesFolder, StaticLiterals.ModelsFolder, StaticLiterals.ServiceModelsFolder);
+        }
+        public static string ReplaceSubNamespaceFolder(string subNamespace, string newValue, params string[] oldValues)
+        {
+            var result = subNamespace;
+
+            foreach (var oldValue in oldValues)
+            {
+                if (result.StartsWith($"{oldValue}."))
+                {
+                    result = result.Replace($"{oldValue}.", $"{newValue}.");
+                }
+            }
+            return result;
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿//@BaseCode
 //MdStart
+
 namespace CommonBase.Modules.PlantUML
 {
     using CommonBase.Extensions;
     using System.Collections;
     using System.Reflection;
-    using System.Runtime.CompilerServices;
     using System.Text;
     public static class UMLCreator
     {
@@ -235,7 +235,6 @@ namespace CommonBase.Modules.PlantUML
         }
         public static IEnumerable<string> CreateTypeRelations(Type type, int deep)
         {
-            var test = new int[10];
             var result = new List<string>();
 
             foreach (var item in type.GetRelations(deep))
@@ -305,10 +304,9 @@ namespace CommonBase.Modules.PlantUML
         {
             var counter = 0;
             var result = new List<string>();
-            var bindingFlags = default(BindingFlags);
 
             #region fields
-            bindingFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+            BindingFlags bindingFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
             foreach (var item in type.GetFields(bindingFlags))
             {
                 counter++;
@@ -399,14 +397,13 @@ namespace CommonBase.Modules.PlantUML
         {
             var counter = 0;
             var result = new List<string>();
-            var bindingFlags = default(BindingFlags);
 
             #region fields
-            bindingFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+            BindingFlags bindingFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
             foreach (var item in obj.GetType().GetFields(bindingFlags))
             {
                 counter++;
-               // result.Add("{static}" + $"{item.FieldType.Name} {GetFieldName(item)} => {GetStateValue(obj, item)}");
+                // result.Add("{static}" + $"{item.FieldType.Name} {GetFieldName(item)} => {GetStateValue(obj, item)}");
                 result.Add("{static}" + $"{GetFieldName(item)} => {GetStateValue(obj, item)}");
             }
             if (counter > 0)
@@ -416,7 +413,7 @@ namespace CommonBase.Modules.PlantUML
             foreach (var item in obj.GetType().GetAllClassFields())
             {
                 counter++;
-//                result.Add($"{item.FieldType.Name} {GetFieldName(item)} => {GetStateValue(obj, item)}");
+                //                result.Add($"{item.FieldType.Name} {GetFieldName(item)} => {GetStateValue(obj, item)}");
                 result.Add($"{GetFieldName(item)} => {GetStateValue(obj, item)}");
             }
             //if (counter > 0)
@@ -503,12 +500,12 @@ namespace CommonBase.Modules.PlantUML
         }
         public static string GetFieldName(FieldInfo fieldInfo)
         {
-            var result = string.Empty;
+            string? result;
 
             if (fieldInfo.Name.Contains("k__BackingField"))
             {
                 result = "_" + fieldInfo.Name.Betweenstring("<", ">");
-                result = result.Substring(0, 2).ToLower() + result.Substring(2);
+                result = string.Concat(result[..2].ToLower(), result.AsSpan(2));
             }
             else
             {
@@ -532,7 +529,7 @@ namespace CommonBase.Modules.PlantUML
         }
         public static Object? GetFieldValue(Object obj, FieldInfo fieldInfo)
         {
-            var value = default(Object);
+            object? value;
 
             if (fieldInfo.IsStatic)
             {
@@ -550,7 +547,7 @@ namespace CommonBase.Modules.PlantUML
         }
         public static string GetStateValue(Object obj, FieldInfo fieldInfo, int maxLength)
         {
-            var result = string.Empty;
+            string? result;
             var value = GetFieldValue(obj, fieldInfo);
 
             if (fieldInfo.FieldType.IsValueType)
@@ -569,7 +566,7 @@ namespace CommonBase.Modules.PlantUML
             {
                 result = $"_{value.GetHashCode()}";
             }
-            return result.Length > maxLength - 3 ? result.Substring(0, maxLength - 2) + "..." : result;
+            return result.Length > maxLength - 3 ? result[..(maxLength - 2)] + "..." : result;
         }
         #endregion helpers
     }

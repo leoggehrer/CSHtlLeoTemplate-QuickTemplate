@@ -1,4 +1,4 @@
-@*@BaseCode*@
+﻿@*@BaseCode*@
 @*#if ACCOUNT_ON*@@*
 @model QuickTemplate.AspMvc.Models.Account.Identity
 <style>
@@ -62,16 +62,16 @@
     @foreach (var item in Model.IdentityRoles.OrderBy(e => e.Designation))
     {
         var parms = new Dictionary<string, string>
-        {
+{
             { "id", Model.Id.ToString() },
             { "accessRoleId", item.Id.ToString() }
         };
-        <div class="btn-group" style="margin-bottom: 1.0em; margin-right: 1.0em; min-width: 15em;">
-            <a href="#" class="btn btn-outline-primary"><i class="fa-regular fa-hand-point-right"></i></a>
-            <a href="#" class="btn btn-outline-primary">@item.Designation</a>
-            <a asp-action="RemoveAccessRole" asp-all-route-data="parms" class="btn btn-primary"><i class="fa fa-times"></i></a>
-        </div>
-    }
+<div class="btn-group" style="margin-bottom: 1.0em; margin-right: 1.0em; min-width: 15em;">
+    <a href="#" class="btn btn-outline-primary"><i class="fa-regular fa-hand-point-right"></i></a>
+    <a href="#" class="btn btn-outline-primary">@item.Designation</a>
+    <a asp-action="RemoveAccessRole" asp-all-route-data="parms" class="btn btn-primary"><i class="fa fa-times"></i></a>
+</div>
+}
     if (Model.AddIdentityRoleList.Any())
     {
         <div class="row">
@@ -84,7 +84,7 @@
                     <ul class="dropdown-menu">
                         @foreach (var item in Model.AddIdentityRoleList)
                         {
-                            <li>@Html.ActionLink(item.Designation, "AddAccessRole", null, new {id=Model.Id, accessRoleId=item.Id}, new { @class="dropdown-item"})</li>
+                            <li>@Html.ActionLink(item.Designation, "AddAccessRole", null, new { id = Model.Id, accessRoleId = item.Id }, new { @class = "dropdown-item" })</li>
                         }
                     </ul>
                 </div>
@@ -93,4 +93,5 @@
     }
     <hr />
 }
+
 *@@*#endif*@

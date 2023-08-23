@@ -2,7 +2,6 @@
 //MdStart
 #nullable disable
 using Microsoft.AspNetCore.Mvc;
-using QuickTemplate.Logic.Contracts;
 #if ACCOUNT_ON
 using Microsoft.AspNetCore.Mvc.Filters;
 #endif
@@ -15,7 +14,7 @@ namespace QuickTemplate.AspMvc.Controllers
     /// <typeparam name="TAccessModel">The type of access model</typeparam>
     /// <typeparam name="TViewModel">The type of view model</typeparam>
     public abstract partial class GenericController<TAccessModel, TViewModel> : MvcController
-        where TAccessModel : IIdentifyable, new()
+        where TAccessModel : BaseContracts.IIdentifyable, new()
         where TViewModel : class, new()
     {
         protected enum ActionMode : int
@@ -35,9 +34,9 @@ namespace QuickTemplate.AspMvc.Controllers
 
             CreateOrEditAction = CreateAction + EditAction,
         }
-        protected IBaseAccess<TAccessModel> DataAccess { get; init; }
+        protected BaseContracts.IBaseAccess<TAccessModel> DataAccess { get; init; }
 
-        protected GenericController(IBaseAccess<TAccessModel> dataAccess)
+        protected GenericController(BaseContracts.IBaseAccess<TAccessModel> dataAccess)
         {
             this.DataAccess = dataAccess ?? throw new ArgumentNullException(nameof(dataAccess));
         }

@@ -15,7 +15,7 @@ namespace QuickTemplate.Logic.Modules.CodeGenerator
                 return assembly.GetTypes();
             }
         }
-        public static Type[] EntityTypes => AllTypes.Where(t => string.IsNullOrEmpty(t.FullName) == false 
+        public static Type[] EntityTypes => AllTypes.Where(t => string.IsNullOrEmpty(t.FullName) == false
                                                              && t.FullName.Contains(".Entities.")).ToArray();
     }
 }

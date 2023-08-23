@@ -200,26 +200,36 @@ namespace CommonBase.Extensions
 
         public static IEnumerable<TagInfo> GetAllTags(this string text, string[] tags)
         {
+            int parseIndex = 0;
             List<TagInfo> result = new();
 
             for (int i = 0; i + 1 < tags.Length; i += 2)
             {
-                result.AddRange(text.GetAllTags(tags[i], tags[i + 1]));
+                var tagInfos = text.GetAllTags(tags[i], tags[i + 1], parseIndex);
+
+                if (tagInfos.Any())
+                {
+                    result.AddRange(tagInfos);
+                    parseIndex = tagInfos.Last().EndTagIndex;
+                }
             }
             return result;
         }
         public static IEnumerable<TagInfo> GetAllTags(this string text, string startTag, string endTag)
         {
-            return text.GetAllTags<TagInfo>(startTag, endTag);
+            return text.GetAllTags<TagInfo>(startTag, endTag, 0);
         }
-        public static IEnumerable<TagInfo> GetAllTags(this string text, string startTag, string endTag, params char[] excludeBlocks)
+        public static IEnumerable<TagInfo> GetAllTags(this string text, string startTag, string endTag, int parseIndex)
         {
-            return text.GetAllTags<TagInfo>(startTag, endTag, excludeBlocks);
+            return text.GetAllTags<TagInfo>(startTag, endTag, parseIndex);
         }
-        public static IEnumerable<T> GetAllTags<T>(this string text, string startTag, string endTag, params char[] excludeBlocks)
+        public static IEnumerable<TagInfo> GetAllTags(this string text, string startTag, string endTag, int parseIndex, params char[] excludeBlocks)
+        {
+            return text.GetAllTags<TagInfo>(startTag, endTag, parseIndex, excludeBlocks);
+        }
+        public static IEnumerable<T> GetAllTags<T>(this string text, string startTag, string endTag, int parseIndex, params char[] excludeBlocks)
             where T : TagInfo, new()
         {
-            var parseIndex = 0;
             int startTagIndex;
             int endTagIndex;
             var result = new List<T>();

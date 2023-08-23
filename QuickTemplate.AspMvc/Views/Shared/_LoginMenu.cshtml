@@ -1,9 +1,9 @@
-@*@BaseCode*@
+﻿@*@BaseCode*@
 @*#if ACCOUNT_ON*@@*
-@{
-    @using Microsoft.AspNetCore.Mvc.Rendering
-    @using QuickTemplate.AspMvc.Modules.Session
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using QuickTemplate.AspMvc.Modules.Session
 
+@{
     var sessionInfo = new SessionWrapper(Context.Session);
     var mnoLogon = ("Logon");
     var mnuLogout = ("Logout");
@@ -15,7 +15,7 @@
     var mnuUser = string.Empty;
 
 #if ACCESSRULES_ON
-    var mnuAccessRules = ("Access-Rules");
+var mnuAccessRules = ("Access-Rules");
 #endif
 
     if (sessionInfo.IsAuthenticated)
@@ -40,26 +40,26 @@
                             <li class="dropdown-item">@Html.ActionLink(mnuIdentityUsers, "Index", "IdentityUsers", routeValues: null, htmlAttributes: null)</li>
                             <li class="dropdown-item">@Html.ActionLink(mnuIdentityRoles, "Index", "IdentityRoles", routeValues: null, htmlAttributes: null)</li>
 #if ACCESSRULES_ON
-                            <li class="dropdown-item">@Html.ActionLink(mnuAccessRules, "Index", "AccessRules", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
+    <li class="dropdown-item">@Html.ActionLink(mnuAccessRules, "Index", "AccessRules", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
 #endif
-                            <li class="dropdown-item">@Html.ActionLink(mnuPwdChange, "ChangePassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
-                            <li class="dropdown-item">@Html.ActionLink(mnuPwdReset, "ResetPassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
-                        }
-                        else if (sessionInfo.HasRole(QuickTemplate.Logic.StaticLiterals.RoleAppAdmin) == true)
-                        {
-                            <li class="dropdown-item">@Html.ActionLink(mnuIdentities, "Index", "Identities", routeValues: null, htmlAttributes: null)</li>
-                            <li class="dropdown-item">@Html.ActionLink(mnuIdentityUsers, "Index", "IdentityUsers", routeValues: null, htmlAttributes: null)</li>
-                            <li class="dropdown-item">@Html.ActionLink(mnuIdentityRoles, "Index", "IdentityRoles", routeValues: null, htmlAttributes: null)</li>
+    <li class="dropdown-item">@Html.ActionLink(mnuPwdChange, "ChangePassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
+    <li class="dropdown-item">@Html.ActionLink(mnuPwdReset, "ResetPassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
+}
+else if (sessionInfo.HasRole(QuickTemplate.Logic.StaticLiterals.RoleAppAdmin) == true)
+{
+    <li class="dropdown-item">@Html.ActionLink(mnuIdentities, "Index", "Identities", routeValues: null, htmlAttributes: null)</li>
+    <li class="dropdown-item">@Html.ActionLink(mnuIdentityUsers, "Index", "IdentityUsers", routeValues: null, htmlAttributes: null)</li>
+    <li class="dropdown-item">@Html.ActionLink(mnuIdentityRoles, "Index", "IdentityRoles", routeValues: null, htmlAttributes: null)</li>
 #if ACCESSRULES_ON
-                            <li class="dropdown-item">@Html.ActionLink(mnuAccessRules, "Index", "AccessRules", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
+<li class="dropdown-item">@Html.ActionLink(mnuAccessRules, "Index", "AccessRules", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
 #endif
-                            <li class="dropdown-item">@Html.ActionLink(mnuPwdChange, "ChangePassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
-                            <li class="dropdown-item">@Html.ActionLink(mnuPwdReset, "ResetPassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
-                        }
-                        else
-                        {
-                            <li class="dropdown-item">@Html.ActionLink(mnuPwdChange, "ChangePassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
-                        }
+<li class="dropdown-item">@Html.ActionLink(mnuPwdChange, "ChangePassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
+<li class="dropdown-item">@Html.ActionLink(mnuPwdReset, "ResetPassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
+}
+else
+{
+<li class="dropdown-item">@Html.ActionLink(mnuPwdChange, "ChangePassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
+}
                         <li class="dropdown-item"><a href="javascript:document.getElementById('logoutForm').submit()">@mnuLogout<i style="margin-left: 1em;" class="fas fa-sign-out-alt"></i></a></li>
                     </ul>
                 </li>
@@ -69,8 +69,9 @@
     else
     {
         <ul class="nav navbar-nav navbar-right">
-            <li>@Html.ActionLink(mnoLogon, "Logon", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class="btn btn-outline-secondary" })</li>
+            <li>@Html.ActionLink(mnoLogon, "Logon", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class = "btn btn-outline-secondary" })</li>
         </ul>
     }
 }
+
 *@@*#endif*@

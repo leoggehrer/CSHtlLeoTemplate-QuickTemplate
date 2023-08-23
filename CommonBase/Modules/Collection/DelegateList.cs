@@ -1,7 +1,7 @@
 ﻿//@BaseCode
 //MdStart
-using System.Collections;
 using CommonBase.Extensions;
+using System.Collections;
 
 namespace CommonBase.Modules.Collection
 {
@@ -12,7 +12,7 @@ namespace CommonBase.Modules.Collection
         #region Fields
         private readonly List<TInnerModel> _innerList;
         private readonly List<TOutModel> _outerList;
-        
+
         private readonly Func<TInnerModel, TOutModel> _toOutModel;
         private readonly Func<TOutModel, TInnerModel> _toInnerModel;
         #endregion Fields
@@ -22,6 +22,7 @@ namespace CommonBase.Modules.Collection
         public Func<TOutModel, TInnerModel> ToInnerModel => _toInnerModel;
         #endregion Properties
 
+        #region Constructors
         partial void Constructing();
         partial void Constructed();
 
@@ -55,6 +56,7 @@ namespace CommonBase.Modules.Collection
             _outerList = innerList.Select(e => _toOutModel(e)).ToList();
             Constructed();
         }
+        #endregion Constructors
 
         #region Implement IList<>
         public TOutModel this[int index]
@@ -131,9 +133,15 @@ namespace CommonBase.Modules.Collection
         {
             return GetEnumerator();
         }
-
         #endregion Implement IList<>
 
+        public void AddRange(IEnumerable<TOutModel> collection)
+        {
+            foreach (var item in collection)
+            {
+                Add(item);
+            }
+        }
         #region Helper
         protected virtual TOutModel ToDefaultOutModel(TInnerModel model)
         {

@@ -33,7 +33,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
         }
         protected static HttpClient CreateClient(string baseAddress, string sessionToken)
         {
-            HttpClient client =CreateClient(baseAddress);
+            HttpClient client = CreateClient(baseAddress);
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer",
@@ -170,7 +170,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
             if (response.IsSuccessStatusCode)
             {
                 var contentData = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                
+
                 result = await JsonSerializer.DeserializeAsync<T>(contentData, DeserializerOptions).ConfigureAwait(false);
             }
             else
@@ -193,7 +193,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
             if (response.IsSuccessStatusCode)
             {
                 var contentData = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                
+
                 result = await JsonSerializer.DeserializeAsync<T[]>(contentData, DeserializerOptions).ConfigureAwait(false);
             }
             else
@@ -215,7 +215,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
             if (response.IsSuccessStatusCode)
             {
                 var contentData = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                
+
                 result = await JsonSerializer.DeserializeAsync<T[]>(contentData, DeserializerOptions).ConfigureAwait(false);
             }
             else
@@ -237,7 +237,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
             if (response.IsSuccessStatusCode)
             {
                 var contentData = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                
+
                 result = await JsonSerializer.DeserializeAsync<T[]>(contentData, DeserializerOptions).ConfigureAwait(false);
             }
             else
@@ -259,7 +259,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
             if (response.IsSuccessStatusCode)
             {
                 var contentData = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                
+
                 result = await JsonSerializer.DeserializeAsync<T[]>(contentData, DeserializerOptions).ConfigureAwait(false);
             }
             else
@@ -282,7 +282,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
             if (response.IsSuccessStatusCode)
             {
                 var contentData = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                
+
                 result = await JsonSerializer.DeserializeAsync<T[]>(contentData, DeserializerOptions).ConfigureAwait(false);
             }
             else
@@ -304,7 +304,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
             if (response.IsSuccessStatusCode)
             {
                 var contentData = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                
+
                 result = await JsonSerializer.DeserializeAsync<T[]>(contentData, DeserializerOptions).ConfigureAwait(false);
             }
             else
@@ -326,7 +326,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
             if (response.IsSuccessStatusCode)
             {
                 var contentData = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                
+
                 result = await JsonSerializer.DeserializeAsync<T[]>(contentData, DeserializerOptions).ConfigureAwait(false);
             }
             else
@@ -348,7 +348,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
             if (response.IsSuccessStatusCode)
             {
                 var contentData = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                
+
                 result = await JsonSerializer.DeserializeAsync<T[]>(contentData, DeserializerOptions).ConfigureAwait(false);
             }
             else
@@ -380,7 +380,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
             }
             else
             {
-                var errorMessage = $"{response.ReasonPhrase}: { await response.Content.ReadAsStringAsync().ConfigureAwait(false) }";
+                var errorMessage = $"{response.ReasonPhrase}: {await response.Content.ReadAsStringAsync().ConfigureAwait(false)}";
 
                 System.Diagnostics.Debug.WriteLine("{0} ({1})", (int)response.StatusCode, errorMessage);
                 throw new LogicException(errorMessage);
@@ -421,7 +421,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
 
             if (response.IsSuccessStatusCode == false)
             {
-                var errorMessage = $"{response.ReasonPhrase}: { await response.Content.ReadAsStringAsync().ConfigureAwait(false) }";
+                var errorMessage = $"{response.ReasonPhrase}: {await response.Content.ReadAsStringAsync().ConfigureAwait(false)}";
 
                 System.Diagnostics.Debug.WriteLine("{0} ({1})", (int)response.StatusCode, errorMessage);
                 throw new LogicException(errorMessage);

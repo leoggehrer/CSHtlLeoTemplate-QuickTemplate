@@ -16,7 +16,11 @@ namespace TemplateCodeGenerator.Logic.Generation
         static partial void ClassConstructing();
         static partial void ClassConstructed();
 
+        #region fields
         private GenerationSetting[]? generationSettings = null;
+        #endregion fields
+
+        #region properties
         public GenerationSetting[] GenerationSettings
         {
             get
@@ -67,8 +71,10 @@ namespace TemplateCodeGenerator.Logic.Generation
                 return generationSettings;
             }
         }
-
         public ISolutionProperties SolutionProperties { get; init; }
+        #endregion properties
+
+        #region construction
         public Configuration(ISolutionProperties solutionProperties)
         {
             Constructing();
@@ -77,7 +83,9 @@ namespace TemplateCodeGenerator.Logic.Generation
         }
         partial void Constructing();
         partial void Constructed();
+        #endregion construction
 
+        #region methods
         public T QuerySettingValue<T>(string unitType, string itemType, string itemName, string valueName, string defaultValue)
         {
             T result;
@@ -121,6 +129,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             }
             return result;
         }
+        #endregion methods
     }
 }
 //MdEnd

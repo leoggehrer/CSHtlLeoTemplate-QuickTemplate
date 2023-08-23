@@ -11,7 +11,7 @@ namespace CommonBase.Extensions
         {
             var result = method;
 
-            if (method != null 
+            if (method != null
                 && method.DeclaringType != null
                 && method.DeclaringType.GetInterfaces().Any(i => i == typeof(IAsyncStateMachine)))
             {

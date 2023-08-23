@@ -7,28 +7,26 @@ namespace CommonBase
         static StaticLiterals()
         {
             BeforeClassInitialize();
-            SolutionProjects = new string[]
+            TemplateProjects = new string[]
             {
-                "CleanDirectories.ConApp",
                 "CommonBase",
+            };
+            TemplateToolProjects = new[]
+            {
                 "TemplateCodeGenerator.Logic",
                 "TemplateTools.ConApp",
             };
-            ProjectExtensions = new string[]
+            TemplateProjectExtensions = new string[]
             {
-                ".ConApp",
-                ".CodeGenApp",
-                ".Logic",
-                ".Logic.UnitTest",
-                ".WebApi",
-                ".AspMvc",
-                ".AngularApp",
-                ".WpfApp",
-                ".MvvMApp",
-            };
-            SolutionToolProjects = new[]
-            {
-                "TemplateCodeGenerator.Logic",
+                ConsoleExtension,
+                CodeGenerationExtension,
+                LogicExtension,
+                LogicUnitTestExtension,
+                WebApiExtension,
+                MVVMExtension,
+                AspMvcExtension,
+                AngularExtension,
+                ClientBlazorExtension,
             };
             GenerationIgnoreFolders = new string[] { "node_module" };
             AfterClassInitialize();
@@ -39,9 +37,21 @@ namespace CommonBase
         public static string SolutionFileExtension => ".sln";
         public static string ProjectFileExtension => ".csproj";
 
-        public static string[] SolutionProjects { get; private set; }
-        public static string[] ProjectExtensions { get; private set; }
-        public static string[] SolutionToolProjects { get; private set; }
+        #region Template project extensions
+        public static string ConsoleExtension => ".ConApp";
+        public static string CodeGenerationExtension => ".CodeGenApp";
+        public static string LogicExtension => ".Logic";
+        public static string LogicUnitTestExtension => ".Logic.UnitTest";
+        public static string WebApiExtension => ".WebApi";
+        public static string MVVMExtension => ".WpfApp";
+        public static string AspMvcExtension => ".AspMvc";
+        public static string AngularExtension => ".AngularApp";
+        public static string ClientBlazorExtension => ".ClientBlazorApp";
+        #endregion Template project extensions
+
+        public static string[] TemplateProjects { get; private set; }
+        public static string[] TemplateToolProjects { get; private set; }
+        public static string[] TemplateProjectExtensions { get; private set; }
 
         public static string[] GenerationIgnoreFolders { get; private set; }
         public static string GeneratedCodeLabel => "@GeneratedCode";
@@ -51,6 +61,8 @@ namespace CommonBase
         public static string CodeCopyLabel => "@CodeCopy";
         public static string CSharpFileExtension => ".cs";
         public static string SourceFileExtensions => "*.css|*.cs|*.ts|*.cshtml|*.razor|*.razor.cs|*.template";
+
+        public static int MaxPageSize => 500;
     }
 }
 //MdEnd

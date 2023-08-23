@@ -1,6 +1,5 @@
 ﻿//@BaseCode
 //MdStart
-
 using System.Reflection;
 
 namespace CommonBase.Extensions
@@ -36,9 +35,9 @@ namespace CommonBase.Extensions
             if (sourceType == otherType)
             {
                 var ignoreList = new List<string>(ignore);
-                var unequalProperties = 
+                var unequalProperties =
                     from pi in sourceType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    where pi != null && !ignoreList.Contains(pi.Name) && pi.GetIndexParameters().Length == 0 && IsSimpleType(pi) 
+                    where pi != null && !ignoreList.Contains(pi.Name) && pi.GetIndexParameters().Length == 0 && IsSimpleType(pi)
                     let sourceValue = sourceType.GetProperty(pi.Name)?.GetValue(source, null)
                     let otherValue = otherType.GetProperty(pi.Name)?.GetValue(other, null)
                     where sourceValue != otherValue && (sourceValue == null || !sourceValue.Equals(otherValue))
@@ -143,7 +142,9 @@ namespace CommonBase.Extensions
         }
         #endregion CopyProperties methods
 
+#pragma warning disable IDE0060 // Remove unused parameter
         public static int CalculateHashCode(this object source, params object?[] items)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             static int CalculateHashCodeRec(object[] values)
             {

@@ -8,47 +8,38 @@ namespace TemplateCodeGenerator.Logic.Git
     public partial class GitIgnoreManager
     {
         #region Properties
-        private static string[] Paths { get; set; } = Array.Empty<string>();
-        private static string[] SearchPatterns => StaticLiterals.SourceFileExtensions.Split('|');
         private static string GitIgnoreFile => ".gitignore";
+        private static string[] SearchPatterns => StaticLiterals.SourceFileExtensions.Split('|');
 
-        private static string BeginGitIgnoreBlock => "#QnSCodeIgnoreStart";
-        private static string EndGitIgnoreBlock => "#QnSCodeIgnoreEnd";
+        private static string BeginGitIgnoreBlock => "#QuickTemplateStart";
+        private static string EndGitIgnoreBlock => "#QuickTemplateEnd";
         #endregion Properties
 
-        public static void Run(string exclusionDirectory)
+        public static void Run(string path)
         {
-            BuildPaths(exclusionDirectory);
+            var gitIgnoreResult = new List<string>();
 
-            foreach (var path in Paths)
+            Console.WriteLine("Remove all generated files from git...");
+            Parallel.ForEach(SearchPatterns, searchPattern =>
             {
-                var gitIgnoreResult = new List<string>();
+                var sourceFiles = GetLabeledFiles(path, searchPattern, new string[] { StaticLiterals.GeneratedCodeLabel });
+                var gitIngoredFiles = GetGitIgnoredEntries(sourceFiles, path);
 
-                // Delete all generated files
-                Parallel.ForEach(SearchPatterns, searchPattern =>
+                lock (gitIgnoreResult)
                 {
-                    var sourceFiles = GetSourceCodeFiles(path, searchPattern, new string[] { StaticLiterals.GeneratedCodeLabel });
-                    var gitIngoredFiles = GetGitIgnoredEntries(sourceFiles, path);
-
-                    lock (gitIgnoreResult)
-                    {
-                        gitIgnoreResult.AddRange(gitIngoredFiles);
-                    }
-
-                });
-                WriteGitIgnoreFiles(gitIgnoreResult, path);
-            }
+                    gitIgnoreResult.AddRange(gitIngoredFiles);
+                }
+            });
+            WriteGitIgnoreFiles(gitIgnoreResult, path);
         }
-
-        private static void BuildPaths(string exclusionDirectory)
+        public static void DeleteIgnoreEntries(string path)
         {
-            var cp = Environment.CurrentDirectory.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-            var sp = cp.TakeTo(x => x.Equals(exclusionDirectory));
+            var files = Array.Empty<string>();
 
-            // Set the solution Path
-            Paths = new string[] { Path.Combine(sp.ToArray()) };
+            Console.WriteLine("Delete all generated files ignored from git...");
+            WriteGitIgnoreFiles(files, path);
         }
-        private static IEnumerable<string> GetSourceCodeFiles(string path, string searchPattern, string[] labels)
+        private static IEnumerable<string> GetLabeledFiles(string path, string searchPattern, string[] labels)
         {
             var result = new ConcurrentBag<string>();
             var files = Directory.EnumerateFiles(path, searchPattern, SearchOption.AllDirectories);
@@ -130,6 +121,7 @@ namespace TemplateCodeGenerator.Logic.Git
                 else
                 {
                     result.AddRange(lines);
+                    result.Add(string.Empty);
                     result.Add(BeginGitIgnoreBlock);
                     result.AddRange(files);
                     result.Add(EndGitIgnoreBlock);
@@ -137,15 +129,18 @@ namespace TemplateCodeGenerator.Logic.Git
 
                 File.WriteAllLines(gitIgnoreFilePath, result);
 
-                var processInfo = new ProcessStartInfo();
-                var anyCommand = "git rm -r --cached .";
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                {
+                    var processInfo = new ProcessStartInfo();
+                    var anyCommand = "git rm -r --cached .";
 
-                processInfo.UseShellExecute = true;
-                processInfo.WorkingDirectory = path;
-                processInfo.FileName = @"C:\Windows\System32\cmd.exe";
-                processInfo.Arguments = anyCommand;
-                processInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                Process.Start(processInfo);
+                    processInfo.WorkingDirectory = path;
+                    processInfo.UseShellExecute = true;
+                    processInfo.FileName = @"C:\Windows\System32\cmd.exe";
+                    processInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    processInfo.Arguments = anyCommand;
+                    Process.Start(processInfo);
+                }
             }
         }
     }

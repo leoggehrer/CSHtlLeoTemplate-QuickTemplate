@@ -11,13 +11,18 @@ namespace TemplateCodeGenerator.Logic.Generation
         static GeneratorObject()
         {
             ClassConstructing();
+
             ClassConstructed();
         }
         static partial void ClassConstructing();
         static partial void ClassConstructed();
+
+        #region properties
         public Configuration Configuration { get; init; }
         public ISolutionProperties SolutionProperties { get; init; }
+        #endregion properties
 
+        #region constructor
         public GeneratorObject(ISolutionProperties solutionProperties)
         {
             Constructing();
@@ -27,7 +32,9 @@ namespace TemplateCodeGenerator.Logic.Generation
         }
         partial void Constructing();
         partial void Constructed();
+        #endregion constructor
 
+        #region query settings
         public string QueryGenerationSettingValue(string unitType, string itemType, string itemName, string valueName, string defaultValue)
         {
             return Configuration.QuerySettingValue(unitType, itemType, itemName, valueName, defaultValue);
@@ -36,38 +43,9 @@ namespace TemplateCodeGenerator.Logic.Generation
         {
             return Configuration.QuerySettingValue(unitType, itemType, itemName, valueName, defaultValue);
         }
+        #endregion query settings
 
         #region Helpers
-        #region Namespace-Helpers
-        public static IEnumerable<string> EnvelopeWithANamespace(IEnumerable<string> source, string nameSpace, params string[] usings)
-        {
-            var result = new List<string>();
-
-            if (nameSpace.HasContent())
-            {
-                result.Add($"namespace {nameSpace}");
-                result.Add("{");
-                result.AddRange(usings);
-            }
-            result.AddRange(source);
-            if (nameSpace.HasContent())
-            {
-                result.Add("}");
-            }
-            return result;
-        }
-        #endregion Namespace-Helpers
-
-        #region Assemply-Helpers
-        public static IEnumerable<Type> GetEntityTypes(Assembly assembly)
-        {
-            return assembly.GetTypes()
-                           .Where(t => t.IsInterface == false
-                                    && (t.BaseType != null && t.BaseType.Name.Equals(StaticLiterals.EntityObjectName)
-                                        || t.BaseType != null && t.BaseType.Name.Equals(StaticLiterals.VersionEntityName)));
-        }
-        #endregion Assembly-Helpers
-
         public static bool IsArrayType(Type type)
         {
             return type.IsArray;
@@ -77,22 +55,6 @@ namespace TemplateCodeGenerator.Logic.Generation
             return type.FullName!.StartsWith("System.Collections.Generic.List");
         }
 
-        /// <summary>
-        /// Diese Methode ermittelt den Solutionname aus seinem Schnittstellen Typ.
-        /// </summary>
-        /// <param name="type">Schnittstellen-Typ</param>
-        /// <returns>Schema der Entitaet.</returns>
-        public static string GetSolutionNameFromType(Type type)
-        {
-            var result = string.Empty;
-            var data = type.Namespace?.Split('.');
-
-            if (data?.Length > 0)
-            {
-                result = data[0];
-            }
-            return result;
-        }
         /// <summary>
         /// Diese Methode ermittelt den Teilnamensraum aus einem Typ.
         /// </summary>
@@ -115,21 +77,6 @@ namespace TemplateCodeGenerator.Logic.Generation
                 }
             }
             return result;
-        }
-        /// <summary>
-        /// Diese Methode ermittelt den Teilnamensraum aus einem Typ.
-        /// </summary>
-        /// <param name="type">Typ</param>
-        /// <returns>Teil-Namensraum</returns>
-        public static string CreateSubNamespaceFromEntityType(Type type)
-        {
-            var result = CreateSubNamespaceFromType(type);
-
-            if (result.Equals(StaticLiterals.EntitiesFolder))
-            {
-                result = string.Empty;
-            }
-            return result.Replace($"{StaticLiterals.EntitiesFolder}.", string.Empty);
         }
         /// <summary>
         /// Diese Methode ermittelt den Teil-Path aus einem Typ.
@@ -160,17 +107,6 @@ namespace TemplateCodeGenerator.Logic.Generation
             return type.Name;
         }
         /// <summary>
-        /// Diese Methode ermittelt den Entity-Typ aus seiner Type (eg. Entities.App.Type).
-        /// </summary>
-        /// <param name="type">Schnittstellen-Typ</param>
-        /// <returns>Typ der Entitaet.</returns>
-        public static string CreateEntityTypeFromType(Type type)
-        {
-            var entityName = CreateEntityNameFromType(type);
-
-            return $"{CreateSubNamespaceFromType(type)}.{entityName}";
-        }
-        /// <summary>
         /// Diese Methode ermittelt den Entity-Typ aus seiner Type (eg. App.Type).
         /// </summary>
         /// <param name="type">Schnittstellen-Typ</param>
@@ -181,162 +117,35 @@ namespace TemplateCodeGenerator.Logic.Generation
 
             return $"{CreateSubNamespaceFromType(type)}.{entityName}".Replace($"{StaticLiterals.EntitiesFolder}.", string.Empty);
         }
-        /// <summary>
-        /// Diese Methode ermittelt den Entity Namen aus seinem Schnittstellen Typ.
-        /// </summary>
-        /// <param name="type">Schnittstellen-Typ</param>
-        /// <returns>Name der Entitaet.</returns>
-        public static string CreateEntityFullNameFromType(Type type)
-        {
-            var result = string.Empty;
-
-            if (type.FullName != null)
-            {
-                var entityName = CreateEntityNameFromType(type);
-
-                result = type.FullName.Replace(type.Name, entityName);
-                result = result.Replace(".Contracts", ".Logic.Entities");
-            }
-            return result;
-        }
-        /// <summary>
-        /// Diese Methode ermittelt den Teil-Pfad aus der Schnittstelle.
-        /// </summary>
-        /// <param name="type">Schnittstellen-Typ</param>
-        /// <param name="pathPrefix">Ein optionaler Pfad-Prefix.</param>
-        /// <param name="filePostfix">Ein optionaler Datei-Postfix.</param>
-        /// <param name="fileExtension">Die Datei-Extension.</param>
-        /// <returns></returns>
-        public static string CreateSubFilePathFromType(Type type, string pathPrefix, string filePostfix, string fileExtension)
-        {
-            var entityName = CreateEntityNameFromType(type);
-
-            string? result;
-            if (pathPrefix.IsNullOrEmpty())
-            {
-                result = CreateSubPathFromType(type);
-            }
-            else
-            {
-                result = Path.Combine(pathPrefix, CreateSubPathFromType(type));
-            }
-            result = Path.Combine(result, $"{entityName}{filePostfix}{fileExtension}");
-            return result;
-        }
-        /// <summary>
-        /// Diese Methode ermittelt den Teil-Pfad aus der Schnittstelle.
-        /// </summary>
-        /// <param name="type">Schnittstellen-Typ</param>
-        /// <param name="pathPrefix">Ein optionaler Pfad-Prefix.</param>
-        /// <param name="filePostfix">Ein optionaler Datei-Postfix.</param>
-        /// <param name="fileExtension">Die Datei-Extension.</param>
-        /// <returns></returns>
-        public static string CreatePluralSubFilePathFromInterface(Type type, string pathPrefix, string filePostfix, string fileExtension)
-        {
-            var result = string.Empty;
-
-            if (type.IsInterface)
-            {
-                var entityName = CreateEntityNameFromType(type);
-
-                if (pathPrefix.IsNullOrEmpty())
-                {
-                    result = CreateSubPathFromType(type);
-                }
-                else
-                {
-                    result = Path.Combine(pathPrefix, CreateSubPathFromType(type));
-                }
-                result = Path.Combine(result, $"{entityName.CreatePluralWord()}{filePostfix}{fileExtension}");
-            }
-            return result;
-        }
-        /// <summary>
-        /// Diese Methode ermittelt den Kontroller Namen aus seinem Schnittstellen Typ.
-        /// </summary>
-        /// <param name="type">Schnittstellen-Typ</param>
-        /// <returns>Name des Kontrollers.</returns>
-        public static string CreateLogicControllerFullNameFromInterface(Type type)
-        {
-            var result = string.Empty;
-
-            if (type.FullName != null)
-            {
-                var entityName = type.Name[1..];
-
-                result = type.FullName.Replace(type.Name, entityName);
-                result = result.Replace(".Contracts", ".Logic.Controllers");
-                result = $"{result}Controller";
-            }
-            return result;
-        }
-        /// <summary>
-        /// Diese Methode ermittelt den Kontroller Namen aus seinem Schnittstellen Typ.
-        /// </summary>
-        /// <param name="type">Schnittstellen-Typ</param>
-        /// <returns>Name des Kontrollers.</returns>
-        public static string CreateWebApiControllerFullNameFromInterface(Type type)
-        {
-            var result = string.Empty;
-
-            if (type.FullName != null)
-            {
-                var entityName = $"{type.Name[1..]}s";
-
-                result = type.FullName.Replace(type.Name, entityName);
-                result = result.Replace(".Contracts", ".WebApi.Controllers");
-                result = $"{result}Controller";
-            }
-            return result;
-        }
-        /// <summary>
-        /// Diese Methode ermittelt den Kontroller Namen aus seinem Schnittstellen Typ.
-        /// </summary>
-        /// <param name="type">Schnittstellen-Typ</param>
-        /// <returns>Name des Kontrollers.</returns>
-        public static string CreateAspMvcControllerFullNameFromInterface(Type type)
-        {
-            var result = string.Empty;
-
-            if (type.FullName != null)
-            {
-                var entityName = $"{type.Name[1..]}s";
-
-                result = type.FullName.Replace(type.Name, entityName);
-                result = result.Replace(".Contracts", ".AspMvc.Controllers");
-                result = $"{result}Controller";
-            }
-            return result;
-        }
 
         #region Comment-Helpers
-        public virtual IEnumerable<string> CreateComment()
+        protected virtual IEnumerable<string> CreateComment()
         {
             var result = new List<string>()
             {
-                "///",
+                "/// <summary>",
                 "/// Generated by the generator",
-                "///",
+                "/// </summary>",
             };
             return result;
         }
-        public virtual IEnumerable<string> CreateComment(Type type)
+        protected virtual IEnumerable<string> CreateComment(Type type)
         {
             var result = new List<string>()
             {
-                "///",
-                "/// Generated by the generator",
-                "///",
+                "/// <summary>",
+                "/// Generated by the generator.",
+                "/// </summary>",
             };
             return result;
         }
-        public virtual IEnumerable<string> CreateComment(PropertyInfo propertyInfo)
+        protected virtual IEnumerable<string> CreateComment(PropertyInfo propertyInfo)
         {
             var result = new List<string>()
             {
-                "///",
-                "/// Generated by the generator",
-                "///",
+                "/// <summary>",
+               $"/// Property '{propertyInfo.Name}' generated by the generator.",
+                "/// </summary>",
             };
             return result;
         }
@@ -344,11 +153,13 @@ namespace TemplateCodeGenerator.Logic.Generation
 
         #region Property-Helpers
         /// <summary>
-        /// Determines whether the property is a reference property.
+        /// Determines whether the specified <see cref="PropertyInfo"/> object represents a reference property like a Id or ArtistId or MenuId_Parent.
         /// </summary>
-        /// <param name="propertyInfo">The property</param>
-        /// <returns>True if it is a reference property, false otherwise.</returns>
-        public virtual bool IsReferenceProperty(PropertyInfo propertyInfo)
+        /// <param name="propertyInfo">The <see cref="PropertyInfo"/> object to check.</param>
+        /// <returns>
+        ///   <c>true</c> if the property is a reference property; otherwise, <c>false</c>.
+        /// </returns>
+        protected virtual bool IsReferenceProperty(PropertyInfo propertyInfo)
         {
             var result = false;
             var idText = "Id";
@@ -368,13 +179,15 @@ namespace TemplateCodeGenerator.Logic.Generation
             }
             return result;
         }
-
+        protected virtual string ConvertPropertyType(string type) => type;
         /// <summary>
-        /// Diese Methode konvertiert den Eigenschaftstyp in eine Zeichenfolge.
+        /// This method analyzes a property and determines its type, 
+        /// considering if it is nullable and whether it is a reference property or not. 
+        /// It returns the type as a string, potentially appending a question mark to indicate nullability if necessary.
         /// </summary>
-        /// <param name="propertyInfo">Das Eigenschaftsinfo-Objekt.</param>
-        /// <returns>Der Eigenschaftstyp als Zeichenfolge.</returns>
-        public virtual string GetPropertyType(PropertyInfo propertyInfo)
+        /// <param name="propertyInfo">The <see cref="PropertyInfo"/> object to check.</param>
+        /// <returns>The type as a string.</returns>
+        protected virtual string GetPropertyType(PropertyInfo propertyInfo)
         {
             var nullable = propertyInfo.IsNullable();
             var result = IsReferenceProperty(propertyInfo) ? StaticLiterals.IdType : propertyInfo.PropertyType.GetCodeDefinition();
@@ -383,7 +196,7 @@ namespace TemplateCodeGenerator.Logic.Generation
             {
                 result += '?';
             }
-            return result;
+            return ConvertPropertyType(result);
         }
         /// <summary>
         /// Diese Methode ermittelt den Feldnamen der Eigenschaft.
@@ -417,7 +230,6 @@ namespace TemplateCodeGenerator.Logic.Generation
             return result;
         }
         public static string CreateParameterName(PropertyInfo propertyInfo) => $"_{char.ToLower(propertyInfo.Name[0])}{propertyInfo.Name[1..]}";
-
         #endregion Property-Helpers
         #endregion Helpers
     }

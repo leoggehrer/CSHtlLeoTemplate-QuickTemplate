@@ -8,7 +8,7 @@ namespace QuickTemplate.Logic.DataContext
     internal partial class ProjectDbContext : DbContext
     {
 #if SQLSERVER_ON
-        private static readonly string ConnectionString = "Data Source=(localdb)\\MSSQLLocalDB;Database=QuickTemplateDb;Integrated Security=True";
+        private static readonly string ConnectionString = "Data Source=127.0.0.1,1433; Database=QuickTemplateDb;User Id=sa; Password=1234!Passme";
 #endif
 #if SQLITE_ON
         private static readonly string ConnectionString = "Data Source=/Users/gerhardgehrer/Projects/Data/QuickTemplate.db";
@@ -49,21 +49,22 @@ namespace QuickTemplate.Logic.DataContext
         /// Data sets for account entities
         /// </summary>
 #if ACCOUNT_ON
-        public DbSet<Entities.Account.SecureIdentity>? IdentitySet { get; set; }
-        public DbSet<Entities.Account.Role>? RoleSet { get; set; }
-        public DbSet<Entities.Account.IdentityXRole>? IdentityXRolesSet { get; set; }
-        public DbSet<Entities.Account.User>? UserSet { get; set; }
-        public DbSet<Entities.Account.LoginSession>? LoginSessionSet { get; set; }
+        public DbSet<Entities.Account.SecureIdentity> IdentitySet { get; set; }
+        public DbSet<Entities.Account.Role> RoleSet { get; set; }
+        public DbSet<Entities.Account.IdentityXRole> IdentityXRolesSet { get; set; }
+        public DbSet<Entities.Account.User> UserSet { get; set; }
+        public DbSet<Entities.Account.LoginSession> LoginSessionSet { get; set; }
 #if ACCESSRULES_ON
-        public DbSet<Entities.Access.AccessRule>? AccessRuleSet { get; set; }
+        public DbSet<Entities.Access.AccessRule> AccessRuleSet { get; set; }
 #endif
 #if LOGGING_ON
-        public DbSet<Entities.Logging.ActionLog>? ActionLogSet { get; set; }
+        public DbSet<Entities.Logging.ActionLog> ActionLogSet { get; set; }
 #endif
 #if REVISION_ON
-        public DbSet<Entities.Revision.History>? HistorySet { get; set; }
+        public DbSet<Entities.Revision.History> HistorySet { get; set; }
 #endif
 #endif
+
         public ProjectDbContext()
         {
             Constructing();

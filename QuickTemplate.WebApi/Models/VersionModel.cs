@@ -1,7 +1,7 @@
 ﻿//@BaseCode
 //MdStart
-using QuickTemplate.Logic.Contracts;
-using System.ComponentModel.DataAnnotations;
+
+using CommonBase.Contracts;
 
 namespace QuickTemplate.WebApi.Models
 {
