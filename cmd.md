@@ -43,3 +43,17 @@ dotnet ef database update --startup-project QuickTemplate.Logic.UnitTest --proje
 ```code
 docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=1234_Passme" -p 1433:1433 --name mssqltest --volume=/Users/ggehrer/Projects/Data/docker/mssqltest:/var/opt/mssql/ -d mcr.microsoft.com/azure-sql-edge:latest
 ```
+
+## ML.NET Kommands
+
+### Installation der ML.NET CLI auf dem MAC
+
+```code
+dotnet tool install --global mlnet-osx-arm64
+```
+
+### Starten der ML.NET CLI mit der Auflistung der Hilfe àm MAC
+
+```code
+~/.dotnet/tools/mlnet --help [command]
+```
