@@ -2,6 +2,7 @@
 //MdStart
 using CommonBase.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using System.Web;
 
 namespace QuickTemplate.WebApi.Controllers
 {
@@ -106,7 +107,7 @@ namespace QuickTemplate.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public virtual async Task<ActionResult<int>> GetCountByAsync(string predicate)
         {
-            var result = await DataAccess.CountAsync(predicate);
+            var result = await DataAccess.CountAsync(HttpUtility.UrlDecode(predicate));
 
             return Ok(result);
         }
@@ -212,7 +213,7 @@ namespace QuickTemplate.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public virtual async Task<ActionResult<IEnumerable<TOutModel>>> QueryAllAsync(string predicate)
         {
-            var accessModels = await DataAccess.QueryAsync(predicate);
+            var accessModels = await DataAccess.QueryAsync(HttpUtility.UrlDecode(predicate));
 
             return Ok(accessModels.Select(e => ToOutModel(e)));
         }
@@ -227,7 +228,7 @@ namespace QuickTemplate.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public virtual async Task<ActionResult<IEnumerable<TOutModel>>> QueryAllAsync(string predicate, string orderBy)
         {
-            var accessModels = await DataAccess.QueryAsync(predicate, orderBy);
+            var accessModels = await DataAccess.QueryAsync(HttpUtility.UrlDecode(predicate), orderBy);
 
             return Ok(accessModels.Select(e => ToOutModel(e)));
         }
@@ -243,7 +244,7 @@ namespace QuickTemplate.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public virtual async Task<ActionResult<IEnumerable<TOutModel>>> QueryAsync(string predicate, int index, int size)
         {
-            var accessModels = await DataAccess.QueryAsync(predicate, index, size);
+            var accessModels = await DataAccess.QueryAsync(HttpUtility.UrlDecode(predicate), index, size);
 
             return Ok(accessModels.Select(e => ToOutModel(e)));
         }
@@ -260,7 +261,7 @@ namespace QuickTemplate.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public virtual async Task<ActionResult<IEnumerable<TOutModel>>> QueryAsync(string predicate, string orderBy, int index, int size)
         {
-            var accessModels = await DataAccess.QueryAsync(predicate, orderBy, index, size);
+            var accessModels = await DataAccess.QueryAsync(HttpUtility.UrlDecode(predicate), orderBy, index, size);
 
             return Ok(accessModels.Select(e => ToOutModel(e)));
         }

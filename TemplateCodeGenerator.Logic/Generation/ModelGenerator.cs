@@ -159,7 +159,6 @@ namespace TemplateCodeGenerator.Logic.Generation
                 if (CanCreate(propertyInfo)
                     && QuerySetting<bool>(unitType, ItemType.ModelProperty, type, StaticLiterals.Generate, "True"))
                 {
-                    result.AddRange(CreateComment(propertyInfo));
                     CreateModelPropertyAttributes(propertyInfo, unitType, result.Source);
                     result.AddRange(CreateProperty(type, propertyInfo));
                 }

@@ -53,7 +53,7 @@ namespace TemplateTools.ConApp
                 Console.WriteLine($"[{++menuIndex}] Compile logic project...");     // 2
                 Console.WriteLine($"[{++menuIndex}] Change group file flag");       // 3
                 Console.WriteLine($"[{++menuIndex}] Change ignore files flag");     // 4
-                Console.WriteLine($"[{++menuIndex}] Delete generation files...");   // 5
+                Console.WriteLine($"[{++menuIndex}] Delete generated files...");   // 5
                 Console.WriteLine($"[{++menuIndex}] Start code generation...");     // 6
                 Console.WriteLine("[x|X] Exit");
                 Console.WriteLine();

@@ -125,7 +125,7 @@ namespace TemplateCodeGenerator.Logic
             var solutionProperties = SolutionProperties.Create(sourcePath);
             var configuration = new Generation.Configuration(solutionProperties);
 
-            Console.WriteLine("Delete all generation files...");
+            Console.WriteLine("Delete all generated files...");
 
             foreach (var searchPattern in StaticLiterals.SourceFileExtensions.Split("|"))
             {

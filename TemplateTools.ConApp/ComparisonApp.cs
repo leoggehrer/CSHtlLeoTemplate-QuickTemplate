@@ -174,7 +174,10 @@ namespace TemplateTools.ConApp
 
                             foreach (var targetCodeFile in targetCodeFiles)
                             {
-                                File.Delete(targetCodeFile);
+                                if (CanDeleteTargetCodeFile(sourcePath, targetCodeFile))
+                                {
+                                    File.Delete(targetCodeFile);
+                                }
                             }
                         }
                     }
@@ -193,6 +196,28 @@ namespace TemplateTools.ConApp
                     }
                 }
             }
+        }
+        private static bool CanDeleteTargetCodeFile(string sourcePath, string targetFilePath)
+        {
+            var result = false;
+            var targetProjectPath = Program.GetPathFromPath(targetFilePath, ".csproj");
+
+            if (targetProjectPath.HasContent())
+            {
+                var subFilePath = targetFilePath.Replace(targetProjectPath, string.Empty);
+                var targetSolutionName = Program.GetDirectoryNameFromPath(targetFilePath, ".sln");
+                var targetProjectName = Program.GetDirectoryNameFromPath(targetFilePath, ".csproj");
+                var sourceSolutionName = Program.GetDirectoryNameFromPath(sourcePath, ".sln");
+                var sourceProjectName = targetProjectName.Replace(targetSolutionName, sourceSolutionName);
+                var sourceFilePath = $"{sourcePath}{Path.DirectorySeparatorChar}{sourceProjectName}{Path.DirectorySeparatorChar}{subFilePath}";
+                var sourceProjectPath = Program.GetPathFromPath(sourceFilePath, ".csproj");
+
+                if (sourceProjectPath.HasContent())
+                {
+                    result = true;
+                }
+            }
+            return result;
         }
         private static bool SynchronizeSourceCodeFile(string sourcePath, string sourceFilePath, string targetPath, string sourceLabel, string targetLabel)
         {

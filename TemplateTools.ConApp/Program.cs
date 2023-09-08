@@ -179,6 +179,46 @@ namespace TemplateTools.ConApp
             }
             return result;
         }
+
+        internal static string GetPathFromPath(string path, string checkFileExtension)
+        {
+            var result = string.Empty;
+            var checkPath = string.Empty;
+            var data = path.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i < data.Length && result == string.Empty; i++)
+            {
+                checkPath = checkPath == string.Empty ? data[i] : Path.Combine(checkPath, data[i]);
+
+                var projectFilePath = Path.Combine(checkPath, $"{data[i]}{checkFileExtension}");
+
+                if (File.Exists(projectFilePath))
+                {
+                    result = checkPath;
+                }
+            }
+            return result;
+        }
+        internal static string GetDirectoryNameFromPath(string path, string checkFileExtension)
+        {
+            var result = string.Empty;
+            var checkPath = string.Empty;
+            var data = path.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i < data.Length && result == string.Empty; i++)
+            {
+                checkPath = checkPath == string.Empty ? data[i] : Path.Combine(checkPath, data[i]);
+
+                var projectFilePath = Path.Combine(checkPath, $"{data[i]}{checkFileExtension}");
+
+                if (File.Exists(projectFilePath))
+                {
+                    result = data[i];
+                }
+            }
+            return result;
+        }
+
         internal static string GetProjectNameFromFilePath(string filePath, string solutionName)
         {
             var result = string.Empty;
