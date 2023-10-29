@@ -316,16 +316,11 @@ namespace TemplateTools.ConApp
             var result = false;
             var canCopy = true;
             var sourceSolutionName = Program.GetSolutionNameFromPath(sourcePath);
-            var sourceProjectName = Program.GetProjectNameFromFilePath(sourceFilePath, sourceSolutionName);
-            var sourceSubFilePath = sourceFilePath.Replace(sourcePath, string.Empty)
-                                                  .Replace(sourceProjectName, string.Empty);
-            var sourceSubFilePath2 = sourceFilePath.Replace(sourcePath, string.Empty)
-                                                   .Replace(sourceProjectName, string.Empty)
-                                                   .Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-            
+            var sourceProjectName = Program.GetProjectNameFromPath(sourceFilePath);
+            var sourceSubFilePath = Program.GetSubFilePath(sourceFilePath);
             var targetSolutionName = Program.GetSolutionNameFromPath(targetPath);
             var targetProjectName = sourceProjectName.Replace(sourceSolutionName, targetSolutionName);
-            var targetFilePath = Path.Combine(targetPath, targetProjectName, string.Join(Path.DirectorySeparatorChar, sourceSubFilePath2));
+            var targetFilePath = Path.Combine(targetPath, targetProjectName, sourceSubFilePath);
             var targetFileFolder = Path.GetDirectoryName(targetFilePath);
             var targetProjectPath = Path.Combine(targetPath, targetProjectName);
             

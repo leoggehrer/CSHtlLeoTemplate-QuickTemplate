@@ -1,4 +1,4 @@
-﻿//@CodeCopy
+﻿//@BaseCode
 //MdStart
 namespace QuickTemplate.Logic.ServiceModels
 {

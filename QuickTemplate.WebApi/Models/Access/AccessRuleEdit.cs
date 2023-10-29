@@ -1,4 +1,4 @@
-﻿//@CodeCopy
+﻿//@BaseCode
 //MdStart
 #if ACCOUNT_ON && ACCESSRULES_ON
 namespace QuickTemplate.WebApi.Models.Access

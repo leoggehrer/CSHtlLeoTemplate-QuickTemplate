@@ -1,4 +1,4 @@
-﻿//@CodeCopy
+﻿//@BaseCode
 //MdStart
 #if ACCOUNT_ON
 namespace CommonBase.Contracts

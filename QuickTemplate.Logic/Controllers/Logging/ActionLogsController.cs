@@ -1,4 +1,4 @@
-﻿//@CodeCopy
+﻿//@BaseCode
 //MdStart
 #if ACCOUNT_ON && LOGGING_ON
 namespace QuickTemplate.Logic.Controllers.Logging

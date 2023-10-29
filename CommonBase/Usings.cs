@@ -1,4 +1,4 @@
-﻿//@CodeCopy
+﻿//@BaseCode
 //MdStart
 #if IDINT_ON
 global using IdType = System.Int32;

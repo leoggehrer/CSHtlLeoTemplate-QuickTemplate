@@ -1,4 +1,4 @@
-﻿//@CodeCopy
+﻿//@BaseCode
 //MdStart
 using System.Reflection;
 using TemplateCodeGenerator.Logic.Contracts;

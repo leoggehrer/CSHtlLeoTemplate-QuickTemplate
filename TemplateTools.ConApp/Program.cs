@@ -7,7 +7,6 @@ namespace TemplateTools.ConApp
     /// <summary>
     /// Represents the main program class.
     /// </summary>
-    // ... Rest of the code ...
     partial class Program
     {
         #region Class-Constructors
@@ -210,16 +209,6 @@ namespace TemplateTools.ConApp
         /// <summary>
         /// Prints a busy progress indicator in the console.
         /// </summary>
-        /// <param name="title">The title that is displayed before the progress starts.</param>
-        internal static void PrintBusyProgress(string title)
-        {
-            Console.WriteLine(title);
-            PrintBusyProgress();
-        }
-
-        /// <summary>
-        /// Prints a busy progress indicator in the console.
-        /// </summary>
         internal static void PrintBusyProgress()
         {
             static void Write(int cursorLeft, int cursorTop, string output)
@@ -313,32 +302,48 @@ namespace TemplateTools.ConApp
             }
             return result;
         }
-        /// <summary>
-        /// Retrieves the name of the solution file from the given solution path.
-        /// </summary>
-        /// <param name="solutionPath">The full path of the solution file.</param>
-        /// <returns>The name of the solution file as a string.</returns>
-        internal static string GetSolutionNameByPath(string solutionPath)
-        {
-            return solutionPath.Split(Path.DirectorySeparatorChar)
-                               .Where(e => string.IsNullOrEmpty(e) == false)
-                               .Last();
-        }
-        /// <summary>
-        /// Retrieves the solution name from a given file path.
-        /// </summary>
-        /// <param name="path">The file path from which to retrieve the solution name.</param>
-        /// <returns>The solution name extracted from the file path.</returns>
+
         internal static string GetSolutionNameFromPath(string path)
         {
-            var result = string.Empty;
-            var data = path.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+            return GetSolutionItemDataFromPath(path, ".sln").Name;
+        }
 
-            if (data.Any())
+        internal static string GetProjectNameFromPath(string path)
+        {
+            return GetSolutionItemDataFromPath(path, ".csproj").Name;
+        }
+
+        internal static string GetSubFilePath(string filePath)
+        {
+            var subPath = GetSolutionItemDataFromPath(filePath, ".csproj").SubPath;
+            var result = filePath!.Replace(subPath, string.Empty);
+
+            if (result.StartsWith(Path.DirectorySeparatorChar))
             {
-                result = data.Last();
+                result = result[1..];
             }
             return result;
+        }
+
+        internal static (string Name, string SubPath) GetSolutionItemDataFromPath(string path, string itemExtension)
+        {
+            var itemName = string.Empty;
+            var subPath = string.Empty;
+            var itemsEnumerator = path.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries)
+                                      .GetEnumerator();
+
+            while (itemName.IsNullOrEmpty() && itemsEnumerator.MoveNext())
+            {
+                subPath = Path.Combine(subPath, itemsEnumerator.Current.ToString()!);
+
+                var filePath = Path.Combine(subPath, $"{itemsEnumerator.Current}{itemExtension}");
+
+                if (File.Exists(filePath))
+                {
+                    itemName = itemsEnumerator.Current.ToString() ?? string.Empty;
+                }
+            }
+            return (itemName, subPath);
         }
 
         /// <summary>
@@ -397,46 +402,6 @@ namespace TemplateTools.ConApp
             return result;
         }
 
-        /// <summary>
-        /// Gets the project name from the given file path and solution name.
-        /// </summary>
-        /// <param name="filePath">The file path.</param>
-        /// <param name="solutionName">The solution name.</param>
-        /// <returns>The project name extracted from the file path.</returns>
-        internal static string GetProjectNameFromFilePath(string filePath, string solutionName)
-        {
-            var result = string.Empty;
-            var data = filePath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-
-            for (int i = 0; i < data.Length && result == string.Empty; i++)
-            {
-                for (int j = 0; j < CommonStaticLiterals.TemplateProjects.Length; j++)
-                {
-                    if (data[i].Equals(CommonStaticLiterals.TemplateProjects[j]))
-                    {
-                        result = data[i];
-                    }
-                }
-                for (int j = 0; j < CommonStaticLiterals.TemplateToolProjects.Length; j++)
-                {
-                    if (data[i].Equals(CommonStaticLiterals.TemplateToolProjects[j]))
-                    {
-                        result = data[i];
-                    }
-                }
-                if (string.IsNullOrEmpty(result))
-                {
-                    for (int j = 0; j < CommonStaticLiterals.TemplateProjectExtensions.Length; j++)
-                    {
-                        if (data[i].Equals($"{solutionName}{CommonStaticLiterals.TemplateProjectExtensions[j]}"))
-                        {
-                            result = data[i];
-                        }
-                    }
-                }
-            }
-            return result;
-        }
         /// <summary>
         /// Retrieves the directory structure of a specified path.
         /// </summary>
@@ -514,21 +479,6 @@ namespace TemplateTools.ConApp
         internal static string[] GetQuickTemplateProjects(string startPath)
         {
             return QueryDirectoryStructure(startPath, n => n.StartsWith("QT"), "bin", "obj", "node_modules");
-        }
-        /// <summary>
-        /// Retrieves the paths of quick templates based on a start path and additional included paths.
-        /// </summary>
-        /// <param name="startPath">The starting path to search for quick template projects.</param>
-        /// <param name="includePaths">Additional paths to include in the search for quick template projects.</param>
-        /// <returns>An array of string paths representing the quick template paths.</returns>
-        internal static string[] GetQuickTemplatePaths(string startPath, params string[] includePaths)
-        {
-            var qtProjects = GetQuickTemplateProjects(startPath).Union(includePaths).ToArray();
-            var qtPaths = qtProjects.Select(p => Program.GetParentDirectory(p))
-                                    .Distinct()
-                                    .OrderBy(p => p);
-
-            return qtPaths.ToArray();
         }
         /// <summary>
         /// Retrieves an array of parent paths for quick template projects starting from a specified path, as well as any additional paths to include.

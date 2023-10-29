@@ -60,7 +60,7 @@ namespace TemplateTools.ConApp
             while (input!.Equals("x") == false)
             {
                 var changedDefines = false;
-                var sourceSolutionName = Program.GetSolutionNameByPath(SourcePath);
+                var sourceSolutionName = Program.GetSolutionNameFromPath(SourcePath);
                 
                 // Read defines from the solution
                 Defines = CodeGenPreprocessor.ProjectFile.ReadDefinesInProjectFiles(SourcePath);

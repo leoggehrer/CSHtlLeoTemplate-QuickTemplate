@@ -165,7 +165,7 @@ namespace CommonBase
         /// Gets a label for code copy.
         /// </summary>
         /// <value>A string representing the label for code copy.</value>
-        public static string CodeCopyLabel => "@CodeCopy";
+        public static string CodeCopyLabel => "@BaseCode";
         /// <summary>
         /// Gets the file extension for C# files.
         /// </summary>

@@ -1,4 +1,4 @@
-﻿//@CodeCopy
+﻿//@BaseCode
 //MdStart
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -83,7 +83,7 @@ namespace TemplateTools.ConApp
             while (input.Equals("x") == false)
             {
                 var menuIndex = 0;
-                var sourceSolutionName = Program.GetSolutionNameByPath(SolutionPath);
+                var sourceSolutionName = Program.GetSolutionNameFromPath(SolutionPath);
                 
                 Console.Clear();
                 Console.ForegroundColor = Program.ForegroundColor;

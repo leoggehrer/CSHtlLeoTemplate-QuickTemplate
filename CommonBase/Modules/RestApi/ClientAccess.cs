@@ -1,4 +1,4 @@
-﻿//@CodeCopy
+﻿//@BaseCode
 //MdStart
 using CommonBase.Extensions;
 using CommonBase.Modules.Exceptions;
