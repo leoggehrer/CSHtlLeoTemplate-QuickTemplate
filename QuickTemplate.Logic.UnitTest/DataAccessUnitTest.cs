@@ -13,14 +13,29 @@ namespace QuickTemplate.Logic.UnitTest
     /// <typeparam name="TAccessModel">The generic parameter of the model.</typeparam>
     public abstract class DataAccessUnitTest<TAccessModel> where TAccessModel : IIdentifyable, new()
     {
+        /// <summary>
+        /// Gets or sets the counter value.
+        /// </summary>
+        /// <value>
+        /// The current value of the counter.
+        /// </value>
+        /// <remarks>
+        /// This property is protected and can be accessed by derived classes.
+        /// The counter is an integer value representing the count.
+        /// </remarks>
         protected static int Counter { get; set; } = 0;
+        /// <summary>
+        /// Creates an instance of a data access object that implements the IDataAccess interface.
+        /// </summary>
+        /// <typeparam name="TAccessModel">The type parameter representing the access model.</typeparam>
+        /// <returns>An instance of IDataAccess</returns>
         public abstract IDataAccess<TAccessModel> CreateDataAccess();
-
+        
         public List<string> IgnoreUpdateProperties = new()
         {
             nameof(IIdentifyable.Id),
 #if ROWVERSION_ON
-            nameof(IVersionable.RowVersion) 
+            nameof(IVersionable.RowVersion)
 #endif
         };
         /// <summary>
@@ -31,14 +46,14 @@ namespace QuickTemplate.Logic.UnitTest
         {
             using var dataAccess = CreateDataAccess();
             var items = await dataAccess.GetAllAsync();
-
+            
             foreach (var item in items)
             {
                 await dataAccess.DeleteAsync(item.Id);
             }
             await dataAccess.SaveChangesAsync();
         }
-
+        
         /// <summary>
         /// This method creates an model in the database, reads this model again and compares it with the input.
         /// </summary>
@@ -50,14 +65,14 @@ namespace QuickTemplate.Logic.UnitTest
             {
                 using var dataAccess = CreateDataAccess();
                 using var ctrlAfter = CreateDataAccess();
-
+                
                 var insertModel = await dataAccess.InsertAsync(accessModel);
-
+                
                 Assert.IsNotNull(insertModel);
                 await dataAccess.SaveChangesAsync();
-
+                
                 var actualModel = await ctrlAfter.GetByIdAsync(insertModel.Id);
-
+                
                 Assert.IsNotNull(actualModel);
                 Assert.IsTrue(insertModel.AreEqualProperties(actualModel));
                 return actualModel;
@@ -65,11 +80,11 @@ namespace QuickTemplate.Logic.UnitTest
             catch (System.Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
-
+                
                 throw;
             }
         }
-
+        
         /// <summary>
         /// This method creates an array of entities in the database, re-reads those entities and compares them to the input.
         /// </summary>
@@ -79,24 +94,24 @@ namespace QuickTemplate.Logic.UnitTest
         {
             using var dataAccess = CreateDataAccess();
             using var dataAccessAfter = CreateDataAccess();
-
+            
             var insertModels = await dataAccess.InsertAsync(accessModels);
-
+            
             Assert.IsNotNull(insertModels);
             Assert.AreEqual(accessModels.Count(), insertModels.Count());
             await dataAccess.SaveChangesAsync();
-
+            
             foreach (var item in insertModels)
             {
                 var actualItem = await dataAccessAfter.GetByIdAsync(item.Id);
-
+                
                 Assert.IsNotNull(actualItem);
                 Assert.IsTrue(item.AreEqualProperties(actualItem));
             }
         }
-
+        
         /// <summary>
-        /// This method updates an model in the database, rereads that model, modifies it, and saves the change. 
+        /// This method updates an model in the database, rereads that model, modifies it, and saves the change.
         /// The model is then read out again and compared with the input.
         /// </summary>
         /// <param name="id">Id form model updated in the Database.</param>
@@ -108,27 +123,27 @@ namespace QuickTemplate.Logic.UnitTest
             using var dataAccessAfter = CreateDataAccess();
             using var dataAccessUpdate = CreateDataAccess();
             using var dataAccessUpdateAfter = CreateDataAccess();
-
+            
             var actualModel = await dataAccessAfter.GetByIdAsync(id);
-
+            
             Assert.IsNotNull(actualModel);
-
+            
             actualModel.CopyFrom(changedModel, n => IgnoreUpdateProperties.Contains(n) == false);
-
+            
             var updateModel = await dataAccessUpdate.UpdateAsync(actualModel);
-
+            
             Assert.IsNotNull(updateModel);
             await dataAccessUpdate.SaveChangesAsync();
-
+            
             var actualUpdateModel = await dataAccessUpdateAfter.GetByIdAsync(id);
-
+            
             Assert.IsNotNull(actualUpdateModel);
             Assert.IsTrue(changedModel.AreEqualProperties(actualUpdateModel, IgnoreUpdateProperties.ToArray()));
             return actualUpdateModel;
         }
-
+        
         /// <summary>
-        /// This method creates an model in the database, rereads that model, modifies it, and saves the change. 
+        /// This method creates an model in the database, rereads that model, modifies it, and saves the change.
         /// The model is then read out again and compared with the input.
         /// </summary>
         /// <param name="accessModel">Model created in the Database.</param>
@@ -140,33 +155,33 @@ namespace QuickTemplate.Logic.UnitTest
             using var dataAccessAfter = CreateDataAccess();
             using var dataAccessUpdate = CreateDataAccess();
             using var dataAccessUpdateAfter = CreateDataAccess();
-
+            
             var insertModel = await dataAccess.InsertAsync(accessModel);
-
+            
             Assert.IsNotNull(insertModel);
             await dataAccess.SaveChangesAsync();
-
+            
             var actualModel = await dataAccessAfter.GetByIdAsync(insertModel.Id);
-
+            
             Assert.IsNotNull(actualModel);
             Assert.IsTrue(insertModel.AreEqualProperties(actualModel));
-
+            
             actualModel.CopyFrom(changedModel, n => IgnoreUpdateProperties.Contains(n) == false);
-
+            
             var updateModel = await dataAccessUpdate.UpdateAsync(actualModel);
-
+            
             Assert.IsNotNull(updateModel);
             await dataAccessUpdate.SaveChangesAsync();
-
+            
             var actualUpdateModel = await dataAccessUpdateAfter.GetByIdAsync(insertModel.Id);
-
+            
             Assert.IsNotNull(actualUpdateModel);
             Assert.IsTrue(changedModel.AreEqualProperties(actualUpdateModel, IgnoreUpdateProperties.ToArray()));
             return actualUpdateModel;
         }
-
+        
         /// <summary>
-        /// This method creates an array of models in the database, re-reads that model, modifies it, and saves the change. 
+        /// This method creates an array of models in the database, re-reads that model, modifies it, and saves the change.
         /// The models are then read out again and compared with the input.
         /// </summary>
         /// <param name="accessModels">Models created in the database.</param>
@@ -179,42 +194,42 @@ namespace QuickTemplate.Logic.UnitTest
             using var dataAccessUpdate = CreateDataAccess();
             using var dataAccessUpdateAfter = CreateDataAccess();
             var actualModels = new List<TAccessModel>();
-
+            
             Assert.AreEqual(accessModels.Count(), changedModels.Count());
-
+            
             var insertModels = await dataAccess.InsertAsync(accessModels);
-
+            
             Assert.IsNotNull(insertModels);
             await dataAccess.SaveChangesAsync();
-
+            
             foreach (var item in insertModels)
             {
                 var actualModel = await dataAccessAfter.GetByIdAsync(item.Id);
-
+                
                 Assert.IsNotNull(actualModel);
                 Assert.IsTrue(item.AreEqualProperties(actualModel));
                 actualModels.Add(actualModel);
             }
-
+            
             var changedArray = changedModels.ToArray();
-
+            
             for (int i = 0; i < actualModels.Count; i++)
             {
                 var actualModel = actualModels[i];
                 var changedModel = changedArray[i];
-
+                
                 actualModel.CopyFrom(changedModel, n => IgnoreUpdateProperties.Contains(n) == false);
             }
-
+            
             var updateModels = await dataAccessUpdate.UpdateAsync(actualModels);
-
+            
             Assert.IsNotNull(updateModels);
             await dataAccessUpdate.SaveChangesAsync();
-
+            
             foreach (var item in updateModels)
             {
                 var actualUpdateModel = await dataAccessUpdateAfter.GetByIdAsync(item.Id);
-
+                
                 Assert.IsNotNull(actualUpdateModel);
                 Assert.IsTrue(item.AreEqualProperties(actualUpdateModel));
             }

@@ -3,13 +3,19 @@
 #if ACCOUNT_ON
 namespace QuickTemplate.Logic.Contracts.Account
 {
-    using QuickTemplate.Logic.Entities.Account;
-
+    /// <summary>
+    /// Represents a relationship between an identity and a role.
+    /// </summary>
     public partial interface IIdentityXRole
     {
+        /// <summary>
+        /// Gets or sets the identity ID.
+        /// </summary>
         IdType IdentityId { get; set; }
+        /// <summary>
+        /// Gets or sets the role ID.
+        /// </summary>
         IdType RoleId { get; set; }
-        Role? Role { get; set; }
     }
 }
 #endif

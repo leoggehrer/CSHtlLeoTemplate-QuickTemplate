@@ -10,23 +10,47 @@ namespace CommonBase.Modules.PlantUML
     public static class UMLCreator
     {
         #region skinparam
+        /// <summary>
+        /// Gets the default class skin parameters.
+        /// </summary>
+        /// <remarks>
+        /// The default class skin parameters include background color, arrow color, and border color.
+        /// </remarks>
+        /// <returns>
+        /// An enumerable collection of strings representing the default class skin parameters.
+        /// </returns>
         public static IEnumerable<string> DefaultClassSkinparam => new[] {
-                                                                            "skinparam class {",
-                                                                            " BackgroundColor whitesmoke",
-                                                                            " ArrowColor grey",
-                                                                            " BorderColor darkgrey",
-                                                                            "}",
-                                                                         };
+            "skinparam class {",
+            " BackgroundColor whitesmoke",
+            " ArrowColor grey",
+            " BorderColor darkgrey",
+            "}",
+        };
+        /// <summary>
+        /// Returns the default skin parameters for objects.
+        /// </summary>
+        /// <remarks>
+        /// The skin parameters define the appearance of objects in a diagram.
+        /// </remarks>
+        /// <returns>
+        /// An enumerable collection of strings representing the default skin parameters.
+        /// </returns>
         public static IEnumerable<string> DefaultObjectSkinparam => new[] {
-                                                                            "skinparam object {",
-                                                                            " BackgroundColor white",
-                                                                            " ArrowColor grey",
-                                                                            " BorderColor darkgrey",
-                                                                            "}",
-                                                                         };
+            "skinparam object {",
+            " BackgroundColor white",
+            " ArrowColor grey",
+            " BorderColor darkgrey",
+            "}",
+        };
         #endregion skinparam
 
         #region diagram creators
+        /// <summary>
+        /// Creates a class diagram based on specified creation flags and types.
+        /// </summary>
+        /// <param name="diagramCreationFlags">The flags indicating the desired elements to include in the diagram.</param>
+        /// <param name="types">The types used to generate the class diagram.</param>
+        /// <returns>A collection of strings representing the class diagram.</returns>
         public static IEnumerable<string> CreateClassDiagram(DiagramCreationFlags diagramCreationFlags, params Type[] types)
         {
             var result = new List<string>();
@@ -90,8 +114,24 @@ namespace CommonBase.Modules.PlantUML
             }
             return result;
         }
+        /// <summary>
+        /// Creates the name of an object by combining the object's type name and hash code.
+        /// </summary>
+        /// <param name="obj">The object to create the name for.</param>
+        /// <returns>The name of the object.</returns>
         static string CreateObjectName(Object obj) => $"{obj.GetType().Name}_{obj.GetHashCode()}";
+        /// <summary>
+        /// Creates a collection name for the specified object.
+        /// </summary>
+        /// <param name="obj">The object for which a collection name is to be created.</param>
+        /// <returns>A string representing the collection name.</returns>
         static string CreateCollectionName(Object obj) => $"Colletion_{obj.GetHashCode()}";
+        /// <summary>
+        /// Creates an object diagram for the given objects up to a specified depth.
+        /// </summary>
+        /// <param name="maxDeep">The maximum depth of the object diagram.</param>
+        /// <param name="objects">The objects to include in the object diagram.</param>
+        /// <returns>The lines representing the object diagram.</returns>
         public static IEnumerable<string> CreateObjectDiagram(int maxDeep, params Object[] objects)
         {
             var result = new List<string>();
@@ -163,6 +203,10 @@ namespace CommonBase.Modules.PlantUML
         #endregion diagram creators
 
         #region diagram helpers
+        /// Creates the XML documentation for the CreateTypeDefinition method.
+        /// @param type The type for which to create the type definition.
+        /// @param diagramCreationFlags The flags to determine which members to include in the type definition.
+        /// @return A collection of strings representing the XML documentation for the method.
         public static IEnumerable<string> CreateTypeDefinition(Type type, DiagramCreationFlags diagramCreationFlags)
         {
             var result = new List<string>();
@@ -170,7 +214,7 @@ namespace CommonBase.Modules.PlantUML
             if (type.IsEnum)
             {
                 result.Add($"enum {type.Name} #light" +
-                    $"blue " + "{");
+                $"blue " + "{");
                 if ((diagramCreationFlags & DiagramCreationFlags.EnumMembers) > 0)
                 {
                     foreach (var item in Enum.GetValues(type))
@@ -205,6 +249,11 @@ namespace CommonBase.Modules.PlantUML
             }
             return result;
         }
+        /// <summary>
+        /// Creates type hierarchies for the given collection of types.
+        /// </summary>
+        /// <param name="types">The collection of types.</param>
+        /// <returns>A collection of string representing the type hierarchies.</returns>
         public static IEnumerable<string> CreateTypeHirarchies(IEnumerable<Type> types)
         {
             var result = new List<string>();
@@ -215,6 +264,11 @@ namespace CommonBase.Modules.PlantUML
             }
             return result;
         }
+        /// <summary>
+        /// Creates a type hierarchy based on the input collection of types.
+        /// </summary>
+        /// <param name="types">The collection of types to create the hierarchy from.</param>
+        /// <returns>An enumerable collection of strings representing the type hierarchy.</returns>
         public static IEnumerable<string> CreateTypeHierachy(IEnumerable<Type> types)
         {
             var result = new List<string>();
@@ -233,6 +287,12 @@ namespace CommonBase.Modules.PlantUML
             }
             return result;
         }
+        /// <summary>
+        /// Retrieves a collection of type relations for the specified type up to the specified depth.
+        /// </summary>
+        /// <param name="type">The type for which to retrieve type relations.</param>
+        /// <param name="deep">The depth up to which to retrieve type relations.</param>
+        /// <returns>A collection of string representations of the type relations.</returns>
         public static IEnumerable<string> CreateTypeRelations(Type type, int deep)
         {
             var result = new List<string>();
@@ -279,6 +339,11 @@ namespace CommonBase.Modules.PlantUML
             }
             return result;
         }
+        /// <summary>
+        /// Creates a collection of formatted string representations of interfaces implemented by the specified type.
+        /// </summary>
+        /// <param name="type">The type to check for implemented interfaces.</param>
+        /// <returns>A collection of formatted string representations of interfaces implemented by the specified type.</returns>
         public static IEnumerable<string> CreateTypeImplements(Type type)
         {
             var result = new List<string>();
@@ -290,6 +355,12 @@ namespace CommonBase.Modules.PlantUML
             }
             return result;
         }
+        /// <summary>
+        /// Creates type definitions for the specified collection of types.
+        /// </summary>
+        /// <param name="types">The collection of types to create type definitions for.</param>
+        /// <param name="diagramCreationFlags">Flags specifying diagram creation options.</param>
+        /// <returns>A collection of type definitions as strings.</returns>
         public static IEnumerable<string> CreateTypeDefinitions(IEnumerable<Type> types, DiagramCreationFlags diagramCreationFlags)
         {
             var result = new List<string>();
@@ -300,6 +371,11 @@ namespace CommonBase.Modules.PlantUML
             }
             return result;
         }
+        /// <summary>
+        /// Retrieves a collection of item members for the specified type.
+        /// </summary>
+        /// <param name="type">The type to retrieve item members from.</param>
+        /// <returns>A collection of item members.</returns>
         public static IEnumerable<string> CreateItemMembers(Type type)
         {
             var counter = 0;
@@ -393,6 +469,11 @@ namespace CommonBase.Modules.PlantUML
             #endregion methoden
             return result;
         }
+        /// <summary>
+        /// Creates an object state by retrieving the fields and their values of the specified object.
+        /// </summary>
+        /// <param name="obj">The object for which to create the state.</param>
+        /// <returns>An enumerable collection of string representations of the object state.</returns>
         public static IEnumerable<string> CreateObjectState(Object obj)
         {
             var counter = 0;
@@ -422,6 +503,11 @@ namespace CommonBase.Modules.PlantUML
 
             return result;
         }
+        /// <summary>
+        /// Creates a collection state by iterating through the given collection and generating a string representation of each item in the collection.
+        /// </summary>
+        /// <param name="collection">The collection to iterate through.</param>
+        /// <returns>An enumerable collection of strings representing the state of items in the collection.</returns>
         public static IEnumerable<string> CreateCollectionState(IEnumerable collection)
         {
             var counter = 0;
@@ -444,6 +530,11 @@ namespace CommonBase.Modules.PlantUML
         #endregion diagram helpers
 
         #region helpers
+        /// <summary>
+        /// Creates diagram hierarchies for the given types.
+        /// </summary>
+        /// <param name="types">The types for which to create diagram hierarchies.</param>
+        /// <returns>An enumerable of enumerables of types representing the diagram hierarchies.</returns>
         public static IEnumerable<IEnumerable<Type>> CreateDiagramHirarchies(IEnumerable<Type> types)
         {
             var result = new List<IEnumerable<Type>>();
@@ -498,6 +589,11 @@ namespace CommonBase.Modules.PlantUML
             }
             return result;
         }
+        /// <summary>
+        /// Returns the name of the field.
+        /// </summary>
+        /// <param name="fieldInfo">The fieldInfo object representing the field.</param>
+        /// <returns>The name of the field.</returns>
         public static string GetFieldName(FieldInfo fieldInfo)
         {
             string? result;
@@ -513,6 +609,11 @@ namespace CommonBase.Modules.PlantUML
             }
             return result;
         }
+        /// <summary>
+        /// Retrieves the parameters of a method and returns them as a string.
+        /// </summary>
+        /// <param name="methodInfo">The <see cref="MethodInfo"/> object representing the method.</param>
+        /// <returns>A string representation of the parameters in the format "ParameterType parameterName, ..." (comma separated).</returns>
         public static string GetParameters(MethodInfo methodInfo)
         {
             var counter = 0;
@@ -527,6 +628,12 @@ namespace CommonBase.Modules.PlantUML
             }
             return result.ToString();
         }
+        /// <summary>
+        /// Retrieves the value of a specified field.
+        /// </summary>
+        /// <param name="obj">The object whose field value will be retrieved.</param>
+        /// <param name="fieldInfo">The FieldInfo object representing the field.</param>
+        /// <returns>The value of the specified field.</returns>
         public static Object? GetFieldValue(Object obj, FieldInfo fieldInfo)
         {
             object? value;
@@ -541,10 +648,23 @@ namespace CommonBase.Modules.PlantUML
             }
             return value;
         }
+        /// <summary>
+        /// Retrieves the state value of an object's field using a specified FieldInfo.
+        /// </summary>
+        /// <param name="obj">The object whose state value is to be retrieved.</param>
+        /// <param name="fieldInfo">The FieldInfo of the field to retrieve the state value from.</param>
+        /// <returns>The state value of the object's field.</returns>
         public static string GetStateValue(Object obj, FieldInfo fieldInfo)
         {
             return GetStateValue(obj, fieldInfo, 15);
         }
+        /// <summary>
+        /// Retrieves the state value of a specified field.
+        /// </summary>
+        /// <param name="obj">The object to retrieve the state value from.</param>
+        /// <param name="fieldInfo">The field information of the desired field.</param>
+        /// <param name="maxLength">The maximum length of the returned value.</param>
+        /// <returns>The state value of the specified field as a string.</returns>
         public static string GetStateValue(Object obj, FieldInfo fieldInfo, int maxLength)
         {
             string? result;
@@ -572,3 +692,5 @@ namespace CommonBase.Modules.PlantUML
     }
 }
 //MdEnd
+
+

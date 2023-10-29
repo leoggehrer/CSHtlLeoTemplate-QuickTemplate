@@ -5,17 +5,21 @@ namespace TemplateCodeGenerator.Logic.Common
     [Flags]
     public enum UnitType : long
     {
-        General = 1,
+        All,
+        General,
 
-        Logic = 2 * General,
-        WebApi = 2 * Logic,
+        CommonBase,
+        Logic,
+        WebApi,
 
-        AspMvc = 2 * WebApi,
-        Angular = 2 * AspMvc,
+        AspMvc,
+        AngularApp,
+        MVVMApp,
+        ClientBlazorApp,
+        ConApp,
 
-        MVVM = 2 * Angular,
-
-        ClientBlazor = 2 * MVVM,
+        TemplateCodeGenerator,
+        TemplateTool,
     }
 }
 //MdEnd

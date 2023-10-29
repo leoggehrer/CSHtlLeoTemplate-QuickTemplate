@@ -4,7 +4,14 @@ namespace QuickTemplate.Logic.Entities
 {
     using CommonBase.Contracts;
     using System.Collections;
-
+    
+    /// <summary>
+    /// This is the base class for all entity objects.
+    /// </summary>
+    /// <remarks>
+    /// The EntityObject class is an abstract class that provides common properties and methods for all entity objects in the system.
+    /// </remarks>
+    /// <seealso cref="IIdentifyable"/>
     public abstract partial class EntityObject : IIdentifyable
     {
         /// <summary>
@@ -12,7 +19,7 @@ namespace QuickTemplate.Logic.Entities
         /// </summary>
         [Key]
         public virtual IdType Id { get; internal set; }
-
+        
         /// <summary>
         /// Determines whether two object instances are equal
         /// </summary>
@@ -22,7 +29,7 @@ namespace QuickTemplate.Logic.Entities
         protected static bool IsEqualsWith(object? obj1, object? obj2)
         {
             bool result = false;
-
+            
             if (obj1 == null && obj2 == null)
             {
                 result = true;
@@ -30,11 +37,11 @@ namespace QuickTemplate.Logic.Entities
             else if (obj1 != null && obj2 != null)
             {
                 if (obj1 is IEnumerable objEnum1
-                    && obj2 is IEnumerable objEnum2)
+                && obj2 is IEnumerable objEnum2)
                 {
                     var enumerable1 = objEnum1.Cast<object>().ToList();
                     var enumerable2 = objEnum2.Cast<object>().ToList();
-
+                    
                     result = enumerable1.SequenceEqual(enumerable2);
                 }
                 else

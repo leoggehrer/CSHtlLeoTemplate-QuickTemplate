@@ -11,7 +11,12 @@
     <DefineConstants>ACCOUNT_OFF;DBOPERATION_ON;ROWVERSION_OFF;IDINT_ON;IDLONG_OFF;IDGUID_OFF;SQLSERVER_OFF;SQLITE_ON;GENERATEDCODE_OFF;ACCESSRULES_OFF;LOGGING_OFF;REVISION_OFF;GUID_OFF;CREATED_OFF;MODIFIED_OFF;CREATEDBY_OFF;MODIFIEDBY_OFF</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
+		<PackageReference Include="RestSharp" Version="110.2.0" />
+	</ItemGroup>
+
+	<ItemGroup>
     <ProjectReference Include="..\CommonBase\CommonBase.csproj" />
     <ProjectReference Include="..\TemplateCodeGenerator.Logic\TemplateCodeGenerator.Logic.csproj" />
   </ItemGroup>

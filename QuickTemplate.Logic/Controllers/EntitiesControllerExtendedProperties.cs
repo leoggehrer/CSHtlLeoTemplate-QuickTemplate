@@ -3,6 +3,9 @@
 
 namespace QuickTemplate.Logic.Controllers
 {
+    /// <summary>
+    /// Represents a partial class for the EntitiesController that handles operations related to a specific entity type.
+    /// </summary>
     partial class EntitiesController<TEntity, TOutModel>
     {
         #region Get
@@ -18,7 +21,7 @@ namespace QuickTemplate.Logic.Controllers
             await CheckAuthorizationAsync(GetType(), nameof(GetByIdAsync), id.ToString()).ConfigureAwait(false);
 #endif
             var result = await ExecuteGetByGuidAsync(id).ConfigureAwait(false);
-
+            
             return result != null ? BeforeReturn(result) : null;
         }
         /// <summary>
@@ -33,7 +36,7 @@ namespace QuickTemplate.Logic.Controllers
             await CheckAuthorizationAsync(GetType(), nameof(GetByIdAsync), id.ToString()).ConfigureAwait(false);
 #endif
             var result = await ExecuteGetByGuidAsync(id, includeItems).ConfigureAwait(false);
-
+            
             return result != null ? BeforeReturn(result) : null;
         }
         /// <summary>
@@ -45,7 +48,7 @@ namespace QuickTemplate.Logic.Controllers
         internal virtual Task<TEntity?> ExecuteGetByGuidAsync(Guid id, params string[] includeItems)
         {
             var query = EntitySet.AsQueryable();
-
+            
             foreach (var includeItem in Includes.Union(includeItems).Distinct())
             {
                 query = query.Include(includeItem);
@@ -54,8 +57,12 @@ namespace QuickTemplate.Logic.Controllers
         }
 #endif
         #endregion Get
-
+        
         #region Action
+        /// <summary>
+        /// Handles the insertion of extended properties for the given entity.
+        /// </summary>
+        /// <param name="entity">The entity to handle.</param>
         protected virtual void HandleInsertExtendedProperties(TEntity entity)
         {
             if (entity is Entities.VersionExtendedEntity instance)
@@ -66,26 +73,30 @@ namespace QuickTemplate.Logic.Controllers
                     instance.Guid = Guid.NewGuid();
                 }
 #endif
-
+                
 #if CREATED_ON
                 instance.CreatedOn = DateTime.UtcNow;
 #endif
-
+                
 #if MODIFIED_ON
                 instance.ModifiedOn = null;
 #endif
-
+                
 #if ACCOUNT_ON && CREATEDBY_ON
                 var curSession = AccountManager.QueryLoginSession(SessionToken);
-
+                
                 instance.IdentityId_CreatedBy = curSession?.IdentityId;
 #endif
-
+                
 #if ACCOUNT_ON && MODIFIEDBY_ON
                 instance.IdentityId_ModifiedBy = null;
 #endif
             }
         }
+        /// <summary>
+        /// Handles the update of extended properties for the specified entity.
+        /// </summary>
+        /// <param name="entity">The entity to update extended properties for.</param>
         protected virtual void HandleUpdateExtendedProperties(TEntity entity)
         {
             if (entity is Entities.VersionExtendedEntity instance)
@@ -93,10 +104,10 @@ namespace QuickTemplate.Logic.Controllers
 #if MODIFIED_ON
                 instance.ModifiedOn = DateTime.UtcNow;
 #endif
-
+                
 #if ACCOUNT_ON && MODIFIEDBY_ON
                 var curSession = AccountManager.QueryLoginSession(SessionToken);
-
+                
                 instance.IdentityId_ModifiedBy = curSession?.IdentityId;
 #endif
             }

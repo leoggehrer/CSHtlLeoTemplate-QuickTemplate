@@ -2,6 +2,9 @@
 //MdStart
 namespace CommonBase.Contracts
 {
+    /// <summary>
+    /// Extends IBaseAccess with GetByGuidAsync(...).
+    /// </summary>
     partial interface IBaseAccess<T>
     {
 #if GUID_ON
@@ -15,3 +18,5 @@ namespace CommonBase.Contracts
     }
 }
 //MdEnd
+
+

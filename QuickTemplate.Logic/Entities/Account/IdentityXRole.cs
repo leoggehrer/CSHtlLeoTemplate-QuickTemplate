@@ -4,6 +4,10 @@
 namespace QuickTemplate.Logic.Entities.Account
 {
     using QuickTemplate.Logic.Contracts.Account;
+
+    /// <summary>
+    /// Represents a identity to role in the account system.
+    /// </summary>
 #if SQLITE_ON
     [System.ComponentModel.DataAnnotations.Schema.Table("IdentityXRoles")]
 #else
@@ -12,11 +16,23 @@ namespace QuickTemplate.Logic.Entities.Account
     [Microsoft.EntityFrameworkCore.Index(nameof(IdentityId), nameof(RoleId), IsUnique = true)]
     public partial class IdentityXRole : VersionEntity, IIdentityXRole
     {
+        /// <summary>
+        /// Gets or sets the identity ID.
+        /// </summary>
+        /// <value>The identity ID.</value>
         public IdType IdentityId { get; set; }
+        ///<summary>
+        ///Gets or sets the role ID.
+        ///</summary>
         public IdType RoleId { get; set; }
-
-        // Navigation properties
+        
+        /// <summary>
+        /// Gets or sets the identity navigation.
+        /// </summary>
         public Identity? Identity { get; set; }
+        /// <summary>
+        /// Gets or sets the role navigation.
+        /// </summary>
         public Role? Role { get; set; }
     }
 }

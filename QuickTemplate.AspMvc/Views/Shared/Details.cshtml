@@ -2,13 +2,15 @@
 @model CommonBase.Contracts.IIdentifyable
 
 @{
-    var image = (string)(ViewBag.Image ?? "banner.jpg");
+    var title = "Details";
+    var pageData = new QuickTemplate.AspMvc.Models.View.PageData { Name = title };
     var canEdit = (bool)(ViewBag.CanEdit ?? true);
 
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = title;
 }
 
-<img class="card-img-top" src="@($"/img/{image}")" style="margin-top: -20px; margin-bottom: -50px" alt="Banner">
+@await Html.PartialAsync("_PageHeader", new QuickTemplate.AspMvc.Models.View.PageData { Name = "Details"})
+
 <h1>Details</h1>
 <h3>@Model.GetType().Name</h3>
 <hr />
@@ -27,3 +29,5 @@
         <a class="btn btn-outline-secondary" style="min-width: 8em;" asp-action="Index">Back to List</a>
     </div>
 </div>
+
+@await Html.PartialAsync("_PageFooter", pageData)

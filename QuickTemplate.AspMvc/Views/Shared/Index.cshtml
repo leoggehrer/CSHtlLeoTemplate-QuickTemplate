@@ -3,6 +3,7 @@
 
 @{
     var title = "Index";
+    var pageData = new QuickTemplate.AspMvc.Models.View.PageData { Name = title };
     var image = (string)(ViewBag.Image ?? "banner.jpg");
     var pageSize = (int)(ViewBag.PageSize ?? 0);
     var modelCount = (int)(ViewBag.ModelCount ?? 0);
@@ -21,8 +22,9 @@
     }
 }
 
-<img class="card-img-top" src="@($"/img/{image}")" style="margin-top: -20px; margin-bottom: -50px" alt="Banner">
-<h1>@title</h1>
+@await Html.PartialAsync("_PageHeader", pageData)
+
+<h1>@pageData.Name</h1>
 
 @if (filter is {Show: true })
 {
@@ -67,3 +69,5 @@ else if (canCreate)
         }
     </tbody>
 </table>
+
+@await Html.PartialAsync("_PageFooter", pageData)

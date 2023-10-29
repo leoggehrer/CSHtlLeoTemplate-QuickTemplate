@@ -6,15 +6,17 @@ namespace TemplateCodeGenerator.Logic.Common
     public enum ItemType : ulong
     {
         #region contracts
-        AccessContract,
-        ServiceAccessContract,
-        ServiceContract,
+        AccessContract,         // controller access contract
+        ServiceAccessContract,  // service access contract
+        ServiceContract,        // service access contract
+        ModelContract,          // model access contract
         #endregion contracts
 
         #region models and properties
         Property,
 
         ModelProperty,
+        InterfaceProperty,
         AccessModel,
         ServiceModel,
         ServiceModelProperty,
@@ -51,6 +53,7 @@ namespace TemplateCodeGenerator.Logic.Common
         TypeScriptService,
 
         AllItems,
+        File,
         Lambda,
     }
 }

@@ -3,23 +3,33 @@
 namespace CommonBase.Services
 {
     using System;
-
+    
     /// <summary>
     /// This class provides the CRUD operations for a service type.
     /// </summary>
     /// <typeparam name="TModel">The service type for which the operations are available.</typeparam>
     public abstract partial class GenericService<TModel> : ServiceObject, Contracts.IBaseAccess<TModel>
-        where TModel : Models.ServiceModel, new()
+    where TModel : Models.ServiceModel, new()
     {
+        /// <summary>
+        /// Initializes the GenericService class.
+        /// </summary>
         static GenericService()
         {
             BeforeClassInitialize();
-
+            
             AfterClassInitialize();
         }
+        /// <summary>
+        /// This method is called before the initialization of the class.
+        /// </summary>
         static partial void BeforeClassInitialize();
+        /// <summary>
+        /// This method is called after the class is initialized.
+        /// It is a partial method and should be implemented in a partial class.
+        /// </summary>
         static partial void AfterClassInitialize();
-
+        
         /// <summary>
         /// Creates an instance.
         /// </summary>
@@ -37,8 +47,8 @@ namespace CommonBase.Services
         protected GenericService(string sessionToken, string baseAddress, string requestUri) : base(sessionToken, baseAddress, requestUri)
         {
         }
-
-        #region Create
+        
+#region Create
         /// <summary>
         /// Creates a new element of type TService.
         /// </summary>
@@ -47,14 +57,14 @@ namespace CommonBase.Services
         {
             return new TModel();
         }
-        #endregion Create
-
-        #region MaxPageSize and Count
+#endregion Create
+        
+#region MaxPageSize and Count
         /// <summary>
         /// Gets the maximum page size.
         /// </summary>
         public virtual int MaxPageSize => StaticLiterals.MaxPageSize;
-
+        
         /// <summary>
         /// Gets the number of quantity in the collection.
         /// </summary>
@@ -62,7 +72,7 @@ namespace CommonBase.Services
         public virtual Task<int> CountAsync()
         {
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.GetCountAsync(RequestUri);
         }
         /// <summary>
@@ -73,12 +83,12 @@ namespace CommonBase.Services
         public virtual Task<int> CountAsync(string predicate)
         {
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.GetCountAsync(RequestUri, predicate);
         }
-        #endregion  MaxPageSize and Count
-
-        #region Get
+#endregion  MaxPageSize and Count
+        
+#region Get
 #if GUID_ON
         /// <summary>
         /// Returns the element of type T with the identification of id.
@@ -88,11 +98,11 @@ namespace CommonBase.Services
         public Task<TService?> GetByGuidAsync(Guid id)
         {
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.GetByGuidAsync<TService>(RequestUri, id);
         }
 #endif
-
+        
         /// <summary>
         /// Returns the element of type T with the identification of id.
         /// </summary>
@@ -101,10 +111,10 @@ namespace CommonBase.Services
         public virtual Task<TModel?> GetByIdAsync(IdType id)
         {
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.GetByIdAsync<TModel>(RequestUri, id);
         }
-
+        
         /// <summary>
         /// Gets all items from the repository.
         /// </summary>
@@ -112,7 +122,7 @@ namespace CommonBase.Services
         public virtual Task<TModel[]> GetAllAsync()
         {
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.GetAsync<TModel>(RequestUri);
         }
         /// <summary>
@@ -123,10 +133,10 @@ namespace CommonBase.Services
         public virtual Task<TModel[]> GetAllAsync(string orderBy)
         {
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.GetAsync<TModel>(RequestUri, orderBy);
         }
-
+        
         /// <summary>
         /// Gets a subset of items from the repository.
         /// </summary>
@@ -136,9 +146,9 @@ namespace CommonBase.Services
         public virtual Task<TModel[]> GetPageListAsync(int pageIndex, int pageSize)
         {
             CheckPageParams(pageIndex, pageSize);
-
+            
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.GetPageListAsync<TModel>(RequestUri, pageIndex, pageSize);
         }
         /// <summary>
@@ -151,14 +161,14 @@ namespace CommonBase.Services
         public virtual Task<TModel[]> GetPageListAsync(string orderBy, int pageIndex, int pageSize)
         {
             CheckPageParams(pageIndex, pageSize);
-
+            
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.GetPageListAsync<TModel>(RequestUri, orderBy, pageIndex, pageSize);
         }
-        #endregion Get
-
-        #region Query
+#endregion Get
+        
+#region Query
         /// <summary>
         /// Filters a sequence of values based on a predicate.
         /// </summary>
@@ -167,7 +177,7 @@ namespace CommonBase.Services
         public virtual Task<TModel[]> QueryAsync(string predicate)
         {
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.QueryAllAsync<TModel>(RequestUri, predicate);
         }
         /// <summary>
@@ -179,7 +189,7 @@ namespace CommonBase.Services
         public virtual Task<TModel[]> QueryAsync(string predicate, string orderBy)
         {
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.QueryAllAsync<TModel>(RequestUri, predicate, orderBy);
         }
         /// <summary>
@@ -192,9 +202,9 @@ namespace CommonBase.Services
         public virtual Task<TModel[]> QueryAsync(string predicate, int pageIndex, int pageSize)
         {
             CheckPageParams(pageIndex, pageSize);
-
+            
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.QueryAllAsync<TModel>(RequestUri, predicate, pageIndex, pageSize);
         }
         /// <summary>
@@ -208,28 +218,28 @@ namespace CommonBase.Services
         public virtual Task<TModel[]> QueryAsync(string predicate, string orderBy, int pageIndex, int pageSize)
         {
             CheckPageParams(pageIndex, pageSize);
-
+            
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.QueryAllAsync<TModel>(RequestUri, predicate, orderBy, pageIndex, pageSize);
         }
-        #endregion Query
-
-        #region Insert
+#endregion Query
+        
+#region Insert
         /// <summary>
-        /// The service is being tracked by the context but does not yet exist in the repository. 
+        /// The service is being tracked by the context but does not yet exist in the repository.
         /// </summary>
         /// <param name="model">The service which is to be inserted.</param>
         /// <returns>The inserted service.</returns>
         public virtual Task<TModel> InsertAsync(TModel model)
         {
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.PostAsync(RequestUri, model);
         }
-        #endregion Insert
-
-        #region Update
+#endregion Insert
+        
+#region Update
         /// <summary>
         /// The service is being tracked by the context and exists in the repository, and some or all of its property values have been modified.
         /// </summary>
@@ -238,12 +248,12 @@ namespace CommonBase.Services
         public virtual Task<TModel> UpdateAsync(TModel model)
         {
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.PutAsync(RequestUri, model.Id, model);
         }
-        #endregion Update
-
-        #region Delete
+#endregion Update
+        
+#region Delete
         /// <summary>
         /// Removes the service from the repository with the appropriate idservice.
         /// </summary>
@@ -251,12 +261,12 @@ namespace CommonBase.Services
         public virtual Task DeleteAsync(IdType id)
         {
             var clientAccess = new Modules.RestApi.ClientAccess(BaseAddress, SessionToken);
-
+            
             return clientAccess.DeleteAsync(RequestUri, id);
         }
-        #endregion Delete
-
-        #region SaveChanges
+#endregion Delete
+        
+#region SaveChanges
         /// <summary>
         /// Saves any changes in the underlying persistence.
         /// </summary>
@@ -265,9 +275,14 @@ namespace CommonBase.Services
         {
             return Task.FromResult(0);
         }
-        #endregion SaveChanges
-
-        #region Helpers
+#endregion SaveChanges
+        
+#region Helpers
+        /// Checks if the specified page index and page size are valid.
+        /// @param pageIndex - The page index to be checked.
+        /// @param pageSize - The page size to be checked.
+        /// @throws ArgumentOutOfRangeException - If the pageIndex is less than zero.
+        /// @throws ArgumentOutOfRangeException - If the pageSize is less than or equal to zero, or greater than the maximum allowed page size.
         internal void CheckPageParams(int pageIndex, int pageSize)
         {
             if (pageIndex < 0)
@@ -279,7 +294,9 @@ namespace CommonBase.Services
                 throw new ArgumentOutOfRangeException(nameof(pageSize));
             }
         }
-        #endregion Helpers
+#endregion Helpers
     }
 }
 //MdEnd
+
+

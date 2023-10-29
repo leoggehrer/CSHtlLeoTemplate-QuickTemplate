@@ -1,392 +1,119 @@
 ﻿//@BaseCode
 //MdStart
-using System.Text;
-using System.Text.RegularExpressions;
-
 namespace CommonBase.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for formatting C# code.
+    /// </summary>
     public static partial class FormatterExtensions
     {
-        public static IEnumerable<string> FormatCSharpCode(this IEnumerable<string> lines, bool removeBlockComments = true, bool removeLineComments = true)
+        /// <summary>
+        /// Gets or sets the indentation space used for formatting.
+        /// </summary>
+        /// <value>
+        /// The indentation space used for formatting.
+        /// </value>
+        public static string IndentSpace { get; set; } = "    ";
+        
+        /// <summary>
+        /// Formats a given C# code by replacing line breaks with the platform-specific line break and then formatting the code using a predefined set of rules.
+        /// </summary>
+        /// <param name="source">The C# code to be formatted.</param>
+        /// <returns>The formatted C# code.</returns>
+        public static string FormatCSharpCode(this string source)
         {
-            return lines.FormatCSharpCode(0, removeBlockComments, removeLineComments);
+            var lines = source.Replace("\n", Environment.NewLine).ToLines();
+            
+            return lines.FormatCSharpCode().ToText();
         }
-        public static IEnumerable<string> FormatCSharpCode(this IEnumerable<string> lines, int indent, bool removeBlockComments, bool removeLineComments)
+        /// <summary>
+        /// Formats the given C# code by applying appropriate indentation.
+        /// </summary>
+        /// <param name="lines">An enumerable collection of C# code lines to be formatted.</param>
+        /// <returns>An enumerable collection of formatted C# code lines.</returns>
+        public static IEnumerable<string> FormatCSharpCode(this IEnumerable<string> lines)
         {
+            int indent = 0;
             var result = new List<string>();
-            var text = lines.ToText();
-
-            if (string.IsNullOrEmpty(text) == false)
+            
+            foreach (var line in lines)
             {
-                if (removeBlockComments)
+                var formatLine = line.Trim();
+                var hasOpenBlock = formatLine.Contains('{', '"', '"');
+                var hasCloseBlock = formatLine.Contains('}', '"', '"');
+                
+                if (formatLine.StartsWith("#if")
+                    || formatLine.StartsWith("#else")
+                    || formatLine.StartsWith("#endif"))
                 {
-                    text = text.RemoveBlockComments();
+                    result.Add(formatLine);
                 }
-                if (removeLineComments)
+                else if (hasOpenBlock && hasCloseBlock)
                 {
-                    text = text.RemoveLineComments();
-                }
-
-                if (text.HasFullCodeBlock())
-                {
-                    text.FormatCSharpCodeBlock(indent, result);
+                    result.Add(formatLine.SetIndent(IndentSpace, indent));
                 }
                 else
                 {
-                    result.AddRange(lines);
-                }
-            }
-            return result;
-        }
-
-        #region Helpers
-        private static string RemoveLineComments(this string source)
-        {
-            var sb = new StringBuilder();
-            int idx = 0, sIdx = 0, eIdx = -1;
-
-            do
-            {
-                sIdx = source.IndexOf("//", sIdx);
-                if (sIdx >= 0 && IsSourceString(source, sIdx) == false)
-                {
-                    eIdx = sIdx;
-                    do
+                    var offest = 0;
+                    indent = hasCloseBlock ? indent - 1 : indent;
+                    if (formatLine.StartsWith(".")
+                    && result.Any()
+                    && (offest = result.Last().IndexOf(".")) > -1)
                     {
-                        eIdx = source.IndexOf(Environment.NewLine, eIdx + 1);
-                    } while (eIdx != -1 && IsSourceString(source, eIdx));
-                }
-                if (sIdx > -1 && eIdx > -1)
-                {
-                    while (idx < sIdx)
-                    {
-                        sb.Append(source[idx++]);
-                    }
-                    sIdx = eIdx + Environment.NewLine.Length;
-                    idx = sIdx;
-                }
-            } while (sIdx != -1 && IsSourceString(source, sIdx) == false);
-            while (idx < source.Length)
-            {
-                sb.Append(source[idx++]);
-            }
-            return sb.ToString();
-        }
-        private static string RemoveBlockComments(this string source)
-        {
-            var sb = new StringBuilder();
-            int idx = 0, sIdx = 0, eIdx = -1;
-
-            do
-            {
-                sIdx = source.IndexOf("/*", sIdx);
-                if (sIdx >= 0 && IsSourceString(source, sIdx) == false)
-                {
-                    eIdx = sIdx;
-                    do
-                    {
-                        eIdx = source.IndexOf("*/", eIdx + 1);
-                    } while (eIdx != -1 && IsSourceString(source, eIdx));
-                }
-                if (sIdx > -1 && eIdx > -1)
-                {
-                    while (idx < sIdx)
-                    {
-                        sb.Append(source[idx++]);
-                    }
-                    sIdx = eIdx + Environment.NewLine.Length;
-                    idx = sIdx;
-                }
-            } while (sIdx != -1 && IsSourceString(source, sIdx) == false);
-
-            while (idx < source.Length)
-            {
-                sb.Append(source[idx++]);
-            }
-            return sb.ToString();
-        }
-
-        private static bool HasFullCodeBlock(this string text)
-        {
-            if (text == null)
-                throw new ArgumentNullException(nameof(text));
-
-            var codeBegin = 0;
-            var codeEnd = 0;
-
-            foreach (var chr in text)
-            {
-                if (chr == '{')
-                    codeBegin++;
-                else if (chr == '}')
-                    codeEnd++;
-            }
-            return codeBegin > 0 && codeBegin == codeEnd;
-        }
-        private static string TrimCSharpLine(this string text)
-        {
-            if (string.IsNullOrEmpty(text) == false)
-            {
-                var trimmer = new Regex(@"\s\s+");
-
-                text = text.Replace("\t", string.Empty);
-                text = text.Replace(Environment.NewLine, string.Empty);
-
-                text = text.Trim();
-                text = trimmer.Replace(text, " ");
-            }
-            return text;
-        }
-        private static bool GetCodeBlockPositions(string text, ref int start, ref int end)
-        {
-            var cornerBraket = 0;
-            var blockBegin = 0;
-            var blockEnd = 0;
-            var quotationMarks = 0;
-
-            start = end = -1;
-            for (var idx = 0; idx >= 0 && idx < text.Length && (start == -1 || end == -1); idx++)
-            {
-                var chr = text[idx];
-                var prvChr = idx > 0 ? text[idx - 1] : 0;
-
-                if (chr == '"' && prvChr != '\\')
-                {
-                    quotationMarks++;
-                }
-                else if (quotationMarks % 2 == 0)
-                {
-                    if (chr == '[')
-                        cornerBraket++;
-                    else if (chr == ']')
-                        cornerBraket++;
-                    else if (chr == '{' && cornerBraket % 2 == 0)
-                    {
-                        blockBegin++;
-                        if (blockBegin == 1)
-                            start = idx;
-                    }
-                    else if (chr == '}' && cornerBraket % 2 == 0)
-                    {
-                        blockEnd++;
-                        if (blockEnd == blockBegin)
-                            end = idx;
-                    }
-                }
-            }
-            return blockBegin > 0 && blockEnd > 0 && blockBegin == blockEnd;
-        }
-
-        private static IEnumerable<string> SplitSourceLine(this string line)
-        {
-            var result = new List<string>();
-            var splitLines = line.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var item in splitLines)
-            {
-                if (item.Trim().Length > 0)
-                {
-                    if (item.Trim().StartsWith("#"))
-                    {
-                        result.Add(item.Trim());
+                        result.Add(formatLine.SetIndent(" ", offest));
                     }
                     else
                     {
-                        result.AddRange(item.SplitCSharpAssignments());
+                        result.Add(formatLine.SetIndent(IndentSpace, indent));
                     }
+                    indent = hasOpenBlock ? indent + 1 : indent;
                 }
             }
             return result;
         }
-        private static IEnumerable<string> SplitCSharpAssignments(this string line)
+
+        /// <summary>
+        /// Checks if the given line is a comment line.
+        /// </summary>
+        /// <param name="line">The line to check.</param>
+        /// <returns>Returns true if the line is a comment line; otherwise, false.</returns>
+        public static bool IsCommentLine(this string line)
         {
-            var result = new List<string>();
-            var startIdx = -1;
-            var partialStartIdx = -1;
-            int partialEndIdx;
-
-            while ((partialEndIdx = line.IndexOf(';', startIdx + 1)) >= 0)
-            {
-                if (IsAssignmentSemicolon(line, partialEndIdx))
-                {
-                    result.Add(line.Partialstring(partialStartIdx + 1, partialEndIdx).TrimCSharpLine());
-                    partialStartIdx = partialEndIdx;
-                    startIdx = partialStartIdx;
-                }
-                else
-                {
-                    startIdx++;
-                }
-            }
-            var endPartial = line.Partialstring(partialStartIdx + 1, line.Length - 1).TrimCSharpLine();
-
-            if (endPartial.Length > 0)
-            {
-                result.Add(endPartial);
-            }
-            return result;
+            return IsXmlLineComment(line) || IsLineComment(line) || IsBlockCommentLine(line);
         }
-        private static IEnumerable<string> SplitCSharpLine(this string line)
+        /// <summary>
+        /// Determines whether the given string represents a line comment.
+        /// </summary>
+        /// <param name="line">The string to be checked.</param>
+        /// <returns>
+        /// <c>true</c> if the given string represents a line comment; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsLineComment(this string line)
         {
-            var result = new List<string>();
-            var lines = new List<string>(line.SplitSourceLine());
-            string blockBegin = "/*", blockEnd = "*/";
-
-            for (var i = 0; i < lines.Count; i++)
-            {
-                if (lines[i].Length > 0)
-                {
-                    int sIdx, eIdx;
-                    if (lines[i].StartsWith("#"))
-                    {
-                        result.Add(lines[i]);
-                    }
-                    // add comment
-                    else if ((sIdx = lines[i].IndexOf("//", StringComparison.Ordinal)) >= 0
-                         &&
-                        (lines[i].IndexOf("\\r\\n", sIdx + 1, StringComparison.Ordinal)) >= 0)
-                    {
-                        result.Add(lines[i]);
-                    }
-                    else if ((sIdx = lines[i].IndexOf(blockBegin, StringComparison.Ordinal)) >= 0
-                              &&
-                             (eIdx = lines[i].IndexOf(blockEnd, sIdx + 1, StringComparison.Ordinal)) >= 0)
-                    {
-                        result.Add(lines[i].Partialstring(sIdx, eIdx + blockEnd.Length - 1));
-                        result.Add(lines[i].Partialstring(eIdx + blockEnd.Length, lines[i].Length - 1));
-                    }
-                    else if ((sIdx = lines[i].IndexOf(blockBegin, StringComparison.Ordinal)) >= 0)
-                    {
-                        if (sIdx > 1)
-                        {
-                            string partLine = lines[i].Partialstring(0, sIdx - 1).TrimCSharpLine();
-
-                            if (partLine.Length > 0)
-                                result.Add(partLine);
-                        }
-
-                        result.Add(blockBegin);
-                        if (sIdx + 2 < lines[i].Length - 1)
-                        {
-                            string partLine = lines[i].Partialstring(sIdx + 2, lines[i].Length - 1).TrimCSharpLine();
-
-                            if (partLine.Length > 0)
-                                result.Add(partLine);
-                        }
-                    }
-                    else if ((sIdx = lines[i].IndexOf(blockEnd, StringComparison.Ordinal)) >= 0)
-                    {
-                        if (sIdx > 1)
-                        {
-                            string partLine = lines[i].Partialstring(0, sIdx - 1).TrimCSharpLine();
-
-                            if (partLine.Length > 0)
-                                result.Add(partLine);
-                        }
-
-                        result.Add(blockEnd);
-                        if (sIdx + 2 < lines[i].Length - 1)
-                        {
-                            string partLine = lines[i].Partialstring(sIdx + 2, lines[i].Length - 1).TrimCSharpLine();
-
-                            if (partLine.Length > 0)
-                                result.Add(partLine);
-                        }
-                    }
-                    else
-                    {
-                        result.AddRange(lines[i].SplitCSharpLine('[', ']'));
-                    }
-                }
-            }
-            return result;
+            return line.Trim().StartsWith(@"//");
         }
-        private static IEnumerable<string> SplitCSharpLine(this string line, char left, char right)
+        /// <summary>
+        /// Checks if the provided string line is a XML line comment.
+        /// </summary>
+        /// <param name="line">The string line to be checked.</param>
+        /// <returns>True if the line is a XML line comment, otherwise false.</returns>
+        public static bool IsXmlLineComment(this string line)
         {
-            var lastIdx = -1;
-            var startIdx = -1;
-            var result = new List<string>();
-
-            static int IndexOf(string text, int start, char chr)
-            {
-                int result = -1;
-                int quotationMarks = 0;
-
-                for (int i = start; i < text.Length && result == -1; i++)
-                {
-                    if (text[i] == '"')
-                        quotationMarks++;
-                    else if (quotationMarks % 2 == 0 && text[i] == chr)
-                        result = i;
-                }
-                return result;
-            }
-
-            int endIdx;
-            while ((startIdx = IndexOf(line, startIdx + 1, left)) >= 0
-                   && (endIdx = IndexOf(line, startIdx + 1, right)) > startIdx
-                   && endIdx - startIdx > 1)
-            {
-                result.Add(line.Partialstring(startIdx, endIdx).TrimCSharpLine());
-                lastIdx = startIdx = endIdx;
-            }
-            string endPartial = line.Partialstring(lastIdx + 1, line.Length - 1).TrimCSharpLine();
-
-            if (endPartial.Length > 0)
-            {
-                result.Add(endPartial);
-            }
-            return result;
+            return line.Trim().StartsWith(@"///");
         }
-
-        private static bool IsAssignmentSemicolon(string text, int pos)
+        /// <summary>
+        /// Checks if a line of code contains a block comment.
+        /// </summary>
+        /// <param name="line">The line of code to check.</param>
+        /// <returns>True if the line contains a block comment, otherwise false.</returns>
+        public static bool IsBlockCommentLine(this string line)
         {
-            return IsLiteralCharacter(text, pos) == false && IsSourceString(text, pos) == false;
+            var result = line.Trim();
+
+            return result.StartsWith(@"/*") || result.StartsWith(@"*/") || result.StartsWith(@"*");
         }
-        private static bool IsLiteralCharacter(string text, int pos)
-        {
-            return pos > 0 && pos + 1 < text.Length && text[pos - 1] == '\'' && text[pos + 1] == '\'';
-        }
-        private static bool IsSourceString(string text, int pos)
-        {
-            var limiterCount = 0;
-
-            for (var i = 0; i < pos && i < text.Length; i++)
-            {
-                if (text[i] == '\"')
-                    limiterCount++;
-            }
-            return limiterCount % 2 > 0;
-        }
-
-        private static void FormatCSharpCodeBlock(this string text, int indent, List<string> lines)
-        {
-            var beginPos = 0;
-            var endPos = 0;
-
-            void AddCodeLines(string txt, int idt, List<string> list)
-            {
-                var items = txt.SplitCSharpLine();
-
-                list.AddRange(items.Where(l => l.Length > 0)
-                    .Select(l => l.StartsWith("#") ? l : l.SetIndent(idt))
-                    .ToArray());
-            }
-
-            if (GetCodeBlockPositions(text, ref beginPos, ref endPos))
-            {
-                AddCodeLines(text.Partialstring(0, beginPos - 1), indent, lines);
-                lines.Add("{".SetIndent(indent));
-                text.Partialstring(beginPos + 1, endPos - 1).FormatCSharpCodeBlock(indent + 1, lines);
-                lines.Add("}".SetIndent(indent));
-                text.Partialstring(endPos + 1, text.Length - 1).FormatCSharpCodeBlock(indent, lines);
-            }
-            else
-            {
-                AddCodeLines(text, indent, lines);
-            }
-        }
-        #endregion Helpers
     }
 }
 //MdEnd
+
+

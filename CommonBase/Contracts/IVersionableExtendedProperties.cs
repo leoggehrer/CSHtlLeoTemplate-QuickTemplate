@@ -3,6 +3,9 @@
 
 namespace CommonBase.Contracts
 {
+    /// <summary>
+    /// An interface representing extended properties for versionable entities.
+    /// </summary>
     public partial interface IVersionableExtendedProperties : IVersionable
     {
 #if GUID_ON

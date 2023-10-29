@@ -9,31 +9,27 @@ namespace QuickTemplate.Logic.Facades
     /// Generic facade for mapping entity types to model types.
     /// </summary>
     /// <typeparam name="TModel">The model type as public type</typeparam>
-    public abstract partial class ControllerFacade<TModel> : FacadeObject, IDataAccess<TModel>
-        where TModel : Models.ModelObject, new()
+    public abstract partial class ControllerFacade<TModel, TAccessContract> : FacadeObject
+    where TModel : Models.ModelObject, new()
+    where TAccessContract : IDataAccess<TModel>
     {
-        protected IDataAccess<TModel> Controller { get; init; }
-        protected ControllerFacade(IDataAccess<TModel> controller)
-            : base((controller as ControllerObject)!)
+        /// <summary>
+        /// Gets or sets the controller used for accessing a specific access contract.
+        /// </summary>
+        /// <value>
+        /// The controller used for accessing a specific access contract.
+        /// </value>
+        protected TAccessContract Controller { get; init; }
+        ///<summary>
+        /// Creates a new instance of the ControllerFacade class.
+        ///</summary>
+        ///<param name="controller">The access contract that the ControllerFacade is based on.</param>
+        protected ControllerFacade(TAccessContract controller)
+        : base((controller as ControllerObject)!)
         {
             Controller = controller;
         }
-
-#if ACCOUNT_ON
-        #region SessionToken
-        /// <summary>
-        /// Sets the authorization token.
-        /// </summary>
-        public string SessionToken
-        {
-            set
-            {
-                Controller.SessionToken = value;
-            }
-        }
-        #endregion SessionToken
-#endif
-
+        
         #region Create
         /// <summary>
         /// Creates a new element of type TModel.
@@ -44,7 +40,7 @@ namespace QuickTemplate.Logic.Facades
             return Controller.Create();
         }
         #endregion Create
-
+        
         #region MaxPageSize and Count
         /// <summary>
         /// Gets the maximum page size.
@@ -78,7 +74,7 @@ namespace QuickTemplate.Logic.Facades
             return Controller.CountAsync(predicate, includeItems);
         }
         #endregion MaxPageSize and Count
-
+        
         #region Queries
 #if GUID_ON
         /// <summary>
@@ -110,7 +106,7 @@ namespace QuickTemplate.Logic.Facades
         {
             return Controller.GetByIdAsync(id, includeItems);
         }
-
+        
         /// <summary>
         /// Returns all objects of the elements in the collection.
         /// </summary>
@@ -146,7 +142,7 @@ namespace QuickTemplate.Logic.Facades
         {
             return Controller.GetAllAsync(orderBy, includeItems);
         }
-
+        
         /// <summary>
         /// Gets a subset of items from the repository.
         /// </summary>
@@ -191,7 +187,7 @@ namespace QuickTemplate.Logic.Facades
         {
             return Controller.GetPageListAsync(orderBy, pageIndex, pageSize, includeItems);
         }
-
+        
         /// <summary>
         /// Filters a sequence of elements based on a predicate.
         /// </summary>
@@ -221,7 +217,7 @@ namespace QuickTemplate.Logic.Facades
         {
             return Controller.QueryAsync(predicate, orderBy);
         }
-
+        
         /// <summary>
         /// Filters a subset of elements based on a predicate.
         /// </summary>
@@ -271,10 +267,10 @@ namespace QuickTemplate.Logic.Facades
             return Controller.QueryAsync(predicate, orderBy, pageIndex, pageSize, includeItems);
         }
         #endregion Queries
-
+        
         #region Insert
         /// <summary>
-        /// The element is being tracked by the context but does not yet exist in the repository. 
+        /// The element is being tracked by the context but does not yet exist in the repository.
         /// </summary>
         /// <param name="element">The element which is to be inserted.</param>
         /// <returns>The inserted element.</returns>
@@ -283,7 +279,7 @@ namespace QuickTemplate.Logic.Facades
             return Controller.InsertAsync(model);
         }
         /// <summary>
-        /// The elements are being tracked by the context but does not yet exist in the repository. 
+        /// The elements are being tracked by the context but does not yet exist in the repository.
         /// </summary>
         /// <param name="elements">The elements which are to be inserted.</param>
         /// <returns>The inserted elements.</returns>
@@ -292,7 +288,7 @@ namespace QuickTemplate.Logic.Facades
             return Controller.InsertAsync(models);
         }
         #endregion Insert
-
+        
         #region Update
         /// <summary>
         /// The element is being tracked by the context and exists in the repository, and some or all of its property values have been modified.
@@ -302,9 +298,9 @@ namespace QuickTemplate.Logic.Facades
         public virtual async Task<TModel> UpdateAsync(TModel model)
         {
             var updModel = await Controller.GetByIdAsync(model.Id).ConfigureAwait(false);
-
+            
             _ = updModel ?? throw new Exception("Entity not found.");
-
+            
             updModel.CopyFrom(model);
             return await Controller.UpdateAsync(updModel).ConfigureAwait(false);
         }
@@ -316,7 +312,7 @@ namespace QuickTemplate.Logic.Facades
         public virtual async Task<IEnumerable<TModel>> UpdateAsync(IEnumerable<TModel> models)
         {
             var result = new List<TModel>();
-
+            
             foreach (var model in models)
             {
                 result.Add(await UpdateAsync(model).ConfigureAwait(false));
@@ -324,7 +320,7 @@ namespace QuickTemplate.Logic.Facades
             return result;
         }
         #endregion Update
-
+        
         #region Delete
         /// <summary>
         /// Removes the element from the repository with the appropriate idelement.
@@ -335,7 +331,7 @@ namespace QuickTemplate.Logic.Facades
             return Controller.DeleteAsync(id);
         }
         #endregion Delete
-
+        
         #region SaveChanges
         /// <summary>
         /// Saves any changes in the underlying persistence.
@@ -349,3 +345,4 @@ namespace QuickTemplate.Logic.Facades
     }
 }
 //MdEnd
+

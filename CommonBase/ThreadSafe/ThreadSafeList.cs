@@ -4,9 +4,13 @@ using System.Collections;
 
 namespace CommonBase.ThreadSafe
 {
+    /// <summary>
+    /// A thread-safe implementation of the IList&lt;T&gt; interface.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the list.</typeparam>
     public partial class ThreadSafeList<T> : IList<T>
     {
-        protected static object _lock = new();
+        private static readonly object _lock = new();
         protected List<T> internalList = new();
 
         public T this[int index]
@@ -30,6 +34,10 @@ namespace CommonBase.ThreadSafe
             }
         }
 
+        /// <summary>
+        /// Gets the number of elements in the internal list.
+        /// </summary>
+        /// <returns>The number of elements in the internal list.</returns>
         public int Count
         {
             get
@@ -44,8 +52,17 @@ namespace CommonBase.ThreadSafe
             }
         }
 
+        /// <summary>
+        /// Determines if the object is read-only.
+        /// </summary>
+        /// <returns>A boolean value indicating if the object is read-only.</returns>
+        /// <exception cref="System.NotImplementedException">Thrown when the method is called.</exception>
         public bool IsReadOnly => throw new NotImplementedException();
 
+        /// <summary>
+        /// Adds an item to the internal list.
+        /// </summary>
+        /// <param name="item">The item to be added.</param>
         public void Add(T item)
         {
             lock (_lock)
@@ -54,6 +71,9 @@ namespace CommonBase.ThreadSafe
             }
         }
 
+        /// <summary>
+        /// Clears the internal list by removing all its elements.
+        /// </summary>
         public void Clear()
         {
             lock (_lock)
@@ -62,6 +82,11 @@ namespace CommonBase.ThreadSafe
             }
         }
 
+        /// <summary>
+        /// Determines whether the internalList contains a specific value.
+        /// </summary>
+        /// <param name="item">The object to locate in the internalList.</param>
+        /// <returns>true if the internalList contains the specified item; otherwise, false.</returns>
         public bool Contains(T item)
         {
             var result = false;
@@ -73,6 +98,12 @@ namespace CommonBase.ThreadSafe
             return result;
         }
 
+        /// <summary>
+        /// Copies the elements of the internal list to an array, starting at the specified index of the target array.
+        /// </summary>
+        /// <param name="array">The one-dimensional target array to copy the elements to.</param>
+        /// <param name="arrayIndex">The index in the target array at which copying begins.</param>
+        /// <typeparam name="T">The type of elements in the array.</typeparam>
         public void CopyTo(T[] array, int arrayIndex)
         {
             lock (_lock)
@@ -81,11 +112,24 @@ namespace CommonBase.ThreadSafe
             }
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through a copy of the collection.
+        /// </summary>
+        /// <returns>
+        /// An enumerator object that can be used to iterate through the collection.
+        /// </returns>
+        /// <remarks>
+        /// This method returns an enumerator that allows sequential iteration over a copy of the elements in the collection.
+        /// The copy of the collection is created by invoking the <see cref="Clone"/> method.
+        /// </remarks>
         public IEnumerator<T> GetEnumerator()
         {
             return Clone().GetEnumerator();
         }
 
+        /// Returns the index of the specified item in the list.
+        /// @param item The item to locate in the list.
+        /// @return The index of the item in the list, or -1 if the item is not found.
         public int IndexOf(T item)
         {
             var result = -1;
@@ -97,6 +141,11 @@ namespace CommonBase.ThreadSafe
             return result;
         }
 
+        /// <summary>
+        /// Inserts an element into the <see cref="List{T}"/> at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index at which the <paramref name="item"/> should be inserted.</param>
+        /// <param name="item">The object to insert into the <see cref="List{T}"/>.</param>
         public void Insert(int index, T item)
         {
             lock (_lock)
@@ -105,6 +154,12 @@ namespace CommonBase.ThreadSafe
             }
         }
 
+        /// <summary>
+        /// Removes the specified item from the internal list and returns a value indicating whether the operation was successful.
+        /// </summary>
+        /// <typeparam name="T">The type of the item.</typeparam>
+        /// <param name="item">The item to be removed.</param>
+        /// <returns>true if the item was successfully removed; otherwise, false.</returns>
         public bool Remove(T item)
         {
             var result = false;
@@ -116,6 +171,10 @@ namespace CommonBase.ThreadSafe
             return result;
         }
 
+        /// <summary>
+        /// Removes the element at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index of the element to remove.</param>
         public void RemoveAt(int index)
         {
             lock (_lock)
@@ -124,11 +183,25 @@ namespace CommonBase.ThreadSafe
             }
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through a collection.
+        /// </summary>
+        /// <returns>
+        /// An IEnumerator object that can be used to iterate through the collection.
+        /// </returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return Clone().GetEnumerator();
         }
 
+        /// <summary>
+        /// Returns a new list that contains the elements of the current list.
+        /// </summary>
+        /// <returns>A new list containing the elements of the current list.</returns>
+        /// <remarks>
+        /// This method creates a new list and copies all elements from the current list to the new list.
+        /// The new list is independent of the original list and can be modified without affecting the original list.
+        /// </remarks>
         public List<T> Clone()
         {
             var newList = new List<T>();

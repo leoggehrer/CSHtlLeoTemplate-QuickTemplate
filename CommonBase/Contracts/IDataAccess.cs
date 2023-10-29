@@ -16,7 +16,7 @@ namespace CommonBase.Contracts
         /// <param name="includeItems">The include items</param>
         /// <returns>Number of entities in the collection.</returns>
         Task<int> CountAsync(string predicate, string[] includeItems);
-
+        
         /// <summary>
         /// Returns the element of type T with the identification of id.
         /// </summary>
@@ -54,7 +54,7 @@ namespace CommonBase.Contracts
         /// <param name="includeItems">The include items</param>
         /// <returns>Subset in accordance with the parameters.</returns>
         Task<T[]> GetPageListAsync(string orderBy, int pageIndex, int pageSize, string[] includeItems);
-
+        
         /// <summary>
         /// Filters a sequence of elements based on a predicate.
         /// </summary>
@@ -81,14 +81,14 @@ namespace CommonBase.Contracts
         /// <param name="includeItems">The include items</param>
         /// <returns>Subset in accordance with the parameters.</returns>
         Task<T[]> QueryAsync(string predicate, string orderBy, int pageIndex, int pageSize, string[] includeItems);
-
+        
         /// <summary>
-        /// The elements are being tracked by the context but does not yet exist in the repository. 
+        /// The elements are being tracked by the context but does not yet exist in the repository.
         /// </summary>
         /// <param name="elements">The elements which are to be inserted.</param>
         /// <returns>The inserted elements.</returns>
         Task<IEnumerable<T>> InsertAsync(IEnumerable<T> elements);
-
+        
         /// <summary>
         /// The elements are being tracked by the context and exists in the repository, and some or all of its property values have been modified.
         /// </summary>
@@ -98,3 +98,5 @@ namespace CommonBase.Contracts
     }
 }
 //MdEnd
+
+

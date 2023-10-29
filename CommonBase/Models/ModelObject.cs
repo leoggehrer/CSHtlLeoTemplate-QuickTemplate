@@ -6,6 +6,9 @@ namespace CommonBase.Models
     using CommonBase.Extensions;
     using System.Collections;
 
+    /// <summary>
+    /// Represents a base class for model objects. This class implements the <see cref="IIdentifyable"/> interface.
+    /// </summary>
     public abstract partial class ModelObject : IIdentifyable
     {
         /// <summary>
@@ -30,7 +33,7 @@ namespace CommonBase.Models
             else if (obj1 != null && obj2 != null)
             {
                 if (obj1 is IEnumerable objEnum1
-                    && obj2 is IEnumerable objEnum2)
+                && obj2 is IEnumerable objEnum2)
                 {
                     var enumerable1 = objEnum1.Cast<object>().ToList();
                     var enumerable2 = objEnum2.Cast<object>().ToList();
@@ -57,3 +60,5 @@ namespace CommonBase.Models
     }
 }
 //MdEnd
+
+

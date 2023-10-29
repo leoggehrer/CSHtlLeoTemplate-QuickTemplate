@@ -4,6 +4,9 @@ using CommonBase.Contracts;
 
 namespace CommonBase.Models
 {
+    /// <summary>
+    /// Represents an abstract partial class for version management.
+    /// </summary>
     public abstract partial class VersionModel : ModelObject, IVersionable
     {
 #if ROWVERSION_ON
@@ -23,6 +26,11 @@ namespace CommonBase.Models
         }
 #endif
 
+        /// <summary>
+        /// Computes the hash code for the specified list of objects.
+        /// </summary>
+        /// <param name="values">A list of objects.</param>
+        /// <returns>The computed hash code.</returns>
         protected override int GetHashCode(List<object?> values)
         {
 #if ROWVERSION_ON
@@ -36,3 +44,5 @@ namespace CommonBase.Models
     }
 }
 //MdEnd
+
+

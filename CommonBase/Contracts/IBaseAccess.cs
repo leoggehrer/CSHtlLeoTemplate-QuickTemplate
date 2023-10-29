@@ -12,13 +12,13 @@ namespace CommonBase.Contracts
         /// Gets the maximum page size.
         /// </summary>
         int MaxPageSize { get; }
-
+        
         /// <summary>
         /// Creates a new element of type T.
         /// </summary>
         /// <returns>The new element.</returns>
         T Create();
-
+        
         /// <summary>
         /// Gets the number of quantity in the collection.
         /// </summary>
@@ -30,7 +30,7 @@ namespace CommonBase.Contracts
         /// <param name="predicate">A string to test each element for a condition.</param>
         /// <returns>Number of entities in the collection.</returns>
         Task<int> CountAsync(string predicate);
-
+        
         /// <summary>
         /// Returns the element of type T with the identification of id.
         /// </summary>
@@ -63,7 +63,7 @@ namespace CommonBase.Contracts
         /// <param name="pageSize">The pagesize.</param>
         /// <returns>Subset in accordance with the parameters.</returns>
         Task<T[]> GetPageListAsync(string orderBy, int pageIndex, int pageSize);
-
+        
         /// <summary>
         /// Filters a sequence of elements based on a predicate.
         /// </summary>
@@ -94,27 +94,27 @@ namespace CommonBase.Contracts
         /// <param name="pageSize">The pagesize.</param>
         /// <returns>Subset in accordance with the parameters.</returns>
         Task<T[]> QueryAsync(string predicate, string orderBy, int pageIndex, int pageSize);
-
+        
         /// <summary>
-        /// The element is being tracked by the context but does not yet exist in the repository. 
+        /// The element is being tracked by the context but does not yet exist in the repository.
         /// </summary>
         /// <param name="element">The element which is to be inserted.</param>
         /// <returns>The inserted element.</returns>
         Task<T> InsertAsync(T element);
-
+        
         /// <summary>
         /// The element is being tracked by the context and exists in the repository, and some or all of its property values have been modified.
         /// </summary>
         /// <param name="element">The element which is to be updated.</param>
         /// <returns>The the modified element.</returns>
         Task<T> UpdateAsync(T element);
-
+        
         /// <summary>
         /// Removes the element from the repository with the appropriate idelement.
         /// </summary>
         /// <param name="id">The identification.</param>
         Task DeleteAsync(IdType id);
-
+        
         /// <summary>
         /// Saves any changes in the underlying persistence.
         /// </summary>
@@ -123,3 +123,5 @@ namespace CommonBase.Contracts
     }
 }
 //MdEnd
+
+

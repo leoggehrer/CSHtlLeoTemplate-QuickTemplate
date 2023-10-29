@@ -20,12 +20,12 @@ namespace QuickTemplate.AspMvc.Models.Account
         /// The time of registration.
         /// </summary>
         public DateTime LoginTime { get; set; }
-
+        
         /// <summary>
         /// The time of logout.
         /// </summary>
         public DateTime? LogoutTime { get; set; }
-
+        
         /// <summary>
         /// The user name.
         /// </summary>
@@ -42,7 +42,12 @@ namespace QuickTemplate.AspMvc.Models.Account
         /// The login roles.
         /// </summary>
         public IdentityRole[] Roles { get; set; } = Array.Empty<IdentityRole>();
-
+        
+        /// <summary>
+        /// Creates a new instance of the <see cref="LoginSession"/> class based on the provided <paramref name="other"/> instance.
+        /// </summary>
+        /// <param name="other">The <see cref="Logic.Models.Account.LoginSession"/> instance to copy values from.</param>
+        /// <returns>A new instance of the <see cref="LoginSession"/> class.</returns>
         public static LoginSession Create(Logic.Models.Account.LoginSession other)
         {
             return new LoginSession
@@ -61,3 +66,4 @@ namespace QuickTemplate.AspMvc.Models.Account
 }
 #endif
 //MdEnd
+

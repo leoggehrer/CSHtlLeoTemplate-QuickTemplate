@@ -3,6 +3,9 @@
 #if ACCOUNT_ON
 namespace QuickTemplate.Logic.Entities.Account
 {
+    /// <summary>
+    /// Represents an user in the account system.
+    /// </summary>
 #if SQLITE_ON
     [System.ComponentModel.DataAnnotations.Schema.Table("Users")]
 #else
@@ -10,9 +13,18 @@ namespace QuickTemplate.Logic.Entities.Account
 #endif
     public partial class User : VersionExtendedEntity
     {
+        /// <summary>
+        /// Gets or sets the identity ID.
+        /// </summary>
         public IdType IdentityId { get; set; }
+        /// <summary>
+        /// Gets or sets the first name of the person.
+        /// </summary>
         [MaxLength(64)]
         public string FirstName { get; set; } = string.Empty;
+        /// <summary>
+        /// Gets or sets the last name of the person.
+        /// </summary>
         [MaxLength(64)]
         public string LastName { get; set; } = string.Empty;
     }

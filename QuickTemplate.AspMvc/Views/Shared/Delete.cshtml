@@ -2,12 +2,14 @@
 @model CommonBase.Contracts.IIdentifyable
 
 @{
-    var image = (string)(ViewBag.Image ?? "banner.jpg");
+    var title = "Delete";
+    var pageData = new QuickTemplate.AspMvc.Models.View.PageData { Name = title };
 
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = title;
 }
 
-<img class="card-img-top" src="@($"/img/{image}")" style="margin-top: -20px; margin-bottom: -50px" alt="Banner">
+@await Html.PartialAsync("_PageHeader", new QuickTemplate.AspMvc.Models.View.PageData { Name = "Delete"})
+
 <h1>Delete</h1>
 <h3>@Model!.GetType().Name</h3>
 <hr />
@@ -26,3 +28,5 @@
         @await Html.PartialAsync("_SubmitBack", new QuickTemplate.AspMvc.Models.View.SubmitBackCmd() { SubmitAction="Delete", SubmitText="Delete", SubmitCss="btn btn-danger", FromSubmitToBack=true })
     </form>
 </div>
+
+@await Html.PartialAsync("_PageFooter", pageData)

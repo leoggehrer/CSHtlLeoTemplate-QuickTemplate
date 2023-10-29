@@ -4,6 +4,10 @@
 namespace QuickTemplate.Logic.Entities.Account
 {
     using QuickTemplate.Logic.Contracts.Account;
+
+    /// <summary>
+    /// Represents a rule in the account system.
+    /// </summary>
 #if SQLITE_ON
     [System.ComponentModel.DataAnnotations.Schema.Table("Roles")]
 #else
@@ -13,10 +17,19 @@ namespace QuickTemplate.Logic.Entities.Account
     public partial class Role : VersionExtendedEntity, IRole
     {
 #if GUID_OFF
+        /// <summary>
+        /// Gets or sets the unique identifier.
+        /// </summary>
         public Guid Guid { get; internal set; }
 #endif
+        /// <summary>
+        /// Gets or sets the designation of a person.
+        /// </summary>
         [MaxLength(64)]
         public string Designation { get; set; } = string.Empty;
+        /// <summary>
+        /// Gets or sets the description.
+        /// </summary>
         [MaxLength(256)]
         public string? Description { get; set; }
     }

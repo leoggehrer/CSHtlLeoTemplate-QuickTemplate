@@ -15,16 +15,16 @@ namespace QuickTemplate.WebApi.Controllers
     [ApiController]
     [Route("api/[controller]")]
     public abstract partial class GenericController<TAccessModel, TEditModel, TOutModel> : ApiControllerBase, IDisposable
-        where TAccessModel : class, IIdentifyable, new()
-        where TEditModel : class, new()
-        where TOutModel : class, new()
+    where TAccessModel : class, IIdentifyable, new()
+    where TEditModel : class, new()
+    where TOutModel : class, new()
     {
         private bool disposedValue = false;
 #if ACCOUNT_ON
         private bool initSessionToken = false;
 #endif
         private IDataAccess<TAccessModel>? _dataAccess;
-
+        
         /// <summary>
         /// This property controls access to the logic operations.
         /// </summary>
@@ -44,6 +44,10 @@ namespace QuickTemplate.WebApi.Controllers
             init => _dataAccess = value;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenericController{TAccessModel, TEditModel, TOutModel}"/> class.
+        /// </summary>
+        /// <param name="dataAccess">The data access object used for accessing data.</param>
         internal GenericController(IDataAccess<TAccessModel> dataAccess)
         {
             DataAccess = dataAccess;
@@ -56,7 +60,7 @@ namespace QuickTemplate.WebApi.Controllers
         protected virtual TOutModel ToOutModel(TAccessModel accessModel)
         {
             var result = new TOutModel();
-
+            
             result.CopyFrom(accessModel);
             return result;
         }
@@ -68,14 +72,14 @@ namespace QuickTemplate.WebApi.Controllers
         protected virtual IEnumerable<TOutModel> ToOutModel(IEnumerable<TAccessModel> accessModels)
         {
             var result = new List<TOutModel>();
-
+            
             foreach (var accessModel in accessModels)
             {
                 result.Add(ToOutModel(accessModel));
             }
             return result;
         }
-
+        
         /// <summary>
         /// Gets the maximum size.
         /// </summary>
@@ -85,7 +89,7 @@ namespace QuickTemplate.WebApi.Controllers
         {
             return Task.Run(() => DataAccess.MaxPageSize);
         }
-
+        
         /// <summary>
         /// Gets the number of quantity in the collection.
         /// </summary>
@@ -95,7 +99,7 @@ namespace QuickTemplate.WebApi.Controllers
         public virtual async Task<ActionResult<int>> GetCountAsync()
         {
             var result = await DataAccess.CountAsync();
-
+            
             return Ok(result);
         }
         /// <summary>
@@ -108,10 +112,10 @@ namespace QuickTemplate.WebApi.Controllers
         public virtual async Task<ActionResult<int>> GetCountByAsync(string predicate)
         {
             var result = await DataAccess.CountAsync(HttpUtility.UrlDecode(predicate));
-
+            
             return Ok(result);
         }
-
+        
         /// <summary>
         /// Get a single model by Id.
         /// </summary>
@@ -124,10 +128,10 @@ namespace QuickTemplate.WebApi.Controllers
         public virtual async Task<ActionResult<TOutModel?>> GetByIdAsync(IdType id)
         {
             var accessModel = await DataAccess.GetByIdAsync(id);
-
+            
             return accessModel == null ? NotFound() : Ok(ToOutModel(accessModel));
         }
-
+        
 #if GUID_ON
         /// <summary>
         /// Get a single model by Id.
@@ -141,11 +145,11 @@ namespace QuickTemplate.WebApi.Controllers
         public virtual async Task<ActionResult<TOutModel?>> GetByGuidAsync(Guid id)
         {
             var accessModel = await DataAccess.GetByGuidAsync(id);
-
+            
             return accessModel == null ? NotFound() : Ok(ToOutModel(accessModel));
         }
 #endif
-
+        
         /// <summary>
         /// Gets a list of out models.
         /// </summary>
@@ -155,10 +159,10 @@ namespace QuickTemplate.WebApi.Controllers
         public virtual async Task<ActionResult<IEnumerable<TOutModel>>> GetAsync()
         {
             var accessModels = await DataAccess.GetAllAsync();
-
+            
             return Ok(ToOutModel(accessModels));
         }
-
+        
         /// <summary>
         /// Returns all out models in the collection.
         /// </summary>
@@ -169,10 +173,10 @@ namespace QuickTemplate.WebApi.Controllers
         public virtual async Task<ActionResult<IEnumerable<TOutModel>>> GetAsync(string orderBy)
         {
             var accessModels = await DataAccess.GetAllAsync(orderBy);
-
+            
             return Ok(ToOutModel(accessModels));
         }
-
+        
         /// <summary>
         /// Gets a subset of items from the repository.
         /// </summary>
@@ -184,10 +188,10 @@ namespace QuickTemplate.WebApi.Controllers
         public virtual async Task<ActionResult<IEnumerable<TOutModel>>> GetPageListAsync(int index, int size)
         {
             var accessModels = await DataAccess.GetPageListAsync(index, size);
-
+            
             return Ok(ToOutModel(accessModels));
         }
-
+        
         /// <summary>
         /// Gets a subset of items from the repository.
         /// </summary>
@@ -200,10 +204,10 @@ namespace QuickTemplate.WebApi.Controllers
         public virtual async Task<ActionResult<IEnumerable<TOutModel>>> GetPageListAsync(string orderBy, int index, int size)
         {
             var accessModels = await DataAccess.GetPageListAsync(orderBy, index, size);
-
+            
             return Ok(ToOutModel(accessModels));
         }
-
+        
         /// <summary>
         /// Filters a sequence of values based on a predicate.
         /// </summary>
@@ -214,10 +218,10 @@ namespace QuickTemplate.WebApi.Controllers
         public virtual async Task<ActionResult<IEnumerable<TOutModel>>> QueryAllAsync(string predicate)
         {
             var accessModels = await DataAccess.QueryAsync(HttpUtility.UrlDecode(predicate));
-
+            
             return Ok(accessModels.Select(e => ToOutModel(e)));
         }
-
+        
         /// <summary>
         /// Filters a sequence of values based on a predicate.
         /// </summary>
@@ -229,10 +233,10 @@ namespace QuickTemplate.WebApi.Controllers
         public virtual async Task<ActionResult<IEnumerable<TOutModel>>> QueryAllAsync(string predicate, string orderBy)
         {
             var accessModels = await DataAccess.QueryAsync(HttpUtility.UrlDecode(predicate), orderBy);
-
+            
             return Ok(accessModels.Select(e => ToOutModel(e)));
         }
-
+        
         /// <summary>
         /// Filters a sequence of values based on a predicate.
         /// </summary>
@@ -245,10 +249,10 @@ namespace QuickTemplate.WebApi.Controllers
         public virtual async Task<ActionResult<IEnumerable<TOutModel>>> QueryAsync(string predicate, int index, int size)
         {
             var accessModels = await DataAccess.QueryAsync(HttpUtility.UrlDecode(predicate), index, size);
-
+            
             return Ok(accessModels.Select(e => ToOutModel(e)));
         }
-
+        
         /// <summary>
         /// Filters a sequence of values based on a predicate.
         /// </summary>
@@ -262,10 +266,10 @@ namespace QuickTemplate.WebApi.Controllers
         public virtual async Task<ActionResult<IEnumerable<TOutModel>>> QueryAsync(string predicate, string orderBy, int index, int size)
         {
             var accessModels = await DataAccess.QueryAsync(HttpUtility.UrlDecode(predicate), orderBy, index, size);
-
+            
             return Ok(accessModels.Select(e => ToOutModel(e)));
         }
-
+        
         /// <summary>
         /// Adds a model.
         /// </summary>
@@ -282,12 +286,12 @@ namespace QuickTemplate.WebApi.Controllers
             {
                 var accessModel = new TAccessModel();
                 var insertAccessModel = default(TAccessModel);
-
+                
                 accessModel.CopyFrom(editModel);
                 insertAccessModel = await DataAccess.InsertAsync(accessModel);
-
+                
                 await DataAccess.SaveChangesAsync();
-
+                
                 return CreatedAtAction("Get", new { id = accessModel.Id }, ToOutModel(insertAccessModel));
             }
             catch (Exception ex)
@@ -295,7 +299,7 @@ namespace QuickTemplate.WebApi.Controllers
                 return BadRequest(ex.GetError());
             }
         }
-
+        
         /// <summary>
         /// Updates a model
         /// </summary>
@@ -315,7 +319,7 @@ namespace QuickTemplate.WebApi.Controllers
             {
                 var accessModel = await DataAccess.GetByIdAsync(id);
                 var updateAccessModel = default(TAccessModel);
-
+                
                 if (accessModel != null)
                 {
                     accessModel.CopyFrom(editModel);
@@ -329,7 +333,7 @@ namespace QuickTemplate.WebApi.Controllers
                 return BadRequest(ex.GetError());
             }
         }
-
+        
         /// <summary>
         /// Delete a single model by Id
         /// </summary>
@@ -346,7 +350,7 @@ namespace QuickTemplate.WebApi.Controllers
             try
             {
                 var accessModel = await DataAccess.GetByIdAsync(id);
-
+                
                 if (accessModel != null)
                 {
                     await DataAccess.DeleteAsync(accessModel.Id);
@@ -359,7 +363,7 @@ namespace QuickTemplate.WebApi.Controllers
                 return BadRequest(ex.GetError());
             }
         }
-
+        
         #region Dispose pattern
         /// <summary>
         /// Dispose(bool disposing) executes in two distinct scenarios.
@@ -383,7 +387,7 @@ namespace QuickTemplate.WebApi.Controllers
                 disposedValue = true;
             }
         }
-
+        
         /// <summary>
         /// A derived class should not be able to override this method.
         /// </summary>
