@@ -9,7 +9,7 @@ namespace QuickTemplate.MvvMApp.ViewModels
     public class BaseViewModel : ReactiveObject
     {
         public Window? Window { get; set; }
-        internal virtual void OnPropertyChanged([CallerMemberName]string? propertyName = null)
+        internal virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             this.RaisePropertyChanged(propertyName);
         }

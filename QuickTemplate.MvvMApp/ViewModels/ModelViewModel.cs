@@ -1,14 +1,11 @@
 ﻿//@BaseCode
 //MdStart
-using CommonBase.Extensions;
 using QuickTemplate.MvvMApp.Views;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace QuickTemplate.MvvMApp.ViewModels
 {
-    using TGenre = Models.ModelObject;
-
     public abstract partial class ModelViewModel<TModel, TEntity> : BaseViewModel
         where TModel : Models.ModelObject, new()
         where TEntity : Logic.Models.ModelObject, new()

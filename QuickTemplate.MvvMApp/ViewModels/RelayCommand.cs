@@ -9,7 +9,7 @@ namespace QuickTemplate.MvvMApp.ViewModels
     {
         private readonly Action<object?> _execute;
         private readonly Predicate<object?>? _canExecute;
-        
+
         private RelayCommand(Action<object?> execute, Predicate<object?>? canExecute)
         {
             _execute = execute ?? throw new ArgumentNullException(nameof(execute));
@@ -31,7 +31,7 @@ namespace QuickTemplate.MvvMApp.ViewModels
         {
             CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
-        
+
         #region Factory mothods
         public static ICommand Create(Action<object?> execute)
         {

@@ -10,9 +10,5 @@ global using IdType = System.Int32;
     global using IdType = System.Int32;
 #endif
 
-global using CommonBase;
 global using CommonBase.Extensions;
-global using BaseContracts = CommonBase.Contracts;
-global using BaseModels = CommonBase.Models;
-global using BaseServices = CommonBase.Services;
 //MdEnd

@@ -71,7 +71,7 @@ namespace QuickTemplate.MvvMApp.Views
             msgbox.Closed += delegate { tcs.TrySetResult(result); };
             if (parent != null)
                 msgbox.ShowDialog(parent);
-            else 
+            else
                 msgbox.Show();
 
             return tcs.Task;
